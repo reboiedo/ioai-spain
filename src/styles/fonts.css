@@ -1,0 +1,115 @@
+html {
+  font-family: var(--font-sans);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+}
+
+h1,
+.heading-3xl {
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+}
+
+h2,
+.heading-2xl {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+}
+h3,
+.heading-xl {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+}
+h4,
+.heading-l {
+  font-family: var(--font-display);
+  font-size: var(--font-size-l);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+}
+h5,
+.heading-m {
+  font-family: var(--font-display);
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+h6,
+.heading-16 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+.heading-14 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+.heading-12 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+.text-xl {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-snug);
+}
+
+.text-l {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-snug);
+}
+
+.text-m {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-normal);
+}
+
+.text-base {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-normal);
+}
+
+.text-18 {
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-normal);
+}
+
+.text-15 {
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-normal);
+}
+
+.text-12 {
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-normal);
+}
+
+/* Font Family Utilities */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}

@@ -1,0 +1,139 @@
+---
+import Eyebrow from './Eyebrow.astro';
+import ioaiLogo from '../assets/ioai-logo.svg';
+import harbourLogo from '../assets/harbour-space-logo.svg';
+import leaguesLogo from '../assets/icons/leagues-logo.svg';
+
+export interface Props {
+  t: {
+    sponsors: {
+      eyebrow: string;
+      sectionTitle: string;
+      intro: string;
+      contactEmail: string;
+    };
+  };
+}
+
+const { t } = Astro.props;
+---
+
+<section class="sponsors" id="sponsors">
+  <div class="container">
+    <div class="content">
+      <!-- <Eyebrow text={t.sponsors.eyebrow} /> -->
+      <h2 class="section-title">{t.sponsors.sectionTitle}</h2>
+      <p class="section-intro">
+        {t.sponsors.intro}
+        <a href={`mailto:${t.sponsors.contactEmail}`} class="contact-link">
+          {t.sponsors.contactEmail}
+        </a>
+      </p>
+    </div>
+
+    <div class="sponsors-grid">
+      <!-- IOAI Logo -->
+      <div class="sponsor-item">
+        <img src={ioaiLogo.src} alt="IOAI - International Olympiad in Artificial Intelligence" class="sponsor-logo" />
+      </div>
+
+      <!-- Harbour.Space Logo -->
+      <div class="sponsor-item">
+        <img src={harbourLogo.src} alt="Harbour.Space - Institute of Technology" class="sponsor-logo" />
+      </div>
+
+      <!-- Leagues of Code Logo -->
+      <div class="sponsor-item">
+        <img src={leaguesLogo.src} alt="Leagues of Code" class="sponsor-logo" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sponsors {
+    padding: var(--section-block) var(--section-inline);
+    background-color: var(--background-primary);
+    /* border-top: 16px solid var(--color-primary); */
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-l);
+  }
+
+  .content {
+    text-align: left;
+  }
+
+  .section-title {
+    color: var(--text-primary);
+    margin-bottom: var(--space-s);
+  }
+
+  .section-intro {
+    color: var(--text-secondary);
+    max-width: 600px;
+  }
+
+  .contact-link {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .contact-link:hover {
+    text-decoration-color: var(--color-primary);
+  }
+
+  .sponsors-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-l);
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .sponsor-item {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .sponsor-logo {
+    height: auto;
+    max-height: 48px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  @media (max-width: 1199px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+    
+  }
+
+
+  @media (max-width: 809px) { /* mobile only */
+    
+    .sponsors-grid {
+      display: flex;
+    
+      gap: var(--space-xs);
+      max-width: 100%;
+    }
+
+
+    .sponsor-logo {
+      max-height: 60px;
+      max-width: 104px;
+    }
+  }
+</style>

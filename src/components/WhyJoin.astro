@@ -1,0 +1,210 @@
+---
+import Eyebrow from './Eyebrow.astro';
+import trophyIcon from '../assets/icons/icon.Trophy.svg';
+import skillsIcon from '../assets/icons/icon.Skills.svg';
+import standOutIcon from '../assets/icons/icon.Stand Out.svg';
+import diversityIcon from '../assets/icons/icon.Diversity.svg';
+
+export interface Props {
+  t: {
+    whyJoin: {
+      eyebrow: string;
+      sectionTitle: string;
+      intro: string;
+      benefits: {
+        represent: {
+          title: string;
+          description: string;
+        };
+        skills: {
+          title: string;
+          description: string;
+        };
+        standOut: {
+          title: string;
+          description: string;
+        };
+        community: {
+          title: string;
+          description: string;
+        };
+      };
+    };
+  };
+}
+
+const { t } = Astro.props;
+---
+
+<section class="why-join" id="why-join">
+  <div class="container">
+    <div class="top">
+      <Eyebrow text={t.whyJoin.eyebrow} />
+      <h2 class="section-title">{t.whyJoin.sectionTitle}</h2>
+      <p class="section-intro">{t.whyJoin.intro}</p>
+    </div>
+    <div class="content-grid">
+      <!-- Left side: Content -->
+      <div class="content">
+
+        <div class="benefits-list">
+          <div class="benefit-item">
+            <img src={trophyIcon.src} alt="" class="benefit-icon" />
+            <div class="benefit-content">
+              <h3 class="benefit-title">{t.whyJoin.benefits.represent.title}</h3>
+              <p class="benefit-description text-base">{t.whyJoin.benefits.represent.description}</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <img src={skillsIcon.src} alt="" class="benefit-icon" />
+            <div class="benefit-content">
+              <h3 class="benefit-title">{t.whyJoin.benefits.skills.title}</h3>
+              <p class="benefit-description text-base">{t.whyJoin.benefits.skills.description}</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <img src={standOutIcon.src} alt="" class="benefit-icon" />
+            <div class="benefit-content">
+              <h3 class="benefit-title">{t.whyJoin.benefits.standOut.title}</h3>
+              <p class="benefit-description text-base">{t.whyJoin.benefits.standOut.description}</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <img src={diversityIcon.src} alt="" class="benefit-icon" />
+            <div class="benefit-content">
+              <h3 class="benefit-title">{t.whyJoin.benefits.community.title}</h3>
+              <p class="benefit-description text-base">{t.whyJoin.benefits.community.description}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right side: Image placeholder -->
+      <div class="image-container">
+        <div class="image-placeholder">
+          <span>Image Placeholder</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .why-join {
+    padding: var(--section-block) var(--section-inline);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--space-l);
+    align-items: center;
+    margin-top: var(--space-l);
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .top {
+    max-width: 760px;
+    display: ;
+  }
+
+
+  .section-intro {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+    color: var(--text-secondary);
+    padding-top: var(--space-m);
+  }
+
+  .benefits-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+  }
+
+  .benefit-item {
+    display: flex;
+    gap: var(--space-s);
+    align-items: flex-start;
+    max-width: 560px;
+  }
+
+  .benefit-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .benefit-content {
+    flex: 1;
+  }
+
+  .benefit-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-bottom: var(--space-3xs);
+  }
+
+
+  .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .image-placeholder {
+    width: 100%;
+    aspect-ratio: 4/5;
+    background: var(--background-elevated);
+    border: 2px dashed var(--border-secondary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+  }
+
+  @media (max-width: 809px) { /* mobile only */
+    .content-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+
+    .image-container {
+      order: -1;
+    }
+
+    .image-placeholder {
+      aspect-ratio: 3/2;
+    }
+
+    .section-title {
+      font-size: var(--font-size-2xl);
+    }
+
+    .benefit-item {
+      gap: var(--space-xs);
+    }
+
+    .benefit-icon {
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>

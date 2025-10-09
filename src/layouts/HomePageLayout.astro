@@ -1,0 +1,83 @@
+---
+import { getCollection, render } from 'astro:content';
+import Hero from '@/components/Hero.astro';
+import About from '@/components/About.astro';
+import WhyJoin from '@/components/WhyJoin.astro';
+import HowItWorks from '@/components/HowItWorks.astro';
+import Eligibility from '@/components/Eligibility.astro'
+import FAQ from '@/components/FAQ.astro';
+import FinalCTA from '@/components/FinalCTA.astro'
+import RegistrationPopover from '@/components/RegistrationPopover.astro';
+import Sponsors from '@/components/Sponsors.astro';
+import Footer from '@/components/Footer.astro';
+import type { useTranslations, Language } from '../i18n';
+import Banner from '@/components/Banner.astro';
+
+export interface Props {
+  t: ReturnType<typeof useTranslations>;
+}
+
+const { t } = Astro.props;
+const locale = (Astro.currentLocale || 'en') as Language;
+
+// Fetch and render Rounds for the current language
+const rounds = await getCollection('rounds', ({ id }) => {
+  return id.startsWith(`${locale}/`);
+});
+
+const sortedRounds = rounds.sort((a, b) => a.data.roundNumber - b.data.roundNumber);
+
+const renderedRounds = await Promise.all(
+  sortedRounds.map(async (round) => {
+    const { Content } = await render(round);
+    return {
+      title: round.data.title,
+      date: round.data.date,
+      introSentence: round.data.introSentence,
+      qualification: round.data.qualification,
+      phase: round.data.phase,
+      Content
+    };
+  })
+);
+
+// Fetch and render FAQs for the current language
+const faqs = await getCollection('faq', ({ id }) => {
+  return id.startsWith(`${locale}/`);
+});
+
+const sortedFAQs = faqs.sort((a, b) => a.data.order - b.data.order);
+
+const renderedFAQs = await Promise.all(
+  sortedFAQs.map(async (faq) => {
+    const { Content } = await render(faq);
+    return {
+      question: faq.data.question,
+      Content
+    };
+  })
+);
+---
+
+<Hero t={t} />
+<Banner t={t} />
+<About t={t}/>
+<WhyJoin t={t} />
+<Eligibility t={t} />
+<HowItWorks t={t} rounds={renderedRounds} />
+<Sponsors t={t} />
+<FAQ t={t} faqs={renderedFAQs} />
+<FinalCTA t={t} />
+<Footer t={t} />
+
+<!-- Registration Popover -->
+<RegistrationPopover t={t} />
+
+<!-- Add more sections as needed -->
+<!-- <section class="features">
+  Add features content here
+</section>
+
+<section class="timeline">
+  Add timeline content here
+</section> -->

@@ -1,0 +1,142 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { LANGUAGES, useTranslations } from '../i18n';
+import type { Language } from '../i18n';
+import Button from '@/components/ui/Button.astro';
+import Dropdown from '@/components/ui/Dropdown.astro';
+
+// Get current locale from Astro's i18n
+const currentLocale = (Astro.currentLocale || 'en') as Language;
+const t = useTranslations(currentLocale);
+
+// Define available languages using the centralized language list
+const languageOptions = LANGUAGES.map(code => ({
+  value: getRelativeLocaleUrl(code, ''),
+  label: code === 'en' ? 'EN' : 'ES',
+  selected: currentLocale === code
+}));
+
+// Define navigation items with proper section IDs
+const navItems = [
+  { label: t.ui.nav.aboutIOAI, href: '#about' },
+  { label: t.ui.nav.whyJoin, href: '#why-join' },
+  { label: t.ui.nav.programme, href: '#how-it-works' },
+  { label: t.ui.nav.eligibility, href: '#eligibility' },
+  { label: t.ui.nav.faq, href: '#faq' }
+];
+---
+
+<nav>
+  <div class="nav-container">
+    <!-- Logo/Brand (you can add your logo here) -->
+    <div class="nav-brand">
+      <a href={getRelativeLocaleUrl(currentLocale, '')}>IOAI Spain</a>
+    </div>
+
+    <!-- Navigation items -->
+    <ul class="nav-items">
+      {navItems.map(item => (
+        <li>
+          <Button variant="text" size="small" href={item.href}>{item.label}</Button>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Right side: Language switcher and CTA -->
+    <div class="nav-right">
+      <!-- Language switcher dropdown -->
+      <Dropdown
+        options={languageOptions}
+        size="small"
+        ariaLabel={t.ui.nav.selectLanguage}
+        onChange="window.location.href = this.value"
+      />
+
+      <!-- CTA Button -->
+      <Button variant="primary" size="small" popoverTarget="registration-popover" popoverAction="show">
+        {t.ui.nav.joinNow}
+      </Button>
+    </div>
+  </div>
+</nav>
+
+<style>
+  nav {
+    padding: 1rem var(--section-inline);
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .nav-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .nav-brand a {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .nav-items {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    nav {
+      padding: var(--space-2xs);
+    }
+
+    .nav-container {
+      /* Keep horizontal layout */
+      flex-direction: row;
+      gap: 1rem;
+    }
+
+    .nav-items {
+      /* Hide navigation items on mobile */
+      display: none;
+    }
+
+    .nav-right {
+      /* Keep language picker and CTA visible */
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-brand a {
+      font-size: 1.125rem; /* Slightly smaller on mobile */
+    }
+
+    /* .language-switcher select {
+      padding: var(--space-xs) calc(var(--space-xs) * 1.5);
+      font-size: var(--font-size-sm);
+      min-height: 40px;
+    } */
+  }
+</style>

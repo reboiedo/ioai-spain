@@ -1,0 +1,35 @@
+---
+export interface Props {
+  text: string;
+  as?: 'span' | 'p' | 'div';
+}
+
+const { text, as: Element = 'span' } = Astro.props;
+---
+
+<Element class="eyebrow">
+  {text}
+</Element>
+
+<style>
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-14);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-primary);
+    margin: 0 0 var(--space-xs) 0;
+    display: block;
+    border: 1px solid var(--color-primary);
+    border-radius: 4px;
+    line-height: var(--line-height-tight);
+    /* align-self: flex-start; */
+    padding: 4px 8px;
+    width: max-content;
+    flex-shrink: 0;
+  }
+
+
+
+</style>

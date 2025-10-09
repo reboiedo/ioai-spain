@@ -1,0 +1,121 @@
+---
+export interface Props {
+  phaseNumber: string;
+  title: string;
+  description: string;
+  background?: 'purple' | 'blue' | 'green' | 'white';
+}
+
+const { phaseNumber, title, description, background = 'white' } = Astro.props;
+---
+
+<div class={`phase phase--${background}`}>
+  <div class="phase-head">
+    <!-- Left side: Phase header + rounds -->
+    <div class="phase-left">
+      <div class="phase-header">
+        <span class="phase-number">{phaseNumber}</span>
+        <h3 class="phase-title">{title}</h3>
+      </div>
+
+    </div>
+    
+    <!-- Right side: Phase description -->
+    <div class="phase-right">
+      <p class="phase-description text-base">{description}</p>
+    </div>
+  </div>
+  <div class="rounds">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .phase {
+    background: var(--background-elevated);
+    border-radius: var(--radius-lg);
+  }
+
+  /* Background color variants */
+  .phase--white {
+    background-color: var(--background-elevated);
+  }
+
+  .phase--purple {
+    background: var(--background-purple);
+  }
+
+  .phase--blue {
+    background: var(--background-blue);
+  }
+
+  .phase--green {
+    background: var(--background-green);
+  }
+
+  .phase-head {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    border-bottom: 1px solid var(--border-primary);
+    padding: var(--card-block) var(--card-inline);
+  }
+
+  .phase-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+  }
+
+  .phase-right {
+    display: flex;
+    max-width: 600px;
+    align-items: flex-start;
+    padding-top: var(--space-m);
+  }
+
+  .phase-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .phase-number {
+    color: var(--color-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    margin: 0;
+  }
+
+  .phase-title {
+    margin: 0;
+  }
+
+  .phase-description {
+    margin: 0;
+  }
+
+  .rounds {
+    display: flex;
+    flex-direction: column;
+    padding: var(--card-block) var(--card-inline);
+  }
+
+  @media (max-width: 768px) {
+  
+
+    .phase-content {
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+    }
+
+    .phase-right {
+      padding-top: 0;
+      padding-bottom: var(--space-m);
+    }
+
+    .phase-title {
+      font-size: var(--font-size-xl);
+    }
+  }
+</style>

@@ -1,0 +1,45 @@
+/* @link https://utopia.fyi/space/calculator?c=360,16,1.2,1240,24,1.285,5,0,810&s=0.75|0.5|0.25,1.5|2|3|4|6|12,s-l&g=s,l,xl,12 */
+
+:root {
+  /* Fonts */
+  --step-0: clamp(1rem, 1rem + 0vw, 1rem);
+  --step-1: clamp(1.2rem, 1.1652rem + 0.1545vw, 1.285rem);
+  --step-2: clamp(1.44rem, 1.3536rem + 0.384vw, 1.6512rem);
+  --step-3: clamp(1.728rem, 1.5669rem + 0.716vw, 2.1218rem);
+  --step-4: clamp(2.0736rem, 1.8065rem + 1.1872vw, 2.7265rem);
+  --step-5: clamp(2.4883rem, 2.073rem + 1.846vw, 3.5036rem);
+
+  /* Spacing */
+  --space-3xs: clamp(0.25rem, 0.1989rem + 0.2273vw, 0.375rem);
+  --space-2xs: clamp(0.5rem, 0.3977rem + 0.4545vw, 0.75rem);
+  --space-xs: clamp(0.75rem, 0.5966rem + 0.6818vw, 1.125rem);
+  --space-s: clamp(1rem, 0.7955rem + 0.9091vw, 1.5rem);
+  --space-m: clamp(1.5rem, 1.1932rem + 1.3636vw, 2.25rem);
+  --space-l: clamp(2rem, 1.5909rem + 1.8182vw, 3rem);
+  --space-xl: clamp(3rem, 2.3864rem + 2.7273vw, 4.5rem);
+  --space-2xl: clamp(4rem, 3.1818rem + 3.6364vw, 6rem);
+  --space-3xl: clamp(6rem, 4.7727rem + 5.4545vw, 9rem);
+  --space-4xl: clamp(12rem, 9.5455rem + 10.9091vw, 18rem);
+
+  /* One-up pairs */
+  --space-3xs-2xs: clamp(0.25rem, 0.0455rem + 0.9091vw, 0.75rem);
+  --space-2xs-xs: clamp(0.5rem, 0.2443rem + 1.1364vw, 1.125rem);
+  --space-xs-s: clamp(0.75rem, 0.4432rem + 1.3636vw, 1.5rem);
+  --space-s-m: clamp(1rem, 0.4886rem + 2.2727vw, 2.25rem);
+  --space-m-l: clamp(1.5rem, 0.8864rem + 2.7273vw, 3rem);
+  --space-l-xl: clamp(2rem, 0.9773rem + 4.5455vw, 4.5rem);
+  --space-xl-2xl: clamp(3rem, 1.7727rem + 5.4545vw, 6rem);
+  --space-2xl-3xl: clamp(4rem, 1.9545rem + 9.0909vw, 9rem);
+  --space-3xl-4xl: clamp(6rem, 1.0909rem + 21.8182vw, 18rem);
+
+  /* Custom pairs */
+  --space-s-l: clamp(1rem, 0.1818rem + 3.6364vw, 3rem);
+
+  /* Breakpoints - Use these values in your media queries
+     Desktop: 1200px+
+     Tablet: 810px - 1199px
+     Mobile: 809px and below
+
+     Usage: @media (max-width: 1199px) or @media (max-width: 809px)
+  */
+}

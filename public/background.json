@@ -1,0 +1,192 @@
+{
+  "history": [
+    {
+      "breakpoints": [],
+      "visible": true,
+      "aspectRatio": 1,
+      "userDownsample": 1,
+      "layerType": "effect",
+      "type": "gradient",
+      "usesPingPong": false,
+      "speed": 0.25,
+      "trackMouse": 0,
+      "trackAxes": "xy",
+      "mouseMomentum": 0,
+      "texture": false,
+      "animating": false,
+      "isMask": 0,
+      "compiledFragmentShaders": [
+        "#version 300 es\nprecision highp float;in vec2 vTextureCoord;uniform vec2 uMousePos;vec3 getColor(int index) { switch(index) { case 0: return vec3(0, 0, 0); case 1: return vec3(0, 0, 0); case 2: return vec3(0, 0, 0); case 3: return vec3(0, 0, 0); case 4: return vec3(0, 0, 0); case 5: return vec3(0, 0, 0); case 6: return vec3(0, 0, 0); case 7: return vec3(0, 0, 0); case 8: return vec3(0, 0, 0); case 9: return vec3(0, 0, 0); case 10: return vec3(0, 0, 0); case 11: return vec3(0, 0, 0); case 12: return vec3(0, 0, 0); case 13: return vec3(0, 0, 0); case 14: return vec3(0, 0, 0); case 15: return vec3(0, 0, 0); default: return vec3(0.0); } }const float PI = 3.14159265;vec2 rotate(vec2 coord, float angle) { float s = sin(angle); float c = cos(angle); return vec2( coord.x * c - coord.y * s, coord.x * s + coord.y * c ); }out vec4 fragColor;vec3 getColor(vec2 uv) {return vec3(0, 0, 0); }void main() {vec2 uv = vTextureCoord; vec2 pos = vec2(0.5, 0.5) + mix(vec2(0), (uMousePos-0.5), 0.0000); uv -= pos; uv /= (0.5000*2.); uv = rotate(uv, (0.0000 - 0.5) * 2. * PI); vec4 color = vec4(getColor(uv), 1.); fragColor = color; }"
+      ],
+      "compiledVertexShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 aVertexPosition; in vec2 aTextureCoord;uniform mat4 uMVMatrix; uniform mat4 uPMatrix;out vec2 vTextureCoord; out vec3 vVertexPosition;void main() { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = aTextureCoord; }"
+      ],
+      "data": {
+        "downSample": 0.5,
+        "depth": false,
+        "uniforms": {},
+        "isBackground": true
+      },
+      "id": "effect"
+    },
+    {
+      "breakpoints": [],
+      "visible": true,
+      "aspectRatio": 1,
+      "userDownsample": 1,
+      "layerType": "effect",
+      "type": "sdf_shape",
+      "usesPingPong": false,
+      "texture": false,
+      "speed": 0,
+      "trackMouseMove": 0.1,
+      "trackAxes": "xy",
+      "mouseMomentum": 1,
+      "trackMouse": 0.25,
+      "animating": false,
+      "isMask": 0,
+      "compiledFragmentShaders": [
+        "#version 300 es\nprecision highp float; precision highp int;in vec2 vTextureCoord; uniform sampler2D uTexture;uniform float uTime;uniform vec2 uMousePos; uniform vec2 uResolution;uvec2 pcg2d(uvec2 v) { v = v * 1664525u + 1013904223u; v.x += v.y * v.y * 1664525u + 1013904223u; v.y += v.x * v.x * 1664525u + 1013904223u; v ^= v >> 16; v.x += v.y * v.y * 1664525u + 1013904223u; v.y += v.x * v.x * 1664525u + 1013904223u; return v; }float randFibo(vec2 p) { uvec2 v = floatBitsToUint(p); v = pcg2d(v); uint r = v.x ^ v.y; return float(r) / float(0xffffffffu); }const float PI = 3.141592653; const float PI2 = 6.283185306; const int DISP_STEPS = 12; const vec3 viewDir = vec3(0,0, -4.25);ivec2 customTexSize; float customTexAspect;const mat3 ROT_Y_90 = mat3( 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0 );const mat3 ROT_Z_90 = mat3( 0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 );const mat3 ROT_X_90 = mat3( 1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 );mat3 rotY(float ang) { float c = cos(ang), s = sin(ang); return mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c); }mat3 rotX(float ang) { float c = cos(ang), s = sin(ang); return mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c); }mat3 rotZ(float ang) { float c = cos(ang), s = sin(ang); return mat3(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0); }vec3 twistY(vec3 p, float amount) { float c = cos(amount * p.y); float s = sin(amount * p.y); mat2 m = mat2(c, -s, s, c); return vec3(m * p.xz, p.y); }vec3 twistX(vec3 p, float amount) { float c = cos(amount * p.x); float s = sin(amount * p.x); mat2 m = mat2(c, -s, s, c); return vec3(p.x, m * p.yz); }float sdfCylinder(vec3 p, float radius, float height) { vec2 d = abs(vec2(length(p.xz) - radius, p.y)) - vec2(radius, height * 0.5); return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)); }float sdStar5(vec2 p, float r, float rf) { const vec2 k1 = vec2(0.809016994375, -0.587785252292); const vec2 k2 = vec2(-k1.x,k1.y); p.x = abs(p.x); p -= 2.0*max(dot(k1,p),0.0)*k1; p -= 2.0*max(dot(k2,p),0.0)*k2; p.x = abs(p.x); p.y -= r; vec2 ba = rf*vec2(-k1.y,k1.x) - vec2(0,1); float h = clamp( dot(p,ba)/dot(ba,ba), 0.0, r ); return length(p-ba*h) * sign(p.y*ba.x-p.x*ba.y); }vec3 getRepeat(vec3 p) { float spacing = (0.0000 + 0.1500 * 0.38) * 8.; return p; }vec3 getThreeDRepeat(vec3 p) { float spacing = (0.0000 + 0.1500 * 0.38) * 8.; return p; }vec3 getAdjustedP(vec3 p) { float scale = max(0.6000, 0.000000001); float scaleFactor = 1.0/scale; vec3 adjustedP = p * scaleFactor;vec2 twist = vec2(0, 0);adjustedP.xy *= vec2(uResolution.x / uResolution.y, 1);adjustedP *= (1. + (0.1500 + 0.01));vec2 mousePos = mix(vec2(0), uMousePos - 0.5, 0.2500); vec2 axis = vec2(-1. * vec3(0.5, 0.75, 0).y - 1. + mousePos.y/PI, vec3(0.5, 0.75, 0).x + mousePos.x/PI) * 2.;adjustedP = getRepeat(adjustedP);float baseTime = uTime * 0.02; float timeX = vec3(0, 1, 0).x * baseTime; float timeY = vec3(0, 1, 0).y * baseTime; float timeZ = vec3(0, 1, 0).z * baseTime;mat3 rotYMat = rotY(axis.y * PI); mat3 rotXMat = rotX(axis.x * PI); mat3 rotZMat = rotZ(vec3(0.5, 0.75, 0).z * 2.0 * PI);mat3 combinedRotation = rotZMat * rotYMat * rotXMat; mat3 combinedAnimation = rotZ(timeZ) * rotX(timeX) * rotY(timeY);adjustedP = combinedRotation * adjustedP; adjustedP = combinedAnimation * adjustedP; adjustedP = getThreeDRepeat(adjustedP); adjustedP = mix(adjustedP, twistY(adjustedP, -1.0 * twist.y), step(0.0, abs(twist.y))); adjustedP = mix(adjustedP, twistX(adjustedP, -1.0 * twist.x), step(0.0, abs(twist.x)));return adjustedP; }float getMergedSDF(vec3 p) { p = getAdjustedP(p); return sdfCylinder(p, 0.7, 0.05 + 0.25 * 0.0000); }vec3 calculateNormal(vec3 p, float eps) { vec2 e = vec2(1.0, -1.0) * eps * 0.5; return normalize( e.xyy * getMergedSDF(p + e.xyy) + e.yyx * getMergedSDF(p + e.yyx) + e.yxy * getMergedSDF(p + e.yxy) + e.xxx * getMergedSDF(p + e.xxx) ); }float scene(vec3 p) { return max(0.0000000001, getMergedSDF(p) - (0.1500 + 0.005)) * max(0.6000, 0.000000001); }const int STEPS = 128; const float MAX_DISTANCE = 100.0;vec4 rayMarch(vec3 ro, vec3 rd) { float pixelSize = 0.0025; float traveled = 0.; vec3 entryPoint = vec3(0.0); vec3 entryNormal = vec3(0.0); float partialAlpha = 0.0; float lastDistance = 0.0; float smoothing = mix(1., 4., 1.0000);for (int i = 0; i < STEPS; ++i) { vec3 currentPos = ro + rd * traveled; float distance = scene(currentPos); float progress = float(i)/float(STEPS); float step = distance * mix(1., 1.5, progress);if (distance > MAX_DISTANCE) break;if (distance < pixelSize) { partialAlpha = 1.; entryPoint = currentPos; entryNormal = calculateNormal(entryPoint, pixelSize * smoothing); break; }lastDistance = distance;traveled += max(step, pixelSize); if (traveled > MAX_DISTANCE) break; }if (partialAlpha == 0.0) { return texture(uTexture, vTextureCoord); }vec3 samplePosition = mix(rd, entryPoint, 0.0000);vec3 refractionColor = vec3(0.0); vec3 lightDir = vec3(((vec2(vec3(0.25, 0.25, -3).x, 1.-vec3(0.25, 0.25, -3).y) - 0.333) * 3.) - vec2(0.5, 0.5), vec3(0.25, 0.25, -3).z); vec3 normLightDir = normalize(lightDir);float lightAndShadow = dot(entryNormal, normLightDir); vec3 lightColor = mix(vec3(1), vec3(1, 1, 1), 1. - 1.0000); vec3 fresnelEffect = vec3(0.0);vec3 specularEffect = vec3(0.0);vec3 halfwayDir = normalize(lightDir + rd); float specFactor = pow(max(dot(entryNormal, halfwayDir), 0.0), 64.0 * 1.0000 + 0.01); specularEffect = specFactor * 1.0000 * lightColor;vec3 combinedEffects = fresnelEffect + specularEffect; vec3 finalColor = mix(refractionColor, vec3(1, 1, 1) * lightAndShadow, 1.0000); finalColor += combinedEffects;vec4 outputColor = vec4(finalColor, 1.);return outputColor; }out vec4 fragColor;void main() { vec4 col = vec4(0); vec4 bg = texture(uTexture, vTextureCoord);if(0.6000 <= 0.0001 || 1.0000 <= 0.0001) { col = vec4(0); if(1 == 1) { col = bg; } fragColor = col; return; }vec2 pos = vec2(0.5, 0.5) + mix(vec2(0), (uMousePos-0.5), 0.1000); vec2 uv = vTextureCoord - pos; float fovFactor = tan(radians(20.) * 0.5); vec3 rd = vec3(uv * fovFactor, 0.5); col = rayMarch(viewDir, rd); float dither = (randFibo(vTextureCoord.xy) - 0.5) / 255.0; col += dither;col = mix(bg, col, 1.0000); fragColor = col;}"
+      ],
+      "compiledVertexShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 aVertexPosition; in vec2 aTextureCoord;uniform mat4 uMVMatrix; uniform mat4 uPMatrix; uniform mat4 uTextureMatrix;out vec2 vTextureCoord; out vec3 vVertexPosition;void main() { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = (uTextureMatrix * vec4(aTextureCoord, 0.0, 1.0)).xy; }"
+      ],
+      "data": { "depth": false, "uniforms": {}, "isBackground": false },
+      "id": "effect1"
+    },
+    {
+      "breakpoints": [],
+      "visible": true,
+      "aspectRatio": 1,
+      "userDownsample": 1,
+      "layerType": "effect",
+      "type": "swirl",
+      "usesPingPong": false,
+      "speed": 0.5,
+      "trackMouse": 0.1,
+      "trackAxes": "xy",
+      "mouseMomentum": 1,
+      "texture": false,
+      "animating": true,
+      "isMask": 0,
+      "compiledFragmentShaders": [
+        "#version 300 es\nprecision mediump float; in vec3 vVertexPosition; in vec2 vTextureCoord; uniform sampler2D uTexture; uniform float uTime; uniform vec2 uMousePos; uniform vec2 uResolution;out vec4 fragColor; void main() { vec2 uv = vTextureCoord; float angle = 1.0000 * 10.; vec2 originalUV = uv; vec2 pos = vec2(0.5, 0.5) + mix(vec2(0), (uMousePos-0.5), 0.1000);uv -= pos; vec2 R = vec2(uv.x * uResolution.x / uResolution.y, uv.y); float distanceToCenter = length(R); distanceToCenter += 0.0000*0.5; if (distanceToCenter <= 0.5000) { float rot = atan(R.y, R.x) + angle * smoothstep(0.5000, 0., distanceToCenter); uv = vec2(cos(rot + uTime / 20. + 0.0000 * 6.28), sin(rot + uTime / 20. + 0.0000 * 6.28)); uv = distanceToCenter * uv + pos; } float t = smoothstep(0., 0.5000, distanceToCenter); vec2 mixedUV = mix(uv, originalUV, t);vec4 color = texture(uTexture, mix(vTextureCoord, mixedUV, 1.0000)); fragColor = color;}"
+      ],
+      "compiledVertexShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 aVertexPosition; in vec2 aTextureCoord;uniform mat4 uMVMatrix; uniform mat4 uPMatrix; uniform mat4 uTextureMatrix;out vec2 vTextureCoord; out vec3 vVertexPosition;void main() { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = (uTextureMatrix * vec4(aTextureCoord, 0.0, 1.0)).xy; }"
+      ],
+      "data": { "depth": false, "uniforms": {}, "isBackground": false },
+      "id": "effect2"
+    },
+    {
+      "breakpoints": [],
+      "visible": true,
+      "aspectRatio": 1,
+      "userDownsample": 1,
+      "layerType": "effect",
+      "type": "voronoi",
+      "usesPingPong": false,
+      "speed": 0.1,
+      "trackMouse": 0.1,
+      "trackAxes": "xy",
+      "mouseMomentum": 1,
+      "texture": false,
+      "animating": true,
+      "isMask": 0,
+      "compiledFragmentShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 vVertexPosition; in vec2 vTextureCoord;uniform sampler2D uTexture;uniform float uTime; uniform vec2 uMousePos; uniform vec2 uResolution; float ease (int easingFunc, float t) { return t; } vec2 random2( vec2 p ) { return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453); }const float PI = 3.14159265359; mat2 rot(float a) { return mat2(cos(a),-sin(a),sin(a),cos(a)); } out vec4 fragColor;vec2 voronoidNoise(vec2 st) { vec2 i_st = floor(st); vec2 f_st = fract(st);float m_dist = 15.; vec2 m_point; vec2 d;for (int j=-1; j<=1; j++ ) { for (int i=-1; i<=1; i++ ) { vec2 neighbor = vec2(float(i),float(j)); vec2 point = random2(i_st + neighbor);point = 0.5 + 0.5 * sin(5. + uTime * 0.2 + 6.2831*point); vec2 diff = neighbor + point - f_st; float dist = length(diff);if( dist < m_dist ) { m_dist = dist; m_point = point; d = diff; } } }return m_point; } vec2 voronoiFBM(vec2 st) { vec2 value = vec2(0.0); vec2 shift = vec2(100.0); float xp = sqrt(2.); mat2 r = rot(0.5); for (int i = 0; i < 8; i++) { value += voronoidNoise(st); st = st * xp + shift; st = r * st; } return value / float(8); } void main() { vec2 uv = vTextureCoord; float aspectRatio = uResolution.x/uResolution.y;vec2 skew = mix(vec2(1), vec2(1, 0), 0.0000);vec2 st = (uv - vec2(0.5, 0.5)) * vec2(aspectRatio, 1.) * 50. * 0.1000; st = st * rot(0.0000 * 2. * PI) * skew; vec2 m_point = voronoiFBM(st);vec2 offset = (m_point * 0.2 * 0.5000 * 2.) - (0.5000 * 0.2);vec2 mPos = vec2(0.5, 0.5) + mix(vec2(0), (uMousePos-0.5), 0.1000); vec2 pos = mix(vec2(0.5, 0.5), mPos, floor(1.0000)); float dist = ease(0, max(0.,1.-distance(uv * vec2(aspectRatio, 1), mPos * vec2(aspectRatio, 1)) * 4. * (1. - 1.0000)));vec4 color = texture(uTexture, uv + offset * dist); fragColor = color;}"
+      ],
+      "compiledVertexShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 aVertexPosition; in vec2 aTextureCoord;uniform mat4 uMVMatrix; uniform mat4 uPMatrix; uniform mat4 uTextureMatrix;out vec2 vTextureCoord; out vec3 vVertexPosition;void main() { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = (uTextureMatrix * vec4(aTextureCoord, 0.0, 1.0)).xy; }"
+      ],
+      "data": { "depth": false, "uniforms": {}, "isBackground": false },
+      "id": "effect3"
+    },
+    {
+      "breakpoints": [],
+      "visible": true,
+      "aspectRatio": 1,
+      "userDownsample": 1,
+      "layerType": "effect",
+      "type": "wisps",
+      "usesPingPong": false,
+      "speed": 0.1,
+      "trackMouse": 0,
+      "trackAxes": "xy",
+      "mouseMomentum": 0,
+      "texture": false,
+      "animating": true,
+      "isMask": 0,
+      "compiledFragmentShaders": [
+        "#version 300 es\nprecision highp float;in vec3 vVertexPosition; in vec2 vTextureCoord; uniform sampler2D uTexture; uniform float uTime; uniform vec2 uMousePos; uniform vec2 uResolution; vec3 blend (int blendMode, vec3 src, vec3 dst) { return src + dst; }out vec4 fragColor; const float PI = 3.14159265359; mat2 rot(float a) { return mat2(cos(a), -sin(a), sin(a), cos(a)); }vec2 hash(vec2 p) { p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3))); return -1.0 + 2.0 * fract(sin(p) * 43758.5453123); }float luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }float voronoi_additive(vec2 st, float radius, vec2 mouse_pos, float scale) { vec2 i_st = floor(st); vec2 f_st = fract(st);float wander = 1.0000 * uTime * 0.2; float total_contribution = 0.0;for (int y = -2; y <= 2; y++) { for (int x = -2; x <= 2; x++) { vec2 neighbor = vec2(float(x), float(y)); vec2 cell_id = i_st + neighbor; vec2 point = hash(cell_id); point = 0.5 + 0.5 * sin(5. + wander + 6.2831 * point); vec2 starAbsPos = cell_id + point; vec2 dirToMouse = mouse_pos - starAbsPos; float distToMouse = length(dirToMouse); float attractStrength = 1.0000 * exp(-distToMouse * mix(2.0 + 0.5000 * 2., 0.5, 1.0000)) * 2.; starAbsPos += dirToMouse * attractStrength; vec2 diff = starAbsPos - st; float dist = length(diff);float contribution = radius / max(dist, radius * 0.1); float shimmer_phase = dot(point, vec2(1.0)) * 10. + hash(cell_id).x * 5.0 + uTime * 0.5; float shimmer = mix(1., (sin(shimmer_phase) + 1.), 1.0000); contribution *= shimmer; total_contribution += mix(contribution*contribution, contribution * 2., 0.0000); } }return total_contribution; }vec4 randomStyle() { vec2 uv = vTextureCoord;vec4 bg = texture(uTexture, uv);vec4 color = vec4(0.0); vec2 aspectRatio = vec2(uResolution.x / uResolution.y, 1.0);vec2 mPos = mix(vec2(0.0), (uMousePos - 0.5), 0.0000);uv -= vec2(0.5, 0.5); uv *= aspectRatio; uv = uv * rot(0.0000 * 2.0 * PI); uv *= 40.0 * 0.5000; uv *= mix(vec2(1.0), vec2(1.0, 0.0), 0.0000); uv /= aspectRatio;mPos = mPos * rot(0.0000 * 2.0 * PI);vec2 mouseGrid = uMousePos; mouseGrid -= vec2(0.5, 0.5); mouseGrid *= aspectRatio; mouseGrid = mouseGrid * rot(0.0000 * 2.0 * PI); mouseGrid *= 40.0 * 0.5000; mouseGrid *= mix(vec2(1.0), vec2(1.0, 0.0), 0.0000); mouseGrid /= aspectRatio;vec2 movementOffset = vec2(0.0, uTime * 1.0000 * -0.05); vec2 mouseGrid1 = mouseGrid - (mPos * 38.0 * 0.5000) + movementOffset; vec2 mouseGrid2 = mouseGrid - (mPos * 48.0 * 0.5000) + movementOffset;vec2 st1 = uv - (mPos * 38.0 * 0.5000); vec2 st2 = uv - (mPos * 48.0 * 0.5000);vec2 mouse1 = st1 + vec2(0.0, uTime * 1.0000 * -0.05); vec2 mouse2 = st2 + vec2(0.0, uTime * 1.0000 * -0.05);float radius1 = 0.5 * 1.0000; float radius2 = 0.5 * 1.0000;float pass1 = voronoi_additive(mouse1 * aspectRatio, radius1, mouseGrid1 * aspectRatio, 38.0 * 0.5000); float pass2 = voronoi_additive(mouse2 * aspectRatio + vec2(10), radius2, mouseGrid2 * aspectRatio + vec2(10.0), 48.0 * 0.5000);pass1 *= 0.02; pass2 *= 0.04;color.rgb = (pass1 + pass2) * vec3(1, 1, 1) * mix(1.0, bg.r, 0.9000); color.rgb = clamp(color.rgb, 0.0, 1.0);color.rgb = blend(1, bg.rgb, color.rgb);color = vec4(color.rgb, max(bg.a, luma(color.rgb))); return color; }void main() { vec4 color;color = randomStyle(); fragColor = color;}"
+      ],
+      "compiledVertexShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 aVertexPosition; in vec2 aTextureCoord;uniform mat4 uMVMatrix; uniform mat4 uPMatrix; uniform mat4 uTextureMatrix;out vec2 vTextureCoord; out vec3 vVertexPosition;void main() { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = (uTextureMatrix * vec4(aTextureCoord, 0.0, 1.0)).xy; }"
+      ],
+      "data": { "depth": false, "uniforms": {}, "isBackground": false },
+      "id": "effect4"
+    },
+    {
+      "breakpoints": [],
+      "visible": true,
+      "aspectRatio": 1,
+      "userDownsample": 1,
+      "layerType": "effect",
+      "type": "glyphDither",
+      "usesPingPong": false,
+      "texture": {
+        "src": "data:image/png;base64,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",
+        "sampler": "uCustomTexture"
+      },
+      "trackMouse": 0,
+      "trackAxes": "xy",
+      "mouseMomentum": 0,
+      "animating": false,
+      "isMask": 0,
+      "compiledFragmentShaders": [
+        "#version 300 es\nprecision highp float;in vec3 vVertexPosition; in vec2 vTextureCoord; uniform sampler2D uTexture; uniform sampler2D uSprite; uniform sampler2D uCustomTexture;uniform vec2 uMousePos; uniform vec2 uResolution; vec3 blend (int blendMode, vec3 src, vec3 dst) { return src; }out vec4 fragColor;const float GLYPH_HEIGHT = 40.0;void main() { vec2 uv = vTextureCoord; vec2 pos = vec2(0.5, 0.5) + mix(vec2(0), (uMousePos-0.5), 0.0000); float aspectRatio = uResolution.x / uResolution.y; float aspectCorrection = mix(aspectRatio, 1./aspectRatio, 0.5);float gridSize = mix(0.05, 0.005, 0.9000);float baseGrid = 1.0 / gridSize; vec2 cellSize = vec2(1.0/(baseGrid * aspectRatio), 1.0/baseGrid) * aspectCorrection; vec2 offsetUv = uv - pos; vec2 cell = floor(offsetUv / cellSize); vec2 cellCenter = (cell + 0.5) * cellSize; vec2 pixelatedCoord = cellCenter + pos; vec4 bg = texture(uTexture, vTextureCoord); vec4 color = texture(uTexture, pixelatedCoord);float luminance = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722)); luminance = mix(luminance, 1.0 - luminance, float(0)); float gamma = pow(mix(0.2, 2.2, 0.4000), 2.2);float scaleFactor = gridSize / GLYPH_HEIGHT;ivec2 customTextureSize = textureSize(uCustomTexture, 0); ivec2 spriteTextureSize = textureSize(uSprite, 0); float selectedWidth = mix(float(spriteTextureSize.x), float(customTextureSize.x), float(6 == 6)); float numSprites = max(1.0, selectedWidth / GLYPH_HEIGHT); float numGlyphRows = 1.0;float spriteIndex = clamp(floor(luminance * numSprites), 0.0, numSprites - 1.0); float spriteIndexWithGamma = clamp(floor(luminance * numSprites * gamma), 0.0, numSprites - 1.0); float glyphIndex = 0.0;float normalizedSpriteSizeX = 1.0 / numSprites; float normalizedSpriteSizeY = 1.0 / numGlyphRows;float spriteX = (spriteIndexWithGamma * normalizedSpriteSizeX);vec2 spriteSheetUV = vec2( spriteX, glyphIndex / numGlyphRows );vec2 spriteSize = vec2(GLYPH_HEIGHT / aspectRatio, GLYPH_HEIGHT) * scaleFactor * aspectCorrection; vec2 localOffset = mod(uv - pos, spriteSize) / spriteSize;spriteSheetUV += vec2( localOffset.x * normalizedSpriteSizeX, localOffset.y * normalizedSpriteSizeY );vec4 spriteColor = vec4(0.0);spriteColor = texture(uCustomTexture, spriteSheetUV); float alpha = smoothstep(0.0, 1.0, spriteColor.r);vec3 cc = (color.rgb - spriteIndex * 0.04) * 1.4; vec3 col = mix(cc, vec3(0, 1, 1), float(0)); vec3 dithered = mix( mix(vec3(0.0), vec3(1.0), float(0)), col, alpha ); vec3 blended = blend(0, dithered, bg.rgb); color.rgb = mix(bg.rgb, blended, 1.0000); fragColor = color;}"
+      ],
+      "compiledVertexShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 aVertexPosition; in vec2 aTextureCoord;uniform mat4 uMVMatrix; uniform mat4 uPMatrix; uniform mat4 uTextureMatrix;out vec2 vTextureCoord; out vec3 vVertexPosition;void main() { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = (uTextureMatrix * vec4(aTextureCoord, 0.0, 1.0)).xy; }"
+      ],
+      "data": {
+        "depth": false,
+        "uniforms": {},
+        "isBackground": false,
+        "texture": { "src": "", "sampler": "uSprite" }
+      },
+      "id": "effect5"
+    },
+    {
+      "breakpoints": [],
+      "visible": true,
+      "aspectRatio": 1,
+      "userDownsample": 1,
+      "layerType": "effect",
+      "type": "duotone",
+      "usesPingPong": false,
+      "texture": false,
+      "animating": false,
+      "mouseMomentum": 0,
+      "isMask": 0,
+      "compiledFragmentShaders": [
+        "#version 300 es\nprecision mediump float; in vec3 vVertexPosition; in vec2 vTextureCoord; uniform sampler2D uTexture;out vec4 fragColor; void main() { vec2 uv = vTextureCoord; vec4 color = texture(uTexture, uv); float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114)); vec3 duotoneColor = mix(vec3(0.9607843137254902, 0.9568627450980393, 0.9607843137254902), vec3(0.25098039215686274, 0.5098039215686274, 0.9137254901960784), gray); color = vec4(mix(color.rgb, duotoneColor, 1.0000), color.a); fragColor = color;}"
+      ],
+      "compiledVertexShaders": [
+        "#version 300 es\nprecision mediump float;in vec3 aVertexPosition; in vec2 aTextureCoord;uniform mat4 uMVMatrix; uniform mat4 uPMatrix; uniform mat4 uTextureMatrix;out vec2 vTextureCoord; out vec3 vVertexPosition;void main() { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = (uTextureMatrix * vec4(aTextureCoord, 0.0, 1.0)).xy; }"
+      ],
+      "data": { "depth": false, "uniforms": {}, "isBackground": false },
+      "id": "effect6"
+    }
+  ],
+  "options": {
+    "name": "Untitled project (Remix)",
+    "fps": 60,
+    "dpi": 1.5,
+    "scale": 1,
+    "includeLogo": false,
+    "isProduction": false
+  },
+  "version": "1.4.33",
+  "id": "6YYVykGeeZPg2XHZo9sA"
+}

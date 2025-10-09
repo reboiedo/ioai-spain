@@ -1,0 +1,114 @@
+---
+import Eyebrow from './Eyebrow.astro';
+import ioaiLogo from '../assets/ioai-logo.svg';
+import harbourSpaceLogo from '../assets/harbour-space-logo.svg';
+
+export interface Props {
+  t: {
+    about: {
+      eyebrow: string;
+      sectionTitle: string;
+      intro: string;
+      ioai2026: {
+        title: string;
+        date: string;
+        description: string;
+      };
+      harbourSpace: {
+        title: string;
+        subtitle: string;
+        description: string;
+      };
+    };
+  };
+}
+
+const { t } = Astro.props;
+---
+
+<section class="about" id="about">
+  <div class="container">
+    <Eyebrow text={t.about.eyebrow} />
+    <!-- <h2 class="section-title">{t.about.sectionTitle}</h2> -->
+    <p class="section-intro">{t.about.intro}</p>
+
+    <div class="cards">
+      <div class="card">
+        <img src={ioaiLogo.src} alt={t.about.ioai2026.title} class="card-logo" />
+        <p class="card-subtitle heading-m">{t.about.ioai2026.date}</p>
+        <p class="card-description text-base">{t.about.ioai2026.description}</p>
+      </div>
+
+      <div class="card">
+        <img src={harbourSpaceLogo.src} alt={t.about.harbourSpace.title} class="card-logo" />
+        <p class="card-subtitle heading-m">{t.about.harbourSpace.subtitle}</p>
+        <p class="card-description text-base">{t.about.harbourSpace.description}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-inline: var(--section-inline);
+    /* background: #f9fafb; */
+  }
+
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding-block: var(--section-block);
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .section-title {
+    margin-bottom: var(--space-l);
+  }
+
+  .section-intro {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-loose)
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .card {
+    background: var(--background-elevated);
+    border-radius: 12px;
+    padding: var(--card-block) var(--card-inline);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  /* .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  } */
+
+  .card-logo {
+    height: 56px;
+    max-width: 180px;
+    width: auto;
+    margin-bottom: 1.5rem;
+    object-fit: contain;
+  }
+
+  .card-subtitle {
+    padding-bottom: var(--space-2xs);
+  }
+
+
+
+  @media (max-width: 768px) {
+  .section-intro {
+    font-size: var(--font-size-m);
+  }
+
+
+  }
+</style>

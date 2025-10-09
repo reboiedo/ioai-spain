@@ -1,0 +1,110 @@
+@import "./core.css";
+
+:root {
+  /* Typography */
+
+  /* Font Families */
+  --font-display: "Funnel Display", ui-serif, Georgia, Cambria,
+    "Times New Roman", Times, serif;
+  --font-sans: "Funnel Sans", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --font-size-12: 0.75rem;
+  --font-size-14: 0.875rem;
+  --font-size-15: 0.9375rem;
+  --font-size-16: 1rem;
+  --font-size-18: 1.125rem;
+  --font-size-base: 1rem;
+  --font-size-m: var(--step-1);
+  --font-size-l: var(--step-2);
+  --font-size-xl: var(--step-3);
+  --font-size-2xl: var(--step-4);
+  --font-size-3xl: var(--step-5);
+
+  /* Line Heights */
+
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* Font weights */
+  --font-weight-ultralight: 200;
+  --font-weight-light: 300;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Letter spacing */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+
+  /* layout */
+  --max-width: 1200px;
+  --section-inline: var(--space-s-m);
+  --section-block: var(--space-2xl-3xl);
+  --card-inline: var(--space-s-m);
+  --card-block: var(--space-l);
+
+  /* Colors */
+
+  /* Base color palette */
+  --color-warm-100: #fef7ed;
+  --color-warm-200: #fed7aa;
+  --color-warm-300: #fdba74;
+  --color-warm-400: #fb923c;
+  --color-warm-500: #f97316;
+  --color-warm-600: #ea580c;
+  --color-warm-700: #c2410c;
+  --color-warm-800: #9a3412;
+  --color-warm-900: #7c2d12;
+
+  --color-sand-100: #f7f6f3;
+  --color-sand-200: #ede9e3;
+  --color-sand-300: #e1ddd4;
+  --color-sand-400: #d0c9bc;
+  --color-sand-500: #b8ad9f;
+  --color-sand-600: #9c8f7e;
+  --color-sand-700: #826e58;
+  --color-sand-800: #63543f;
+  --color-sand-900: #4a3f2f;
+
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+
+  /* Semantic color tokens for components */
+  --text-primary: var(--color-neutral-900);
+  --text-secondary: var(--color-neutral-600);
+  --text-inactive: var(--color-neutral-400);
+  --text-inverse: #fff;
+
+  --background-primary: #f5f4f5;
+  --background-secondary: #000;
+  --background-elevated: #fff;
+  --background-blue: #a3cfe3;
+  --background-green: #a3e3b7;
+  --background-purple: #b9a3e3;
+
+  --color-primary: #0066cc;
+
+  --border-primary: #d1d1d1;
+  --border-secondary: var(--color-neutral-300);
+  --border-focus: var(--color-primary);
+
+  /* Border radius */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}

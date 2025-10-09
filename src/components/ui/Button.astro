@@ -1,0 +1,355 @@
+---
+// Button.astro
+// A simple, reusable button component
+// 
+// DESIGN RULE: Always use design tokens from core.css/semantic.css
+// Never use random hardcoded values for styling
+
+interface Props {
+  variant?: 'primary' | 'secondary' | 'outline' | 'text';
+  size?: 'small' | 'medium' | 'large';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  className?: string;
+  disabled?: boolean;
+  fullWidth?: boolean;
+  popoverTarget?: string;
+  popoverAction?: 'show' | 'hide' | 'toggle';
+}
+
+const {
+  variant = 'primary',
+  size = 'medium',
+  href,
+  type = 'button',
+  className = '',
+  disabled = false,
+  fullWidth = false,
+  popoverTarget,
+  popoverAction = 'show'
+} = Astro.props;
+
+const classes = [
+  'btn-animate-chars',
+  `btn-animate-chars--${variant}`,
+  `btn-animate-chars--${size}`,
+  disabled && 'btn-animate-chars--disabled',
+  fullWidth && 'btn-animate-chars--full-width',
+  className
+].filter(Boolean).join(' ');
+
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class={classes}
+  href={href}
+  type={!href ? type : undefined}
+  disabled={!href ? disabled : undefined}
+  popovertarget={popoverTarget}
+  popovertargetaction={popoverTarget ? popoverAction : undefined}
+  data-component="Button"
+>
+  <div class="btn-animate-chars__bg"></div>
+  <span data-button-animate-chars="" class="btn-animate-chars__text">
+    <slot />
+  </span>
+</Tag>
+
+<style>
+  .btn-animate-chars {
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    border: none;
+    background: none;
+    line-height: var(--line-height-tight);
+    display: inline-flex;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* Size variants */
+  .btn-animate-chars--small {
+    padding: var(--space-xs) calc(var(--space-xs) * 1.75);
+    font-size: var(--font-size-14);
+  }
+
+  .btn-animate-chars--medium {
+    padding: calc(var(--space-xs) * 1.25) var(--space-s);
+    font-size: var(--font-size-base);
+  }
+
+  .btn-animate-chars--large {
+    padding: var(--space-s) calc(var(--space-s) * 1.5);
+    font-size: var(--font-size-md);
+  }
+
+  /* Full width variant */
+  .btn-animate-chars--full-width {
+    display: flex;
+    width: 100%;
+  }
+
+  .btn-animate-chars__text {
+    white-space: nowrap;
+    line-height: var(--line-height-tight);
+    z-index: 2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-shadow: 0 1.2em currentColor;
+  }
+
+  /* Characters animation setup with masking */
+  .btn-animate-chars [data-button-animate-chars] {
+    overflow: hidden;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 1.2em;
+  }
+
+  .btn-animate-chars [data-button-animate-chars] :global(.char) {
+    display: inline-block;
+    position: relative;
+  }
+
+  /* Background - handles all visual styling and animations */
+  .btn-animate-chars__bg {
+    border-radius: var(--radius-md);
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transform-origin: center;
+  }
+
+  /* Style variants - colors only on button */
+  .btn-animate-chars--primary {
+    color: var(--text-inverse);
+  }
+
+  .btn-animate-chars--primary .btn-animate-chars__bg {
+    background-color: var(--color-primary);
+  }
+
+  .btn-animate-chars--secondary {
+    color: var(--text-primary);
+  }
+
+  .btn-animate-chars--secondary .btn-animate-chars__bg {
+    background-color: var(--background-elevated);
+  }
+
+  .btn-animate-chars--outline {
+    color: var(--text-primary);
+  }
+
+  .btn-animate-chars--outline .btn-animate-chars__bg {
+    background-color: transparent;
+    border: 2px solid var(--text-primary);
+  }
+
+  .btn-animate-chars--text {
+    color: var(--text-primary);
+    position: relative;
+    padding: var(--space-xs) 0;
+  }
+
+  .btn-animate-chars--text .btn-animate-chars__bg {
+    display: none;
+  }
+
+  /* Text variant underline animation with CSS custom properties */
+  .btn-animate-chars--text {
+    --underline-scale: 0;
+    --underline-origin: left center;
+  }
+
+  .btn-animate-chars--text::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-primary);
+    transform: scaleX(var(--underline-scale));
+    transform-origin: var(--underline-origin);
+  }
+
+  /* Remove CSS transitions - now handled by GSAP */
+
+  /* Accessibility: Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-animate-chars--text::after {
+      transition-duration: 0.01ms !important;
+    }
+    
+    /* Disable GSAP animations via data attribute */
+    .btn-animate-chars {
+      --animation-disabled: true;
+    }
+  }
+
+
+  /* Disabled state */
+  .btn-animate-chars--disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    color: var(--text-inactive);
+  }
+
+
+
+  /* Focus state for accessibility */
+  .btn-animate-chars:focus-visible {
+    box-shadow: 0 0 0 3px var(--border-focus);
+  }
+</style>
+
+<script>
+  function initButtonCharacterStagger() {
+
+    // Wait for GSAP and SplitText to be available
+    if (typeof window.gsap === 'undefined' || typeof (window as any).SplitText === 'undefined') {
+      setTimeout(initButtonCharacterStagger, 100);
+      return;
+    }
+
+    const buttonTexts = document.querySelectorAll('[data-button-animate-chars]');
+
+    buttonTexts.forEach((textElement) => {
+      // Skip if already initialized
+      if (textElement.hasAttribute('data-chars-initialized')) {
+        return;
+      }
+
+      // Get the actual button element (parent)
+      const button = textElement.closest('.btn-animate-chars');
+      if (!button) return;
+
+      // Get the background element for scaling (if it exists)
+      const buttonBg = button.querySelector('.btn-animate-chars__bg');
+
+      // Check if this is a text button (no background element)
+      const isTextButton = button.classList.contains('btn-animate-chars--text');
+
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Store original text for debugging
+      const originalText = textElement.textContent;
+      console.log('Original button text:', originalText);
+
+      // Different approach: manually split the text and create spans
+      // This bypasses SplitText's space-removing behavior entirely
+      const manualChars = [];
+      for (let i = 0; i < originalText.length; i++) {
+        const char = originalText[i];
+        const span = document.createElement('span');
+        span.className = 'char';
+        span.textContent = char === ' ' ? '\u00A0' : char; // Use non-breaking space for spaces
+        span.style.display = 'inline-block';
+        span.style.position = 'relative';
+        manualChars.push(span);
+      }
+
+      // Clear the element and add our manual spans
+      textElement.innerHTML = '';
+      manualChars.forEach(span => textElement.appendChild(span));
+
+      // Create a fake split object that mimics SplitText's structure
+      const split = {
+        chars: manualChars
+      };
+
+      console.log('Manual split chars:', split.chars.length);
+      console.log('After manual split:', textElement.textContent);
+
+      // Set initial state - characters are at normal position
+      window.gsap.set(split.chars, { y: 0 });
+
+      // Create timeline for better control and to prevent conflicts
+      const tl = window.gsap.timeline({ paused: true });
+
+      if (isTextButton) {
+        // Text button: animate underline and characters
+        const underline = button.querySelector('::after');
+
+        tl.to(split.chars, {
+          y: "-1.2em",
+          duration: 0.3,
+          ease: "power1.in",
+          stagger: 0.005,
+          force3D: true
+        }, 0)
+        .fromTo(button, {
+          '--underline-scale': 0,
+          '--underline-origin': 'left center'
+        }, {
+          '--underline-scale': 1,
+          duration: 0.25,
+          ease: "power1.in"
+        }, 0);
+      } else if (buttonBg) {
+        // Regular button: animate background and characters
+        tl.to(buttonBg, {
+          scale: 0.97,
+          duration: 0.3,
+          ease: "power1.in",
+          force3D: true
+        }, 0)
+        .to(split.chars, {
+          y: "-1.2em",
+          duration: 0.3,
+          ease: "power1.in",
+          stagger: 0.005,
+          force3D: true
+        }, 0);
+      }
+
+      // Add hover event listeners with timeline control
+      button.addEventListener('mouseenter', () => {
+        if (!(button as HTMLButtonElement).disabled && !prefersReducedMotion) {
+          if (isTextButton) {
+            // Set transform-origin to left for entering
+            window.gsap.set(button, { '--underline-origin': 'left center' });
+          }
+          tl.play();
+        }
+      });
+
+      button.addEventListener('mouseleave', () => {
+        if (!(button as HTMLButtonElement).disabled && !prefersReducedMotion) {
+          if (isTextButton) {
+            // Change transform-origin to right for exiting
+            window.gsap.set(button, { '--underline-origin': 'right center' });
+          }
+          tl.reverse();
+        }
+      });
+
+      // Mark as initialized on the text element
+      textElement.setAttribute('data-chars-initialized', 'true');
+    });
+  }
+
+  // Initialize on different events
+  document.addEventListener('DOMContentLoaded', initButtonCharacterStagger);
+  document.addEventListener('astro:page-load', initButtonCharacterStagger);
+
+  // Clean up on page swap
+  document.addEventListener('astro:before-swap', () => {
+    const buttons = document.querySelectorAll('[data-button-animate-chars]');
+    buttons.forEach(button => {
+      button.removeAttribute('data-chars-initialized');
+    });
+  });
+</script>

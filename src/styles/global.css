@@ -1,0 +1,8 @@
+@import "./reset.css";
+@import "./core.css";
+@import "./semantic.css";
+@import "./fonts.css";
+
+body {
+  font-size: var(--font-size-base);
+}

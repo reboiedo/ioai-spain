@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HomePageLayout from '../../layouts/HomePageLayout.astro';
+import { useTranslations } from '../../i18n';
+
+// Spanish version
+const locale = Astro.currentLocale || 'es';
+const t = useTranslations(locale as 'en' | 'es');
+---
+
+<BaseLayout title={t.meta.title} description={t.meta.description}>
+  <HomePageLayout t={t} />
+</BaseLayout>

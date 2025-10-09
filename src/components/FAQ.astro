@@ -1,0 +1,80 @@
+---
+import FAQItem from './FAQItem.astro';
+import Eyebrow from './Eyebrow.astro';
+
+interface FAQData {
+  question: string;
+  Content: any; // Astro component type
+}
+
+export interface Props {
+  t: {
+    faq: {
+      eyebrow: string;
+      sectionTitle: string;
+    };
+  };
+  faqs: FAQData[];
+}
+
+const { t, faqs } = Astro.props;
+---
+
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="faq-grid">
+      <!-- Left side: Title and intro -->
+      <div class="faq-header">
+        <Eyebrow text={t.faq.eyebrow} />
+        <h2>{t.faq.sectionTitle}</h2>
+      </div>
+
+      <!-- Right side: FAQ items -->
+      <div class="faq-list">
+        {faqs.map((faq) => (
+          <FAQItem question={faq.question}>
+            <faq.Content />
+          </FAQItem>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-section {
+    padding: 0 var(--section-inline) var(--section-block) var(--section-inline);
+  }
+
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-2xl);
+    align-items: flex-start;
+  }
+
+
+
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  @media (max-width: 809px) { /* mobile only */
+    .faq-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+
+    .faq-header {
+      position: static;
+    }
+  }
+</style>

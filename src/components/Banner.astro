@@ -1,0 +1,60 @@
+---
+import Button from "@/components/ui/Button.astro";
+
+export interface Props {
+  t: {
+    banner: {
+      title: string;
+      description: string;
+      downloadButton: string;
+    };
+  };
+}
+
+const { t } = Astro.props;
+---
+
+<section class="banner-section">
+  <div class="banner">
+    <div class="wrapper">
+      <div class="text-wrapper">
+        <h3>{t.banner.title}</h3>
+        <p>{t.banner.description}</p>
+      </div>
+      <Button variant="secondary">{t.banner.downloadButton}</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .banner-section {
+    padding-inline: var(--section-inline);
+  }
+
+  .banner {
+    max-width: var(--max-width);
+    background-color: var(--background-secondary);
+    color: var(--text-inverse);
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-l);
+    border-radius: 24px;
+    text-align: center;
+  }
+
+  .text-wrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+  }
+
+  .wrapper {
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 0 auto;
+    align-items: center;
+
+  }
+
+</style>

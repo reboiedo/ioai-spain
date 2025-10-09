@@ -1,0 +1,180 @@
+---
+import Phase from './Phase.astro';
+import Round from './Round.astro';
+import Eyebrow from './Eyebrow.astro';
+
+interface RoundData {
+  title: string;
+  date: string;
+  introSentence: string;
+  qualification?: string;
+  phase: 'basic' | 'preparatory' | 'team';
+  Content: any; // Astro component type
+}
+
+export interface Props {
+  t: {
+    howItWorks: {
+      eyebrow: string;
+      sectionTitle: string;
+      sectionIntro: string;
+      phases: {
+        basic: {
+          eyebrow: string;
+          title: string;
+          intro: string;
+        };
+        preparatory: {
+          eyebrow: string;
+          title: string;
+          intro: string;
+        };
+        team: {
+          eyebrow: string;
+          title: string;
+          intro: string;
+        };
+      };
+      labels: {
+        qualification: string;
+        tbd: string;
+        starts: string;
+      };
+    };
+  };
+  rounds: RoundData[];
+}
+
+const { t, rounds } = Astro.props;
+
+// Group rounds by phase
+const basicRounds = rounds.filter(r => r.phase === 'basic');
+const preparatoryRounds = rounds.filter(r => r.phase === 'preparatory');
+const teamRounds = rounds.filter(r => r.phase === 'team');
+---
+
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <Eyebrow text={t.howItWorks.eyebrow} />
+      <h2 class="section-title ">{t.howItWorks.sectionTitle}</h2>
+      <p class="section-intro">{t.howItWorks.sectionIntro}</p>
+    </div>
+
+    <div class="phases">
+      {/* Basic Cycle Phase */}
+      {basicRounds.length > 0 && (
+        <Phase
+          phaseNumber={t.howItWorks.phases.basic.eyebrow}
+          title={t.howItWorks.phases.basic.title}
+          description={t.howItWorks.phases.basic.intro}
+        >
+          {basicRounds.map((round) => (
+            <Round
+              title={round.title}
+              date={round.date}
+              introSentence={round.introSentence}
+              qualification={round.qualification}
+              t={t}
+            >
+              <round.Content />
+            </Round>
+          ))}
+        </Phase>
+      )}
+
+      {/* Preparatory Cycle Phase */}
+      {preparatoryRounds.length > 0 && (
+        <Phase
+          phaseNumber={t.howItWorks.phases.preparatory.eyebrow}
+          title={t.howItWorks.phases.preparatory.title}
+          description={t.howItWorks.phases.preparatory.intro}
+        >
+          {preparatoryRounds.map((round) => (
+            <Round
+              title={round.title}
+              date={round.date}
+              introSentence={round.introSentence}
+              qualification={round.qualification}
+              t={t}
+            >
+              <round.Content />
+            </Round>
+          ))}
+        </Phase>
+      )}
+
+      {/* Team Spain Phase */}
+      <Phase
+        phaseNumber={t.howItWorks.phases.team.eyebrow}
+        title={t.howItWorks.phases.team.title}
+        description={t.howItWorks.phases.team.intro}
+      >
+        {teamRounds.length > 0 ? teamRounds.map((round) => (
+          <Round
+            title={round.title}
+            date={round.date}
+            introSentence={round.introSentence}
+            qualification={round.qualification}
+            t={t}
+          >
+            <round.Content />
+          </Round>
+        )) : (
+          <div class="coming-soon">
+            <p>Team selection rounds coming soon...</p>
+          </div>
+        )}
+      </Phase>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how-it-works {
+    padding: var(--section-block) var(--section-inline) 0 var(--section-inline);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .section-title {
+    margin-bottom: var(--space-s);
+  }
+
+  .section-intro {
+    max-width: 600px;
+  }
+
+  .phases {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .coming-soon {
+    padding: var(--space-m);
+    background: var(--background-secondary);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border-secondary);
+    text-align: center;
+  }
+
+  .coming-soon p {
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .section-title {
+      font-size: var(--font-size-2xl);
+    }
+  }
+</style>
