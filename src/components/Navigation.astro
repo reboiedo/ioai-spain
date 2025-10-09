@@ -4,6 +4,7 @@ import { LANGUAGES, useTranslations } from '../i18n';
 import type { Language } from '../i18n';
 import Button from '@/components/ui/Button.astro';
 import Dropdown from '@/components/ui/Dropdown.astro';
+import logoSvg from '@/assets/icons/ioai-spain.svg';
 
 // Get current locale from Astro's i18n
 const currentLocale = (Astro.currentLocale || 'en') as Language;
@@ -28,9 +29,11 @@ const navItems = [
 
 <nav>
   <div class="nav-container">
-    <!-- Logo/Brand (you can add your logo here) -->
+    <!-- Logo/Brand -->
     <div class="nav-brand">
-      <a href={getRelativeLocaleUrl(currentLocale, '')}>IOAI Spain</a>
+      <a href={getRelativeLocaleUrl(currentLocale, '')}>
+        <img src={logoSvg.src} alt="IOAI Spain" class="logo" />
+      </a>
     </div>
 
     <!-- Navigation items -->
@@ -62,7 +65,7 @@ const navItems = [
 
 <style>
   nav {
-    padding: 1rem var(--section-inline);
+    padding: var(--space-2xs) var(--section-inline);
     border-bottom: 1px solid #eee;
     background: #fff;
     position: sticky;
@@ -81,10 +84,19 @@ const navItems = [
   }
 
   .nav-brand a {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #333;
+    display: flex;
+    align-items: center;
     text-decoration: none;
+  }
+
+  .logo {
+    height: 40px;
+    width: auto;
+    transition: opacity 0.2s ease;
+  }
+
+  .logo:hover {
+    opacity: 0.8;
   }
 
   .nav-items {
@@ -109,7 +121,7 @@ const navItems = [
   /* Mobile responsive */
   @media (max-width: 768px) {
     nav {
-      padding: var(--space-2xs);
+      padding: var(--space-2xs) var(--section-inline);
     }
 
     .nav-container {
@@ -129,8 +141,8 @@ const navItems = [
       align-items: center;
     }
 
-    .nav-brand a {
-      font-size: 1.125rem; /* Slightly smaller on mobile */
+    .logo {
+      height: 36px; /* Slightly smaller on mobile */
     }
 
     /* .language-switcher select {
