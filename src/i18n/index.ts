@@ -10,6 +10,7 @@ import { whyJoin } from './whyJoin';
 import { sponsors } from './sponsors';
 import { finalCTA } from './finalCTA';
 import { banner } from './banner';
+import { thankYou } from './thankYou';
 import type { Language } from './types';
 import { getTranslation } from './types';
 
@@ -25,7 +26,8 @@ export const translations = {
   whyJoin,
   sponsors,
   finalCTA,
-  banner
+  banner,
+  thankYou
 } as const;
 
 export function useTranslations(locale: Language | undefined) {
@@ -197,6 +199,15 @@ export function useTranslations(locale: Language | undefined) {
       title: getTranslation(banner.title, locale),
       description: getTranslation(banner.description, locale),
       downloadButton: getTranslation(banner.downloadButton, locale)
+    },
+    thankYou: {
+      meta: {
+        title: getTranslation(thankYou.meta.title, locale),
+        description: getTranslation(thankYou.meta.description, locale)
+      },
+      title: getTranslation(thankYou.title, locale),
+      paragraph: getTranslation(thankYou.paragraph, locale),
+      buttonText: getTranslation(thankYou.buttonText, locale)
     }
   };
 }

@@ -5,9 +5,10 @@ import '@/styles/global.css';
 export interface Props {
   title: string;
   description?: string;
+  showNavigation?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, showNavigation = true } = Astro.props;
 
 // Use Astro's native i18n support to get current locale
 const locale = Astro.currentLocale || 'en';
@@ -33,7 +34,7 @@ const locale = Astro.currentLocale || 'en';
 
   </head>
   <body>
-    <Navigation />
+    {showNavigation && <Navigation />}
     <main>
       <slot />
     </main>

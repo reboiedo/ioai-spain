@@ -16,6 +16,14 @@ const { t } = Astro.props;
 
 <section class="banner-section">
   <div class="banner">
+    <!-- Unicorn Studio Background -->
+    <div
+      class="unicorn-embed unicorn-background"
+      data-us-project-src="/banner.json"
+      data-us-scale="1"
+      data-us-dpi="1.5"
+    ></div>
+
     <div class="wrapper">
       <div class="text-wrapper">
         <h3>{t.banner.title}</h3>
@@ -36,9 +44,11 @@ const { t } = Astro.props;
     background-color: var(--background-secondary);
     color: var(--text-inverse);
     margin: 0 auto;
-    padding: var(--space-2xl) var(--space-l);
-    border-radius: 24px;
+    padding-inline: var(--space-l);
+    border-radius: 16px;
     text-align: center;
+    position: relative;
+    overflow: hidden;
   }
 
   .text-wrapper {
@@ -49,12 +59,71 @@ const { t } = Astro.props;
 
   .wrapper {
     max-width: 600px;
+    background-color: black;
+    padding: var(--space-xl) var(--card-inline);
     display: flex;
     flex-direction: column;
     gap: 40px;
     margin: 0 auto;
     align-items: center;
-
+    position: relative;
+    z-index: 1;
   }
 
+  /* Unicorn Studio Background Styles */
+  .unicorn-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 24px;
+  }
+
+  .unicorn-background canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+  }
+
+  @media(max-width: 810px) {
+    .banner {
+      padding: var(--space-xl) 0;
+    }
+
+  }
 </style>
+
+<!-- Unicorn Studio Script (only load if not already loaded) -->
+<script is:inline>
+  // Check if UnicornStudio is already loaded, if not load it
+  if (!window.UnicornStudio) {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.33/dist/unicornStudio.umd.js';
+    document.head.appendChild(script);
+  }
+</script>
+
+<!-- Initialize Unicorn Studio for Banner -->
+<script is:inline>
+  function initBannerUnicorn() {
+    if (window.UnicornStudio) {
+      UnicornStudio.init()
+        .then((scenes) => {
+          console.log('Banner Unicorn Studio initialized successfully:', scenes);
+        })
+        .catch((err) => {
+          console.error('Banner Unicorn Studio initialization error:', err);
+        });
+    } else {
+      // Retry after a short delay if UnicornStudio isn't loaded yet
+      setTimeout(initBannerUnicorn, 100);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', initBannerUnicorn);
+  // Also try on astro page load for client-side navigation
+  document.addEventListener('astro:page-load', initBannerUnicorn);
+</script>
