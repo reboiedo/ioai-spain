@@ -2,6 +2,7 @@
 import Eyebrow from './Eyebrow.astro';
 import ioaiLogo from '../assets/ioai-logo.svg';
 import harbourSpaceLogo from '../assets/harbour-space-logo.svg';
+import CardFlair from './ui/CardFlair.astro';
 
 export interface Props {
   t: {
@@ -34,12 +35,18 @@ const { t } = Astro.props;
 
     <div class="cards">
       <div class="card">
+        <CardFlair position='top' />
+        <!-- <CardFlair position='bottom' /> -->
+
         <img src={ioaiLogo.src} alt={t.about.ioai2026.title} class="card-logo" />
         <p class="card-subtitle heading-m">{t.about.ioai2026.date}</p>
         <p class="card-description text-base">{t.about.ioai2026.description}</p>
       </div>
 
       <div class="card">
+        <CardFlair position='top' />
+        <!-- <CardFlair position='bottom' /> -->
+
         <img src={harbourSpaceLogo.src} alt={t.about.harbourSpace.title} class="card-logo" />
         <p class="card-subtitle heading-m">{t.about.harbourSpace.subtitle}</p>
         <p class="card-description text-base">{t.about.harbourSpace.description}</p>
@@ -74,14 +81,15 @@ const { t } = Astro.props;
   .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+    gap: var(--space-l);
+    margin-top: var(--space-2xl);
   }
 
   .card {
+    position: relative;
     background: var(--background-elevated);
     border-radius: 12px;
-    padding: var(--card-block) var(--card-inline);
+    padding: var(--space-l) var(--card-inline) var(--space-xl) var(--card-inline);
     transition: transform 0.2s, box-shadow 0.2s;
   }
 

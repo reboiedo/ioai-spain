@@ -1,6 +1,7 @@
 ---
 import Eyebrow from '@/components/Eyebrow.astro';
 import Button from '@/components/ui/Button.astro';
+import CardFlair from '@/components/ui/CardFlair.astro';
 
 export interface Props {
   t: {
@@ -23,6 +24,9 @@ const { t } = Astro.props;
 
 <section class="eligibility" id="eligibility">
   <div class="container">
+    <CardFlair position="top" />
+        <CardFlair position="bottom" />
+
     <div class="content-wrapper">
       <Eyebrow text={t.eligibility.eyebrow} />
       
@@ -56,14 +60,16 @@ const { t } = Astro.props;
 <style>
   .eligibility {
     padding-inline: var(--section-inline);
+    padding-block: var(--section-offset);
   }
 
   .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-xl) var(--section-inline);
+    padding: var(--space-xl) var(--section-inline) var(--space-3xl) var(--section-inline);
     background: var(--background-elevated);
-    border-radius: var(--radius-xl)
+    border-radius: var(--radius-xl);
+    position: relative;
   }
 
   .grid {

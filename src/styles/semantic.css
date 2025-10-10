@@ -45,6 +45,7 @@
   --max-width: 1200px;
   --section-inline: var(--space-s-m);
   --section-block: var(--space-2xl-3xl);
+  --section-offset: var(--space-xl-2xl);
   --card-inline: var(--space-s-m);
   --card-block: var(--space-l);
 
@@ -97,7 +98,7 @@
 
   --color-primary: #0066cc;
 
-  --border-primary: #d1d1d1;
+  --border-primary: #eaeaeb;
   --border-secondary: var(--color-neutral-300);
   --border-focus: var(--color-primary);
 

@@ -1,4 +1,6 @@
 ---
+import CardFlair from '@/components/ui/CardFlair.astro';
+
 export interface Props {
   phaseNumber: string;
   title: string;
@@ -10,8 +12,12 @@ const { phaseNumber, title, description, background = 'white' } = Astro.props;
 ---
 
 <div class={`phase phase--${background}`}>
+  <CardFlair position="top"/>
+  <CardFlair position="bottom"/>
+
   <div class="phase-head">
     <!-- Left side: Phase header + rounds -->
+
     <div class="phase-left">
       <div class="phase-header">
         <span class="phase-number">{phaseNumber}</span>
@@ -34,6 +40,7 @@ const { phaseNumber, title, description, background = 'white' } = Astro.props;
   .phase {
     background: var(--background-elevated);
     border-radius: var(--radius-lg);
+    position: relative;
   }
 
   /* Background color variants */

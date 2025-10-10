@@ -1,0 +1,40 @@
+---
+import cardFlairSvg from '@/assets/icons/card-flair.svg';
+import Eyebrow from '../Eyebrow.astro';
+
+export interface Props {
+  position: 'top' | 'bottom';
+}
+
+const { position } = Astro.props;
+---
+
+<div class={`card-flair card-flair--${position}`}>
+  <img src={cardFlairSvg.src} alt="" class="flair-image" />
+</div>
+
+<style>
+  .card-flair {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .card-flair--top {
+    top: 0;
+    transform: rotate(180deg) translateY(50%);
+  }
+
+  .card-flair--bottom {
+    bottom: 0;
+    transform: translateY(50%);
+  }
+
+  .flair-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
