@@ -2,7 +2,7 @@ import { createTranslation } from './types';
 
 export const howItWorks = {
   eyebrow: createTranslation({
-    en: "Programme",
+    en: "Program",
     es: "Programa"
   }),
   sectionTitle: createTranslation({
@@ -24,8 +24,8 @@ export const howItWorks = {
         es: "Ciclo Básico"
       }),
       intro: createTranslation({
-        en: "No AI experience? No problem. The early stages spark curiosity and introduce core AI concepts through accessible online tests. Students, teachers, and parents can all participate.",
-        es: "¿Sin experiencia en IA? No hay problema. Las primeras etapas despiertan la curiosidad e introducen conceptos básicos de IA a través de pruebas en línea accesibles. Estudiantes, profesores y padres pueden participar."
+        en: "New to AI? Perfect—that's exactly who we designed this for. Dive into foundational concepts through simple online tests, and yes, using ChatGPT along the way is absolutely encouraged!",
+        es: "¿Nuevo en IA? Perfecto, es exactamente para quien diseñamos esto. Sumérgete en conceptos fundamentales a través de pruebas simples en línea, ¡y sí, usar ChatGPT en el proceso está totalmente recomendado!"
       })
     },
     preparatory: {
@@ -38,8 +38,8 @@ export const howItWorks = {
         es: "Ciclo Preparatorio"
       }),
       intro: createTranslation({
-        en: "High school students only. Develop practical AI skills through specialized training and real-world challenges.",
-        es: "Solo estudiantes de secundaria. Desarrolla habilidades prácticas de IA a través de entrenamiento especializado y desafíos del mundo real."
+        en: "The Preparatory Cycle develops practical AI skills through hands-on challenges—no programming experience required, though it helps. Full task details will be published by the end of 2025; until then, review the <a href=\"https://ioai-official.org/wp-content/uploads/2025/10/Syllabus.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">IOAI 2026 Syllabus</a> to get a head start.",
+        es: "El Ciclo Preparatorio desarrolla habilidades prácticas de IA a través de desafíos prácticos—no se requiere experiencia en programación, aunque ayuda. Los detalles completos de las tareas se publicarán a finales de 2025; mientras tanto, revisa el <a href=\"https://ioai-official.org/wp-content/uploads/2025/10/Syllabus.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Programa IOAI 2026</a> para obtener ventaja."
       })
     },
     team: {

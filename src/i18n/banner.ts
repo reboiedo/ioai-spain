@@ -12,5 +12,9 @@ export const banner = {
   downloadButton: createTranslation({
     en: "Download Brochure",
     es: "Descargar Folleto"
+  }),
+  downloadUrl: createTranslation({
+    en: "https://drive.google.com/file/d/1mjPIas7ib3Pt_ps2erV9FFxFUWlqAMpp/view?usp=drive_link",
+    es: "https://drive.google.com/file/d/16xmZtRJaj5BqwMmyAIn1FNBU_js5f_9d/view?usp=drive_link"
   })
 } as const;

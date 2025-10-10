@@ -198,7 +198,8 @@ export function useTranslations(locale: Language | undefined) {
     banner: {
       title: getTranslation(banner.title, locale),
       description: getTranslation(banner.description, locale),
-      downloadButton: getTranslation(banner.downloadButton, locale)
+      downloadButton: getTranslation(banner.downloadButton, locale),
+      downloadUrl: getTranslation(banner.downloadUrl, locale)
     },
     thankYou: {
       meta: {

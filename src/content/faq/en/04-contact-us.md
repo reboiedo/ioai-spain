@@ -4,7 +4,7 @@ category: "contact"
 order: 4
 ---
 
-We're happy to help. Email at [IOAI.spain@harbour.space](mailto:IOAI.spain@harbour.space). To speed things up, include:
+We're happy to help. Email us at [IOAI.spain@harbour.space](mailto:IOAI.spain@harbour.space). To speed things up, include:
 
 - Your full name
 - School (if applicable)

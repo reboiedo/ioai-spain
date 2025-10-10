@@ -1,14 +1,12 @@
 ---
 roundNumber: 4
-title: "Ronda 4"
-date: ""
-introSentence: "Desafíos estándar de IOAI identificando estudiantes listos para competición internacional. Inmersión completa en formato de competición."
+title: "Ronda 4 + Sesiones de Aprendizaje"
+date: "Fechas por confirmar"
+introSentence: "Preparación con sesiones prácticas y conferencias, seguida de la ronda final de selección para el Equipo España."
 phase: "preparatory"
-qualification: "Los 15-20 mejores estudiantes seleccionados para el Equipo España"
+qualification: "Los 10-20 mejores estudiantes seleccionados para el Equipo España"
 ---
 
-## Formato de Competición
+## Qué Esperar
 
-- Tareas y tiempo estándar de IOAI
-- Evaluaciones teóricas avanzadas
-- Desafíos prácticos de resolución de problemas
+El Comité Científico y los profesores de Harbour.Space impartirán una serie de conferencias preparatorias y sesiones prácticas para ayudar a los participantes a prepararse para la siguiente etapa de la competición. Los estudiantes se sumergirán completamente en teoría y tareas prácticas alineadas con los estándares de IOAI.

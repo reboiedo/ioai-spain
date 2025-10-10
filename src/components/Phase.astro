@@ -28,7 +28,7 @@ const { phaseNumber, title, description, background = 'white' } = Astro.props;
     
     <!-- Right side: Phase description -->
     <div class="phase-right">
-      <p class="phase-description text-base">{description}</p>
+      <p class="phase-description text-base" set:html={description}></p>
     </div>
   </div>
   <div class="rounds">

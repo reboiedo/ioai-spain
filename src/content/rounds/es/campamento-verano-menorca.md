@@ -1,7 +1,7 @@
 ---
 roundNumber: 6
 title: "Campamento de Verano en Menorca"
-date: "Julio ???, 2026"
+date: "Julio 2026"
 introSentence: "Campamento residencial de élite en Menorca que reúne a los mejores talentos de IA de España para la preparación intensiva final con expertos de clase mundial, con todos los gastos cubiertos."
 phase: "team"
 ---

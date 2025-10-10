@@ -23,7 +23,7 @@ export const ui = {
       es: 'Por Qué Unirse'
     }),
     programme: createTranslation({
-      en: 'Programme',
+      en: 'Program',
       es: 'Programa'
     }),
     eligibility: createTranslation({

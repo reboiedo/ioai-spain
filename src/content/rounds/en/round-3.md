@@ -2,22 +2,16 @@
 roundNumber: 3
 title: "Round 3"
 date: "February 2026"
-introSentence: "Practical AI tasks combined with theoretical challenges. Students demonstrate abilities through hands-on implementation."
+introSentence: "Practical AI tasks combined with theoretical challenges. Students apply their skills and critical thinking through hands-on problem-solving."
 phase: "preparatory"
-qualification: "Top 100 Participants Advance to round 4"
+qualification: "Up to 100 participants will be selected to continue to the next rounds"
 ---
 
-## Topics Covered
+## What to Expect
 
-- Basic AI concepts and terminology
-- Logic and reasoning fundamentals
-- Pattern recognition exercises
-- History and evolution of AI
-- Search mechanisms and information retrieval
-- Ethics and responsible use of AI
+Participants may receive data sets for analysis and will be required to submit both:
 
-## Training Provided
+- **A response file** with their results according to the committee's specifications
+- **A methodology file** explaining how those results were achieved
 
-- Preparatory lectures by Harbour.Space faculty
-- Hands-on AI implementation sessions
-- Introduction to IOAI competition standards
+**Qualification:** Up to 100 participants will be selected to continue to the next rounds.

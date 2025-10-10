@@ -2,22 +2,16 @@
 roundNumber: 3
 title: "Ronda 3"
 date: "Febrero de 2026"
-introSentence: "Tareas prácticas de IA combinadas con desafíos teóricos. Los estudiantes demuestran habilidades a través de implementación práctica."
+introSentence: "Tareas prácticas de IA combinadas con desafíos teóricos. Los estudiantes aplican sus habilidades y pensamiento crítico a través de resolución práctica de problemas."
 phase: "preparatory"
-qualification: "Los 100 mejores participantes avanzan a la ronda 4"
+qualification: "Hasta 100 participantes serán seleccionados para continuar a las siguientes rondas"
 ---
 
-## Temas Cubiertos
+## Qué Esperar
 
-- Conceptos básicos y terminología de IA
-- Fundamentos de lógica y razonamiento
-- Ejercicios de reconocimiento de patrones
-- Historia y evolución de la IA
-- Mecanismos de búsqueda y recuperación de información
-- Ética y uso responsable de la IA
+Los participantes pueden recibir conjuntos de datos para análisis y deberán entregar ambos:
 
-## Formación Proporcionada
+- **Un archivo de respuesta** con sus resultados según las especificaciones del comité
+- **Un archivo de metodología** explicando cómo se obtuvieron esos resultados
 
-- Conferencias preparatorias por profesores de Harbour.Space
-- Sesiones prácticas de implementación de IA
-- Introducción a los estándares de competición IOAI
+**Calificación:** Hasta 100 participantes serán seleccionados para continuar a las siguientes rondas.

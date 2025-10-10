@@ -7,6 +7,7 @@ export interface Props {
       title: string;
       description: string;
       downloadButton: string;
+      downloadUrl: string;
     };
   };
 }
@@ -29,7 +30,14 @@ const { t } = Astro.props;
         <h3>{t.banner.title}</h3>
         <p>{t.banner.description}</p>
       </div>
-      <Button variant="secondary">{t.banner.downloadButton}</Button>
+      <Button
+        variant="secondary"
+        href={t.banner.downloadUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {t.banner.downloadButton}
+      </Button>
     </div>
   </div>
 </section>

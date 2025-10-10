@@ -1,7 +1,7 @@
 ---
 roundNumber: 6
 title: "Menorca Summer Camp"
-date: "July ???, 2026"
+date: "July 2026"
 introSentence: "Elite residential training camp in Menorca bringing together Spain's top AI talents for final intensive preparation with world-class experts, with all expenses covered."
 phase: "team"
 ---
