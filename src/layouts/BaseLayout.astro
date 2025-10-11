@@ -7,6 +7,7 @@ export interface Props {
   title: string;
   description?: string;
   showNavigation?: boolean;
+  hideNavItems?: boolean;
   ogImage?: string;
   ogType?: 'website' | 'article';
   canonical?: string;
@@ -16,6 +17,7 @@ const {
   title,
   description,
   showNavigation = true,
+  hideNavItems = false,
   ogImage,
   ogType,
   canonical
@@ -35,7 +37,7 @@ const locale = Astro.currentLocale || 'en';
     canonical={canonical}
   />
   <body>
-    {showNavigation && <Navigation />}
+    {showNavigation && <Navigation hideNavItems={hideNavItems} />}
     <main>
       <slot />
     </main>

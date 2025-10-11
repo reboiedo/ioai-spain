@@ -7,6 +7,12 @@ import Dropdown from '@/components/ui/Dropdown.astro';
 import { Image } from 'astro:assets';
 import logoSvg from '@/assets/icons/ioai-spain.svg';
 
+export interface Props {
+  hideNavItems?: boolean;
+}
+
+const { hideNavItems = false } = Astro.props;
+
 // Get current locale from Astro's i18n
 const currentLocale = (Astro.currentLocale || 'en') as Language;
 const t = useTranslations(currentLocale);
@@ -52,13 +58,15 @@ const navItems = [
     </div>
 
     <!-- Navigation items -->
-    <ul class="nav-items">
-      {navItems.map(item => (
-        <li>
-          <Button variant="text" size="small" href={item.href}>{item.label}</Button>
-        </li>
-      ))}
-    </ul>
+    {!hideNavItems && (
+      <ul class="nav-items">
+        {navItems.map(item => (
+          <li>
+            <Button variant="text" size="small" href={item.href}>{item.label}</Button>
+          </li>
+        ))}
+      </ul>
+    )}
 
     <!-- Right side: Language switcher and CTA -->
     <div class="nav-right">
