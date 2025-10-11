@@ -1,9 +1,10 @@
 ---
 // Button.astro
-// A simple, reusable button component
-// 
+// A simple, reusable button component with UTM tracking support
+//
 // DESIGN RULE: Always use design tokens from core.css/semantic.css
 // Never use random hardcoded values for styling
+
 
 interface Props {
   variant?: 'primary' | 'secondary' | 'outline' | 'text';
@@ -17,6 +18,7 @@ interface Props {
   fullWidth?: boolean;
   popoverTarget?: string;
   popoverAction?: 'show' | 'hide' | 'toggle';
+  buttonId?: string; // For UTM tracking context
 }
 
 const {
@@ -30,8 +32,11 @@ const {
   disabled = false,
   fullWidth = false,
   popoverTarget,
-  popoverAction = 'show'
+  popoverAction = 'show',
+  buttonId
 } = Astro.props;
+
+const enhancedHref = href;
 
 const classes = [
   'btn-animate-chars',
@@ -42,19 +47,20 @@ const classes = [
   className
 ].filter(Boolean).join(' ');
 
-const Tag = href ? 'a' : 'button';
+const Tag = enhancedHref ? 'a' : 'button';
 ---
 
 <Tag
   class={classes}
-  href={href}
-  target={href ? target : undefined}
-  rel={href ? rel : undefined}
-  type={!href ? type : undefined}
-  disabled={!href ? disabled : undefined}
+  href={enhancedHref}
+  target={enhancedHref ? target : undefined}
+  rel={enhancedHref ? rel : undefined}
+  type={!enhancedHref ? type : undefined}
+  disabled={!enhancedHref ? disabled : undefined}
   popovertarget={popoverTarget}
   popovertargetaction={popoverTarget ? popoverAction : undefined}
   data-component="Button"
+  data-button-id={buttonId}
 >
   <div class="btn-animate-chars__bg"></div>
   <span data-button-animate-chars="" class="btn-animate-chars__text">
@@ -354,11 +360,9 @@ const Tag = href ? 'a' : 'button';
           }
         });
       }
-
-      // Mark as initialized on the text element
-      textElement.setAttribute('data-chars-initialized', 'true');
     });
   }
+
 
   // Initialize on different events
   document.addEventListener('DOMContentLoaded', initButtonCharacterStagger);

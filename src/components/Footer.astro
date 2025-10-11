@@ -1,4 +1,7 @@
 ---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import type { Language } from '../i18n';
+
 export interface Props {
   t: {
     // We can add footer translations later if needed
@@ -7,6 +10,8 @@ export interface Props {
 
 const { t } = Astro.props;
 const currentYear = new Date().getFullYear();
+const currentLocale = (Astro.currentLocale || 'en') as Language;
+const privacyUrl = getRelativeLocaleUrl(currentLocale, 'privacy');
 ---
 
 <footer class="footer">
@@ -16,7 +21,7 @@ const currentYear = new Date().getFullYear();
         <h3 class="footer-title">IOAI Spain</h3>
         <div class="footer-links">
           <span class="footer-year">© {currentYear} Harbour.Space</span>
-          <a target="_blank" href="https://harbour.space/privacy-policy" class="footer-link">Privacy Policy</a>
+          <a href={privacyUrl} class="footer-link">Privacy Policy</a>
           <a href="mailto:ioai.spain@harbour.space" class="footer-link">ioai.spain@harbour.space</a>
         </div>
       </div>

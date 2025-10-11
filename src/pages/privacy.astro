@@ -1,0 +1,20 @@
+---
+import { getEntry } from 'astro:content';
+import PrivacyLayout from '../layouts/PrivacyLayout.astro';
+
+const privacyEntry = await getEntry('privacy', 'en');
+
+if (!privacyEntry) {
+  throw new Error('Privacy policy content not found for locale: en');
+}
+
+const title = privacyEntry.data.title;
+const description = privacyEntry.data.description;
+---
+
+<PrivacyLayout
+  title={title}
+  description={description}
+  privacyEntry={privacyEntry}
+  locale="en"
+/>

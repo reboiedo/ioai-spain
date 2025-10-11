@@ -1,0 +1,78 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  canonical?: string;
+}
+
+const {
+  title,
+  description = 'Join IOAI Spain - An intensive AI program by Harbour.Space University for high school students.',
+  ogImage = '/og-image.png',
+  ogType = 'website',
+  canonical
+} = Astro.props;
+
+// Use Astro's native i18n support to get current locale
+const locale = Astro.currentLocale || 'en';
+
+// Build canonical URL
+const canonicalUrl = canonical || Astro.url.href;
+
+// Build full OG image URL (needs to be absolute for social media)
+const fullOgImageUrl = new URL(ogImage, Astro.site || Astro.url.origin).href;
+
+// Site info
+const siteName = 'IOAI Spain';
+const twitterHandle = '@ioaispain'; // Update with actual Twitter handle if available
+---
+
+<head>
+  <!-- Essential Meta Tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content={Astro.generator} />
+
+  <!-- SEO Meta Tags -->
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalUrl} />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content={ogType} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={fullOgImageUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content={siteName} />
+  <meta property="og:locale" content={locale === 'es' ? 'es_ES' : 'en_US'} />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content={canonicalUrl} />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={fullOgImageUrl} />
+  {twitterHandle && <meta name="twitter:site" content={twitterHandle} />}
+
+  <!-- Additional Meta Tags -->
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Harbour.Space University" />
+
+  <!-- Google Fonts Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Google Fonts: Funnel Display and Funnel Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <!-- UTM Tracking Script -->
+  <script src="/scripts/preserveUTM.js" is:inline></script>
+</head>

@@ -11,9 +11,15 @@ import logoSvg from '@/assets/icons/ioai-spain.svg';
 const currentLocale = (Astro.currentLocale || 'en') as Language;
 const t = useTranslations(currentLocale);
 
+// Get the current page path without locale prefix for language switching
+const currentPath = Astro.url.pathname;
+const pathWithoutLocale = currentLocale === 'en'
+  ? currentPath
+  : currentPath.replace(`/${currentLocale}`, '') || '/';
+
 // Define available languages using the centralized language list
 const languageOptions = LANGUAGES.map(code => ({
-  value: getRelativeLocaleUrl(code, ''),
+  value: getRelativeLocaleUrl(code, pathWithoutLocale),
   label: code === 'en' ? 'EN' : 'ES',
   selected: currentLocale === code
 }));
@@ -151,7 +157,7 @@ const navItems = [
     }
 
     .logo {
-      height: 36px; /* Slightly smaller on mobile */
+      height: 24px; /* Slightly smaller on mobile */
     }
 
     /* .language-switcher select {

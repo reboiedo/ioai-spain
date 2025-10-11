@@ -1,0 +1,327 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Footer from '../components/Footer.astro';
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  title: string;
+  description: string;
+  privacyEntry: CollectionEntry<'privacy'>;
+  locale?: 'en' | 'es';
+}
+
+const { title, description, privacyEntry, locale = 'en' } = Astro.props;
+const { Content } = await render(privacyEntry);
+const lastUpdated = privacyEntry.data.lastUpdated;
+
+// Parse markdown content to extract headings for navigation
+function parseMarkdownHeadings(markdown: string) {
+  const headingRegex = /^## (.+)$/gm;
+  const headings: { id: string; title: string }[] = [];
+  let match;
+
+  while ((match = headingRegex.exec(markdown)) !== null) {
+    const headingTitle = match[1];
+    const id = headingTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '-');
+    headings.push({ id, title: headingTitle });
+  }
+
+  return headings;
+}
+
+const headings = parseMarkdownHeadings(privacyEntry.body || '');
+
+// Translations for the interface
+const translations = {
+  en: {
+    tableOfContents: "Table of contents",
+    lastUpdated: "Last updated:"
+  },
+  es: {
+    tableOfContents: "Tabla de contenidos",
+    lastUpdated: "Última actualización:"
+  }
+};
+
+const t = translations[locale];
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="privacy-page">
+    <div class="container">
+      <!-- Header Section - Full Width -->
+      <div class="header">
+        <h1>{title}</h1>
+        <p class="last-updated">{t.lastUpdated} {lastUpdated}</p>
+      </div>
+
+      <!-- Main Layout Grid -->
+      <div class="layout-grid">
+        <!-- Navigation Sidebar -->
+        <nav class="quicknav">
+          <!-- <h3>{t.tableOfContents}</h3> -->
+          <ul>
+            {headings.map(heading => (
+              <li><a href={`#${heading.id}`}>{heading.title}</a></li>
+            ))}
+          </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="content">
+          <Content />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Footer t={{}} />
+</BaseLayout>
+
+<style>
+  .privacy-page {
+    padding: var(--section-block) var(--section-inline);
+    min-height: 70vh;
+  }
+
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  /* Header Section - Full Width */
+  .header {
+    margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-xs) 0;
+  }
+
+  .last-updated {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Grid Layout */
+  .layout-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  /* Quick Navigation Sidebar */
+  .quicknav {
+    position: sticky;
+    top: var(--space-3xl);
+  }
+
+  .quicknav h3 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-m) 0;
+  }
+
+  .quicknav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .quicknav li {
+    margin: 0;
+    margin-bottom: var(--space-3xs);
+  }
+
+  .quicknav a {
+    display: block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-relaxed);
+    transition: color 0.2s ease;
+  }
+
+  .quicknav a:hover {
+    color: var(--text-primary);
+  }
+
+  /* Main Content */
+  .content {
+    line-height: var(--line-height-normal);
+  }
+
+  .content :global(h1) {
+    font-family: var(--font-display);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xl);
+    margin-top: 0;
+  }
+
+  .content :global(h2) {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-s);
+    scroll-margin-top: var(--space-xl);
+  }
+
+  .content :global(h2:first-of-type) {
+    margin-top: 0;
+  }
+
+  .content :global(h3) {
+    font-family: var(--font-display);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    margin-top: var(--space-m);
+    margin-bottom: var(--space-s);
+  }
+
+  .content :global(p) {
+    font-size: var(--font-size-base);
+    font-weight: 300;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-s);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .content :global(ul) {
+    margin: var(--space-m) 0;
+    padding-left: var(--space-s);
+    color: var(--text-secondary);
+    font-weight: 300;
+    list-style-type: disc;
+    display: block;
+  }
+
+  .content :global(li) {
+    margin: var(--space-xs) 0;
+    line-height: var(--line-height-relaxed);
+    display: list-item;
+  }
+
+  .content :global(strong) {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+  }
+
+  .content :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .content :global(a:hover) {
+    text-decoration-color: var(--color-primary);
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 1024px) {
+    .layout-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+
+    .quicknav {
+      position: static;
+      order: -1;
+    }
+
+    .quicknav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .quicknav a {
+      white-space: nowrap;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .privacy-page {
+      padding: var(--space-xl) var(--section-inline);
+    }
+
+    .header h1 {
+      font-size: var(--font-size-xl);
+    }
+
+    .content :global(h2) {
+      font-size: var(--font-size-lg);
+    }
+
+    .content :global(h3) {
+      font-size: var(--font-size-base);
+    }
+
+    .quicknav ul {
+      display: block;
+    }
+
+    .quicknav a {
+      white-space: normal;
+    }
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .quicknav a.active {
+    color: var(--text-primary);
+  }
+</style>
+
+<script>
+  // Add active state highlighting for navigation
+  function updateActiveNavItem() {
+    const sections = document.querySelectorAll('h2[id]');
+    const navLinks = document.querySelectorAll('.quicknav a');
+
+    let currentSection = '';
+
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 100) {
+        currentSection = section.id;
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${currentSection}`) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  // Listen for scroll events
+  window.addEventListener('scroll', updateActiveNavItem);
+
+  // Set initial active state
+  updateActiveNavItem();
+</script>
+</BaseLayout>

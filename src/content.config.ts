@@ -89,8 +89,19 @@ const forms = defineCollection({
   })
 });
 
+const privacy = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/privacy' }),
+  schema: z.object({
+    title: z.string(),
+    lastUpdated: z.string(),
+    locale: z.enum(['en', 'es']),
+    description: z.string()
+  })
+});
+
 export const collections = {
   faq,
   rounds,
-  forms
+  forms,
+  privacy
 };
