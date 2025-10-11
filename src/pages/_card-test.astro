@@ -1,0 +1,141 @@
+---
+import ClippedCard from '@/components/ui/ClippedCard.astro';
+import Button from '@/components/ui/Button.astro';
+import Layout from '@/layouts/BaseLayout.astro';
+---
+
+<Layout title="ClippedCard Test Page">
+  <div class="test-container">
+    <h1>ClippedCard Component Test</h1>
+    <p>Testing the new CSS clip-path based card component with asymmetrical notches</p>
+
+    <div class="grid-container">
+      <!-- Large card spanning 2 columns -->
+      <ClippedCard class="large-card">
+        <h2>Large Card (2 Columns)</h2>
+        <p>This is a larger card that spans two columns in our grid. It contains more content to test how the clipped shape behaves with different amounts of text and varying heights.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+        <div style="margin-top: 2rem;">
+          <Button variant="primary" href="#test">Large Card Action</Button>
+        </div>
+      </ClippedCard>
+
+      <!-- Small card 1 -->
+      <ClippedCard class="small-card">
+        <h3>Small Card 1</h3>
+        <p>This is a smaller card with less content to test the shape behavior.</p>
+        <div style="margin-top: 1rem;">
+          <Button variant="outline" href="#test">Action 1</Button>
+        </div>
+      </ClippedCard>
+
+      <!-- Small card 2 -->
+      <ClippedCard class="small-card">
+        <h3>Small Card 2</h3>
+        <p>Another small card with minimal content to see how the clip-path scales with different content lengths and heights.</p>
+        <p>Additional paragraph to create more height variation.</p>
+        <div style="margin-top: 1rem;">
+          <Button variant="outline" href="#test">Action 2</Button>
+        </div>
+      </ClippedCard>
+    </div>
+
+    <!-- Alternative test with deep notch variant -->
+    <div class="variant-test">
+      <h2>Deep Notch Variant Test</h2>
+      <div class="single-card-test">
+        <ClippedCard class="deep-notch">
+          <h3>Deep Notch Card</h3>
+          <p>This card uses the deep-notch variant class to test a more pronounced notched shape.</p>
+          <div style="margin-top: 1rem;">
+            <Button variant="primary" href="#test">Deep Notch Action</Button>
+          </div>
+        </ClippedCard>
+      </div>
+    </div>
+
+    <!-- Comparison section -->
+    <div class="comparison-section">
+      <h2>Comparison: Current vs New Implementation</h2>
+      <p>Navigate to <a href="/#eligibility">eligibility section</a> to compare with current CardFlair implementation.</p>
+      <p>The new implementation creates asymmetrical notches: top notch on left, bottom notch on right.</p>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .test-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+
+  .grid-container :global(.large-card) {
+    grid-column: span 2;
+    /* Large cards automatically get deeper notches via container queries */
+  }
+
+  .grid-container :global(.small-card) {
+    grid-column: span 1;
+    /* Small cards automatically get shallower notches via container queries */
+  }
+
+  .variant-test {
+    margin-bottom: 4rem;
+  }
+
+  .single-card-test {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .comparison-section {
+    text-align: center;
+    padding: 2rem;
+    background: var(--background-elevated, #f8f9fa);
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .comparison-section a {
+    color: var(--color-primary, #0066cc);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .comparison-section a:hover {
+    text-decoration: underline;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 809px) {
+    .test-container {
+      padding: 1rem;
+    }
+
+    .grid-container {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .grid-container :global(.large-card),
+    .grid-container :global(.small-card) {
+      grid-column: span 1;
+    }
+  }
+</style>

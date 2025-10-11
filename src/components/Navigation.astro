@@ -4,6 +4,7 @@ import { LANGUAGES, useTranslations } from '../i18n';
 import type { Language } from '../i18n';
 import Button from '@/components/ui/Button.astro';
 import Dropdown from '@/components/ui/Dropdown.astro';
+import { Image } from 'astro:assets';
 import logoSvg from '@/assets/icons/ioai-spain.svg';
 
 // Get current locale from Astro's i18n
@@ -32,7 +33,15 @@ const navItems = [
     <!-- Logo/Brand -->
     <div class="nav-brand">
       <a href={getRelativeLocaleUrl(currentLocale, '')}>
-        <img src={logoSvg.src} alt="IOAI Spain" class="logo" />
+        <Image
+          src={logoSvg}
+          alt="IOAI Spain"
+          class="logo"
+          width={120}
+          height={40}
+          loading="eager"
+          format="svg"
+        />
       </a>
     </div>
 
@@ -56,7 +65,7 @@ const navItems = [
       />
 
       <!-- CTA Button -->
-      <Button variant="primary" size="small" popoverTarget="registration-popover" popoverAction="show">
+      <Button variant="primary" size="small" href={t.ui.nav.joinNowUrl}>
         {t.ui.nav.joinNow}
       </Button>
     </div>

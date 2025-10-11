@@ -8,5 +8,9 @@ export const finalCTA = {
   ctaButton: createTranslation({
     en: "Join the Waitlist",
     es: "Únete a la Lista de Espera"
+  }),
+  ctaUrl: createTranslation({
+    en: "/form/join-training/",
+    es: "/es/form/join-training/"
   })
 } as const;

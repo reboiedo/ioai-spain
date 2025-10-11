@@ -1,0 +1,188 @@
+---
+import Button from './ui/Button.astro';
+
+export interface Props {
+  config: {
+    title: string;
+    message: string;
+    buttons: {
+      primary: {
+        text: string;
+        url: string;
+        openInNewTab: boolean;
+      };
+      secondary?: {
+        text: string;
+        url: string;
+        openInNewTab: boolean;
+      };
+    };
+  };
+  locale: 'en' | 'es';
+}
+
+const { config, locale } = Astro.props;
+
+// Smart URL handling function
+function getButtonProps(button: { url: string; openInNewTab: boolean }) {
+  const isExternalUrl = button.url.startsWith('http://') || button.url.startsWith('https://');
+  const shouldOpenInNewTab = button.openInNewTab ?? isExternalUrl; // explicit or fallback
+
+  return {
+    href: button.url,
+    target: shouldOpenInNewTab ? '_blank' : undefined,
+    rel: shouldOpenInNewTab && isExternalUrl ? 'noopener noreferrer' : undefined
+  };
+}
+
+const primaryButtonProps = getButtonProps(config.buttons.primary);
+const secondaryButtonProps = config.buttons.secondary ? getButtonProps(config.buttons.secondary) : null;
+---
+
+<section class="thank-you-section">
+  <div class="container">
+    <div class="thank-you-container">
+      <div class="thank-you-wrapper">
+        <!-- Success Icon -->
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="#10b981" />
+            <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <h1 class="thank-you-title">{config.title}</h1>
+        <p class="thank-you-message">{config.message}</p>
+
+        <!-- Primary Button -->
+        <div class="button-section primary-button">
+          <Button
+            href={primaryButtonProps.href}
+            variant="primary"
+            size="medium"
+            target={primaryButtonProps.target}
+            rel={primaryButtonProps.rel}
+          >
+            {primaryButtonProps.href.includes('drive.google.com') && (
+              <svg class="download-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            )}
+            {config.buttons.primary.text}
+          </Button>
+        </div>
+
+        <!-- Secondary Button (if provided) -->
+        {config.buttons.secondary && secondaryButtonProps && (
+          <div class="button-section secondary-button">
+            <Button
+              href={secondaryButtonProps.href}
+              variant="outline"
+              size="medium"
+              target={secondaryButtonProps.target}
+              rel={secondaryButtonProps.rel}
+            >
+              {config.buttons.secondary.text}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .thank-you-section {
+    padding: var(--space-xl) var(--section-inline);
+    background: var(--background-primary);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+  }
+
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .thank-you-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .thank-you-wrapper {
+    background: var(--background-elevated);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-primary);
+    text-align: center;
+  }
+
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+  }
+
+  .success-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .thank-you-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .thank-you-message {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .button-section {
+    margin-top: 1.5rem;
+  }
+
+  .primary-button {
+    margin-bottom: 1rem;
+  }
+
+  .secondary-button {
+    margin-top: 1rem;
+  }
+
+  .download-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    .thank-you-section {
+      padding: var(--space-l) var(--section-inline);
+    }
+
+    .thank-you-wrapper {
+      padding: 2rem 1.5rem;
+    }
+
+    .thank-you-title {
+      font-size: 1.75rem;
+    }
+
+    .success-icon {
+      width: 60px;
+      height: 60px;
+    }
+  }
+</style>

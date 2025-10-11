@@ -1,8 +1,8 @@
 ---
 roundNumber: 6
-title: "Campamento de Verano en Menorca"
+title: "Campamento de Verano en Tenerife"
 date: "Julio 2026"
-introSentence: "Campamento residencial de élite en Menorca que reúne a los mejores talentos de IA de España para la preparación intensiva final con expertos de clase mundial, con todos los gastos cubiertos."
+introSentence: "Campamento residencial de élite en Tenerife que reúne a los mejores talentos de IA de España para la preparación intensiva final con expertos de clase mundial. Gratuito para miembros del Equipo España, abierto a todos los estudiantes apasionados por la IA."
 phase: "team"
 ---
 
@@ -19,7 +19,14 @@ phase: "team"
 
 - Ambiente de aprendizaje inmersivo lejos de distracciones
 - Networking con las mentes más brillantes de IA de España
-- Actividades culturales y recreativas en Menorca
+- Actividades culturales y recreativas en Tenerife
 - Mentoría personal de líderes de la industria
 - Proceso final de selección y formación del equipo
 - Preparación mental para la competición internacional
+
+## Participación y Tarifas
+
+- Gratuito para miembros del Equipo España
+- Inscripción abierta para todos los entusiastas españoles de la IA
+- Plazas limitadas - registro temprano recomendado
+- Oportunidades de beca para candidatos excepcionales

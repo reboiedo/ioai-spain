@@ -1,0 +1,137 @@
+---
+export interface Props {
+  id: string;
+  name: string;
+  label: string;
+  options: Array<{ value: string; label: string; disabled?: boolean }>;
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  label,
+  options,
+  placeholder,
+  required = false,
+  value,
+  class: className
+} = Astro.props;
+---
+
+<div class={`select-group ${className || ''}`}>
+  <label for={id} class="select-label">
+    {label}
+    {required && <span class="required">*</span>}
+  </label>
+  <div class="select-wrapper">
+    <select
+      id={id}
+      name={name}
+      class="select-field"
+      required={required}
+    >
+      {placeholder && (
+        <option value="" disabled selected={!value}>
+          {placeholder}
+        </option>
+      )}
+      {options.map((option) => (
+        <option
+          value={option.value}
+          disabled={option.disabled}
+          selected={value === option.value}
+        >
+          {option.label}
+        </option>
+      ))}
+    </select>
+    <svg class="select-icon" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+    </svg>
+  </div>
+</div>
+
+<style>
+  .select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .select-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .select-wrapper {
+    position: relative;
+  }
+
+  .select-field {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    font-size: 1rem;
+    line-height: 1.5;
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .select-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .select-field:disabled {
+    background-color: var(--background-secondary);
+    color: var(--text-inactive);
+    cursor: not-allowed;
+  }
+
+  .select-field option:disabled {
+    color: var(--text-inactive);
+  }
+
+  .select-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+    transition: color 0.2s ease;
+  }
+
+  .select-field:focus + .select-icon {
+    color: var(--color-primary);
+  }
+
+  .select-field:disabled + .select-icon {
+    color: var(--text-inactive);
+  }
+
+  /* iOS Safari: Prevent zoom on input focus */
+  @media screen and (max-width: 768px) {
+    .select-field {
+      font-size: 16px;
+    }
+  }
+</style>

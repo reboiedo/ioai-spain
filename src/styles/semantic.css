@@ -48,6 +48,7 @@
   --section-offset: var(--space-xl-2xl);
   --card-inline: var(--space-s-m);
   --card-block: var(--space-l);
+  --notch-depth: clamp(2.5rem, 1.0682rem + 6.3636cqi, 6rem);
 
   /* Colors */
 

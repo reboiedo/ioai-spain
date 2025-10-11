@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import GenericForm from '../../../components/GenericForm.astro';
+import SimpleFormLayout from '../../../layouts/SimpleFormLayout.astro';
+import { useTranslations } from '../../../i18n';
+
+export async function getStaticPaths() {
+  const forms = await getCollection('forms', ({ id }) => {
+    return id.startsWith('es/');
+  });
+
+  return forms.map(form => ({
+    params: { slug: form.data.slug },
+    props: { form }
+  }));
+}
+
+const { form } = Astro.props;
+const locale = 'es';
+const t = useTranslations(locale);
+
+// Use meta data directly from collection
+const title = form.data.meta.title;
+const description = form.data.meta.description;
+---
+
+<SimpleFormLayout
+  title={title}
+  description={description}
+  t={t}
+>
+  <GenericForm formData={form.data} locale={locale} />
+</SimpleFormLayout>

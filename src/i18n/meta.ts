@@ -8,5 +8,9 @@ export const meta = {
   description: createTranslation({
     en: "Join Spain's national team for the International Olympiad in Artificial Intelligence 2026",
     es: "Únete al equipo nacional de España para la Olimpiada Internacional de Inteligencia Artificial 2026"
+  }),
+  organizationName: createTranslation({
+    en: "IOAI Spain",
+    es: "IOAI España"
   })
 } as const;

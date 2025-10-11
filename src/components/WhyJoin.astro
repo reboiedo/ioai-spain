@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
 import trophyIcon from '../assets/icons/icon.Trophy.svg';
 import skillsIcon from '../assets/icons/icon.Skills.svg';
@@ -49,7 +50,7 @@ const { t } = Astro.props;
 
         <div class="benefits-list">
           <div class="benefit-item">
-            <img src={trophyIcon.src} alt="" class="benefit-icon" />
+            <Image src={trophyIcon} alt="" class="benefit-icon" width={32} height={32} loading="lazy" format="svg" aria-hidden="true" />
             <div class="benefit-content">
               <h3 class="benefit-title">{t.whyJoin.benefits.represent.title}</h3>
               <p class="benefit-description text-base">{t.whyJoin.benefits.represent.description}</p>
@@ -57,7 +58,7 @@ const { t } = Astro.props;
           </div>
 
           <div class="benefit-item">
-            <img src={skillsIcon.src} alt="" class="benefit-icon" />
+            <Image src={skillsIcon} alt="" class="benefit-icon" width={32} height={32} loading="lazy" format="svg" aria-hidden="true" />
             <div class="benefit-content">
               <h3 class="benefit-title">{t.whyJoin.benefits.skills.title}</h3>
               <p class="benefit-description text-base">{t.whyJoin.benefits.skills.description}</p>
@@ -65,7 +66,7 @@ const { t } = Astro.props;
           </div>
 
           <div class="benefit-item">
-            <img src={standOutIcon.src} alt="" class="benefit-icon" />
+            <Image src={standOutIcon} alt="" class="benefit-icon" width={32} height={32} loading="lazy" format="svg" aria-hidden="true" />
             <div class="benefit-content">
               <h3 class="benefit-title">{t.whyJoin.benefits.standOut.title}</h3>
               <p class="benefit-description text-base">{t.whyJoin.benefits.standOut.description}</p>
@@ -73,7 +74,7 @@ const { t } = Astro.props;
           </div>
 
           <div class="benefit-item">
-            <img src={diversityIcon.src} alt="" class="benefit-icon" />
+            <Image src={diversityIcon} alt="" class="benefit-icon" width={32} height={32} loading="lazy" format="svg" aria-hidden="true" />
             <div class="benefit-content">
               <h3 class="benefit-title">{t.whyJoin.benefits.community.title}</h3>
               <p class="benefit-description text-base">{t.whyJoin.benefits.community.description}</p>

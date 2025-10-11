@@ -16,5 +16,9 @@ export const hero = {
   trainingStarts: createTranslation({
     en: "Training starts October 27th",
     es: "El entrenamiento comienza el 27 de octubre"
+  }),
+  ctaUrl: createTranslation({
+    en: "/form/join-training/",
+    es: "/es/form/join-training/"
   })
 } as const;

@@ -1,0 +1,95 @@
+---
+export interface Props {
+  id: string;
+  name: string;
+  type?: 'text' | 'email' | 'tel' | 'password' | 'url';
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  type = 'text',
+  label,
+  placeholder,
+  required = false,
+  value,
+  class: className
+} = Astro.props;
+---
+
+<div class={`input-group ${className || ''}`}>
+  <label for={id} class="input-label">
+    {label}
+    {required && <span class="required">*</span>}
+  </label>
+  <input
+    type={type}
+    id={id}
+    name={name}
+    class="input-field"
+    placeholder={placeholder}
+    required={required}
+    value={value}
+  />
+</div>
+
+<style>
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .input-label {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    line-height: var(--line-height-snug);
+  }
+
+  .required {
+    color: var(--color-warm-600);
+    margin-left: var(--space-3xs);
+  }
+
+  .input-field {
+    padding: var(--space-2xs) var(--space-s);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    line-height: var(--line-height-normal);
+    background-color: var(--background-elevated);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  }
+
+  .input-field::placeholder {
+    color: var(--text-inactive);
+  }
+
+  .input-field:disabled {
+    background-color: var(--color-neutral-100);
+    color: var(--text-inactive);
+    cursor: not-allowed;
+  }
+
+  /* iOS Safari: Prevent zoom on input focus */
+  @media screen and (max-width: 809px) {
+    .input-field {
+      font-size: 16px;
+    }
+  }
+</style>

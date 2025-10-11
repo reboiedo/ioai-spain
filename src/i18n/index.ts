@@ -10,7 +10,6 @@ import { whyJoin } from './whyJoin';
 import { sponsors } from './sponsors';
 import { finalCTA } from './finalCTA';
 import { banner } from './banner';
-import { thankYou } from './thankYou';
 import type { Language } from './types';
 import { getTranslation } from './types';
 
@@ -26,8 +25,7 @@ export const translations = {
   whyJoin,
   sponsors,
   finalCTA,
-  banner,
-  thankYou
+  banner
 } as const;
 
 export function useTranslations(locale: Language | undefined) {
@@ -36,17 +34,20 @@ export function useTranslations(locale: Language | undefined) {
       eyebrow: getTranslation(hero.eyebrow, locale),
       title: getTranslation(hero.title, locale),
       subtitle: getTranslation(hero.subtitle, locale),
-      trainingStarts: getTranslation(hero.trainingStarts, locale)
+      trainingStarts: getTranslation(hero.trainingStarts, locale),
+      ctaUrl: getTranslation(hero.ctaUrl, locale)
     },
     meta: {
       title: getTranslation(meta.title, locale),
-      description: getTranslation(meta.description, locale)
+      description: getTranslation(meta.description, locale),
+      organizationName: getTranslation(meta.organizationName, locale)
     },
     ui: {
       nav: {
         languageLabel: getTranslation(ui.nav.languageLabel, locale),
         selectLanguage: getTranslation(ui.nav.selectLanguage, locale),
         joinNow: getTranslation(ui.nav.joinNow, locale),
+        joinNowUrl: getTranslation(ui.nav.joinNowUrl, locale),
         aboutIOAI: getTranslation(ui.nav.aboutIOAI, locale),
         whyJoin: getTranslation(ui.nav.whyJoin, locale),
         programme: getTranslation(ui.nav.programme, locale),
@@ -126,9 +127,16 @@ export function useTranslations(locale: Language | undefined) {
         point2: getTranslation(eligibility.criteria.point2, locale),
         point3: getTranslation(eligibility.criteria.point3, locale)
       },
-      joinButton: getTranslation(eligibility.joinButton, locale)
+      joinButton: getTranslation(eligibility.joinButton, locale),
+      joinButtonUrl: getTranslation(eligibility.joinButtonUrl, locale)
     },
     registration: {
+      meta: {
+        title: getTranslation(registration.meta.title, locale),
+        description: getTranslation(registration.meta.description, locale)
+      },
+      title: getTranslation(registration.title, locale),
+      subtitle: getTranslation(registration.subtitle, locale),
       sectionTitle: getTranslation(registration.sectionTitle, locale),
       fields: {
         fullName: {
@@ -193,22 +201,14 @@ export function useTranslations(locale: Language | undefined) {
     },
     finalCTA: {
       title: getTranslation(finalCTA.title, locale),
-      ctaButton: getTranslation(finalCTA.ctaButton, locale)
+      ctaButton: getTranslation(finalCTA.ctaButton, locale),
+      ctaUrl: getTranslation(finalCTA.ctaUrl, locale)
     },
     banner: {
       title: getTranslation(banner.title, locale),
       description: getTranslation(banner.description, locale),
       downloadButton: getTranslation(banner.downloadButton, locale),
       downloadUrl: getTranslation(banner.downloadUrl, locale)
-    },
-    thankYou: {
-      meta: {
-        title: getTranslation(thankYou.meta.title, locale),
-        description: getTranslation(thankYou.meta.description, locale)
-      },
-      title: getTranslation(thankYou.title, locale),
-      paragraph: getTranslation(thankYou.paragraph, locale),
-      buttonText: getTranslation(thankYou.buttonText, locale)
     }
   };
 }

@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import GenericThankYou from '../../../components/GenericThankYou.astro';
+import SimpleFormLayout from '../../../layouts/SimpleFormLayout.astro';
+import { useTranslations } from '../../../i18n';
+
+export async function getStaticPaths() {
+  const forms = await getCollection('forms', ({ id }) => {
+    return id.startsWith('en/');
+  });
+
+  return forms.map(form => ({
+    params: { slug: form.data.slug },
+    props: { form }
+  }));
+}
+
+const { form } = Astro.props;
+const locale = 'en';
+const t = useTranslations(locale);
+
+// Use thank you data directly from collection
+const title = form.data.thankYou.title;
+const description = `Thank you for your submission to IOAI Spain.`;
+---
+
+<SimpleFormLayout
+  title={title}
+  description={description}
+  t={t}
+>
+  <GenericThankYou config={form.data.thankYou} locale={locale} />
+</SimpleFormLayout>

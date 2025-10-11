@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
 import ioaiLogo from '../assets/ioai-logo.svg';
 import harbourLogo from '../assets/harbour-space-logo.svg';
@@ -34,17 +35,47 @@ const { t } = Astro.props;
     <div class="sponsors-grid">
       <!-- IOAI Logo -->
       <div class="sponsor-item">
-        <img src={ioaiLogo.src} alt="IOAI - International Olympiad in Artificial Intelligence" class="sponsor-logo" />
+        <a href="https://ioai-official.org/" target="_blank" rel="noopener noreferrer">
+          <Image
+            src={ioaiLogo}
+            alt="IOAI - International Olympiad in Artificial Intelligence"
+            class="sponsor-logo"
+            width={180}
+            height={48}
+            loading="lazy"
+            format="svg"
+          />
+        </a>
       </div>
 
       <!-- Harbour.Space Logo -->
       <div class="sponsor-item">
-        <img src={harbourLogo.src} alt="Harbour.Space - Institute of Technology" class="sponsor-logo" />
+        <a href="https://harbour.space/" target="_blank" rel="noopener noreferrer">
+          <Image
+            src={harbourLogo}
+            alt="Harbour.Space - Institute of Technology"
+            class="sponsor-logo"
+            width={180}
+            height={48}
+            loading="lazy"
+            format="svg"
+          />
+        </a>
       </div>
 
       <!-- Leagues of Code Logo -->
       <div class="sponsor-item">
-        <img src={leaguesLogo.src} alt="Leagues of Code" class="sponsor-logo" />
+        <a href="https://leaguesofcode.com/" target="_blank" rel="noopener noreferrer">
+          <Image
+            src={leaguesLogo}
+            alt="Leagues of Code"
+            class="sponsor-logo"
+            width={180}
+            height={48}
+            loading="lazy"
+            format="svg"
+          />
+        </a>
       </div>
     </div>
   </div>

@@ -15,6 +15,7 @@ export interface Props {
         point3: string;
       };
       joinButton: string;
+      joinButtonUrl: string;
     };
   };
 }
@@ -43,7 +44,7 @@ const { t } = Astro.props;
             <li>{t.eligibility.criteria.point2}</li>
             <li>{t.eligibility.criteria.point3}</li>
           </ul>
-          <div class="button-wrapper"><Button popoverTarget="registration-popover"> {t.eligibility.joinButton} </Button></div>
+          <div class="button-wrapper"><Button href={t.eligibility.joinButtonUrl}> {t.eligibility.joinButton} </Button></div>
         </div>
         </div>
         

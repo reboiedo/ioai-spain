@@ -7,6 +7,7 @@ export interface Props {
       title: string;
       subtitle: string;
       trainingStarts: string;
+      ctaUrl: string;
     };
     ui: {
       common: {
@@ -38,7 +39,7 @@ const { t } = Astro.props;
     
     <!-- Call-to-action buttons -->
     <div class="button-group">
-      <Button variant="primary" popoverTarget="registration-popover">{t.ui.common.joinNow}</Button>
+      <Button variant="primary" href={t.hero.ctaUrl}>{t.ui.common.joinNow}</Button>
       <p><strong>{t.hero.trainingStarts}</strong></p>
     </div>
   </div>

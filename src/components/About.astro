@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
 import ioaiLogo from '../assets/ioai-logo.svg';
 import harbourSpaceLogo from '../assets/harbour-space-logo.svg';
@@ -38,7 +39,17 @@ const { t } = Astro.props;
         <CardFlair position='top' />
         <!-- <CardFlair position='bottom' /> -->
 
-        <img src={ioaiLogo.src} alt={t.about.ioai2026.title} class="card-logo" />
+        <a href="https://ioai-official.org/" target="_blank" rel="noopener noreferrer">
+          <Image
+            src={ioaiLogo}
+            alt={t.about.ioai2026.title}
+            class="card-logo"
+            width={120}
+            height={40}
+            loading="lazy"
+            format="svg"
+          />
+        </a>
         <p class="card-subtitle heading-m">{t.about.ioai2026.date}</p>
         <p class="card-description text-base">{t.about.ioai2026.description}</p>
       </div>
@@ -47,7 +58,17 @@ const { t } = Astro.props;
         <CardFlair position='top' />
         <!-- <CardFlair position='bottom' /> -->
 
-        <img src={harbourSpaceLogo.src} alt={t.about.harbourSpace.title} class="card-logo" />
+        <a href="https://harbour.space/" target="_blank" rel="noopener noreferrer">
+          <Image
+            src={harbourSpaceLogo}
+            alt={t.about.harbourSpace.title}
+            class="card-logo"
+            width={120}
+            height={40}
+            loading="lazy"
+            format="svg"
+          />
+        </a>
         <p class="card-subtitle heading-m">{t.about.harbourSpace.subtitle}</p>
         <p class="card-description text-base">{t.about.harbourSpace.description}</p>
       </div>

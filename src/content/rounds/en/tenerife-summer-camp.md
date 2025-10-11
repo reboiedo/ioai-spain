@@ -1,8 +1,8 @@
 ---
 roundNumber: 6
-title: "Menorca Summer Camp"
+title: "Tenerife Summer Camp"
 date: "July 2026"
-introSentence: "Elite residential training camp in Menorca bringing together Spain's top AI talents for final intensive preparation with world-class experts, with all expenses covered."
+introSentence: "Elite residential training camp in Tenerife bringing together Spain's top AI talents for final intensive preparation with world-class experts. Free for Team Spain members, open to all passionate AI students."
 phase: "team"
 ---
 
@@ -19,7 +19,14 @@ phase: "team"
 
 - Immersive learning environment away from distractions
 - Peer networking with Spain's brightest AI minds
-- Cultural and recreational activities in Menorca
+- Cultural and recreational activities in Tenerife
 - Personal mentorship from industry leaders
 - Final team selection and formation process
 - Mental preparation for international competition
+
+## Participation & Fees
+
+- Free of charge for Team Spain members
+- Open enrollment for all Spanish AI enthusiasts
+- Limited spots available - early registration recommended
+- Scholarship opportunities for exceptional candidates

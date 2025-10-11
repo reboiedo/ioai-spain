@@ -14,6 +14,10 @@ export const ui = {
       en: 'Join Now',
       es: 'Únete Ahora'
     }),
+    joinNowUrl: createTranslation({
+      en: '/form/join-training/',
+      es: '/es/form/join-training/'
+    }),
     aboutIOAI: createTranslation({
       en: 'About IOAI',
       es: 'Acerca de IOAI'

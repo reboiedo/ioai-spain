@@ -22,7 +22,75 @@ const rounds = defineCollection({
   })
 });
 
+const forms = defineCollection({
+  loader: glob({
+    pattern: '**/*.md',
+    base: './src/content/forms',
+    generateId: ({ entry, base }) => {
+      // Keep the directory structure: en/apply.md -> en/apply
+      const relativePath = entry.replace(base + '/', '');
+      return relativePath.replace(/\.md$/, '');
+    }
+  }),
+  schema: z.object({
+    slug: z.string(),
+    enabled: z.boolean().default(true),
+
+    // Either use a form template OR provide full form configuration
+    formTemplate: z.enum(['application', 'download', 'contact']).optional(),
+
+
+    // Full form configuration (used when formTemplate is not provided)
+    form: z.object({
+      title: z.string(),
+      subtitle: z.string().optional(),
+      action: z.string().optional(), // Optional when using template
+      fields: z.array(z.object({
+        type: z.enum(['text', 'email', 'select', 'textarea', 'checkbox']),
+        name: z.string(),
+        label: z.string(),
+        placeholder: z.string().optional(),
+        required: z.boolean().default(false),
+        options: z.array(z.object({
+          value: z.string(),
+          label: z.string()
+        })).optional() // For select fields
+      })).optional(), // Optional when using template
+      submitButton: z.object({
+        default: z.string(),
+        loading: z.string()
+      }).optional(), // Optional when using template
+      confirmationMessage: z.string().optional()
+    }),
+
+    // Self-contained thank you configuration
+    thankYou: z.object({
+      title: z.string(),
+      message: z.string(),
+      buttons: z.object({
+        primary: z.object({
+          text: z.string(),
+          url: z.string(),
+          openInNewTab: z.boolean().default(false)
+        }),
+        secondary: z.object({
+          text: z.string(),
+          url: z.string(),
+          openInNewTab: z.boolean().default(false)
+        }).optional()
+      })
+    }),
+
+    // Page metadata
+    meta: z.object({
+      title: z.string(),
+      description: z.string()
+    })
+  })
+});
+
 export const collections = {
   faq,
-  rounds
+  rounds,
+  forms
 };

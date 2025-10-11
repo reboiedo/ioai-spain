@@ -1,0 +1,48 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import SimpleHeader from '../components/ui/SimpleHeader.astro';
+import SimpleFooter from '../components/ui/SimpleFooter.astro';
+import type { useTranslations, Language } from '../i18n';
+
+export interface Props {
+  title: string;
+  description: string;
+  t: ReturnType<typeof useTranslations>;
+}
+
+const { title, description, t } = Astro.props;
+const locale = (Astro.currentLocale || 'en') as Language;
+---
+
+<BaseLayout title={title} description={description} showNavigation={false}>
+  <div class="simple-form-layout">
+    <SimpleHeader locale={locale} />
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <slot />
+    </div>
+
+    <SimpleFooter t={t} />
+  </div>
+</BaseLayout>
+
+<style>
+  /* Layout using your existing design system */
+  .simple-form-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    background: var(--background-primary);
+    display: flex;
+    align-items: center;
+    min-height: 0;
+  }
+
+</style>

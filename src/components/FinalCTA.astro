@@ -6,6 +6,7 @@ export interface Props {
     finalCTA: {
       title: string;
       ctaButton: string;
+      ctaUrl: string;
     };
   };
 }
@@ -30,8 +31,7 @@ const { t } = Astro.props;
       <Button
         variant="primary"
         size="large"
-        popoverTarget="registration-popover"
-        popoverAction="show"
+        href={t.finalCTA.ctaUrl}
       >
         {t.finalCTA.ctaButton}
       </Button>

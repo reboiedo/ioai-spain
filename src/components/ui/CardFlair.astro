@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import cardFlairSvg from '@/assets/icons/card-flair.svg';
 import Eyebrow from '../Eyebrow.astro';
 
@@ -10,7 +11,7 @@ const { position } = Astro.props;
 ---
 
 <div class={`card-flair card-flair--${position}`}>
-  <img src={cardFlairSvg.src} alt="" class="flair-image" />
+  <Image src={cardFlairSvg} alt="" class="flair-image" width={100} height={20} loading="lazy" format="svg" aria-hidden="true" />
 </div>
 
 <style>

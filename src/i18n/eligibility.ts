@@ -30,5 +30,9 @@ export const eligibility = {
   joinButton: createTranslation({
     en: "Join now",
     es: "Únete ahora"
+  }),
+  joinButtonUrl: createTranslation({
+    en: "/form/join-training/",
+    es: "/es/form/join-training/"
   })
 } as const;

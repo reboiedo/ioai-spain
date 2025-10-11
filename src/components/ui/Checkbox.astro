@@ -1,0 +1,127 @@
+---
+export interface Props {
+  id: string;
+  name: string;
+  label: string;
+  value?: string;
+  required?: boolean;
+  checked?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  name,
+  label,
+  value = 'yes',
+  required = false,
+  checked = false,
+  class: className
+} = Astro.props;
+---
+
+<div class={`checkbox-group ${className || ''}`}>
+  <label class="checkbox-label">
+    <input
+      type="checkbox"
+      id={id}
+      name={name}
+      value={value}
+      required={required}
+      checked={checked}
+      class="checkbox-input"
+    />
+    <span class="checkbox-custom"></span>
+    <span class="checkbox-text">
+      {label}
+      {required && <span class="required">*</span>}
+    </span>
+  </label>
+</div>
+
+<style>
+  .checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+
+  .checkbox-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .checkbox-custom {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--border-primary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-primary);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    margin-top: 0.125rem; /* Align with text baseline */
+  }
+
+  .checkbox-custom::after {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-6.5 6.5a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7 9.293l6.146-6.147a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .checkbox-input:checked + .checkbox-custom {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .checkbox-input:checked + .checkbox-custom::after {
+    opacity: 1;
+  }
+
+  .checkbox-input:focus + .checkbox-custom {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .checkbox-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .required {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .checkbox-label:hover .checkbox-custom {
+    border-color: var(--color-primary);
+  }
+
+  .checkbox-input:disabled + .checkbox-custom {
+    background-color: var(--background-secondary);
+    border-color: var(--border-secondary);
+    cursor: not-allowed;
+  }
+
+  .checkbox-input:disabled + .checkbox-custom + .checkbox-text {
+    color: var(--text-inactive);
+    cursor: not-allowed;
+  }
+</style>

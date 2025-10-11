@@ -1,0 +1,71 @@
+---
+import { Image } from 'astro:assets';
+import logoSvg from '@/assets/icons/ioai-spain.svg';
+import type { Language } from '../../i18n';
+
+export interface Props {
+  locale?: Language;
+}
+
+const { locale = 'en' } = Astro.props;
+
+// Determine home URL based on locale
+const homeUrl = locale === 'en' ? '/' : '/es/';
+---
+
+<header class="simple-header">
+  <div class="header-container">
+    <a href={homeUrl} class="logo-link">
+      <Image
+        src={logoSvg}
+        alt="IOAI Spain"
+        class="logo"
+        width={120}
+        height={40}
+        loading="eager"
+        format="svg"
+      />
+    </a>
+  </div>
+</header>
+
+<style>
+  /* Simple Header */
+  .simple-header {
+    padding: var(--space-s) 0;
+  }
+
+  .header-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--section-inline);
+    display: flex;
+    justify-content: center;
+  }
+
+  .logo-link {
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  .logo {
+    height: var(--space-l);
+    width: auto;
+    transition: opacity 0.2s ease;
+  }
+
+  .logo-link:hover .logo {
+    opacity: 0.8;
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 809px) {
+    .simple-header {
+      padding: var(--space-2xs) 0;
+    }
+
+    .logo {
+      height: var(--space-s);
+    }
+  }
+</style>

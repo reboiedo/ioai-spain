@@ -1,0 +1,40 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`clipped-card-container ${className}`}>
+  <div class="clipped-card">
+    <div class="card-content">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .clipped-card-container {
+    /* Container for queries - this establishes the containment context */
+    container-type: inline-size;
+    container-name: card;
+  }
+
+  .clipped-card {
+    position: relative;
+    background: var(--background-elevated);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl) var(--section-inline) var(--space-3xl) var(--section-inline);
+
+    /* SVG path with rounded curves at notch points - uses semantic --notch-depth variable */
+    clip-path: path("M 0 0 L 44% 0 A 2% 2% 0 0 1 50% var(--notch-depth) A 2% 2% 0 0 1 56% var(--notch-depth) L 100% var(--notch-depth) L 100% 100% L 56% 100% A 2% 2% 0 0 1 50% calc(100% - var(--notch-depth)) A 2% 2% 0 0 1 44% calc(100% - var(--notch-depth)) L 0 calc(100% - var(--notch-depth)) Z");
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+  }
+
+
+</style>

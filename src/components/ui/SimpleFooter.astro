@@ -1,0 +1,44 @@
+---
+import type { useTranslations } from '../../i18n';
+
+export interface Props {
+  t: ReturnType<typeof useTranslations>;
+}
+
+const { t } = Astro.props;
+---
+
+<footer class="simple-footer">
+  <div class="footer-container">
+    <p class="copyright">
+      ©{new Date().getFullYear()} {t.meta.organizationName}
+    </p>
+  </div>
+</footer>
+
+<style>
+  /* Simple Footer */
+  .simple-footer {
+    padding: var(--space-m) 0;
+  }
+
+  .footer-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--section-inline);
+    text-align: center;
+  }
+
+  .copyright {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-14);
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 809px) {
+    .simple-footer {
+      padding: var(--space-xs) 0;
+    }
+  }
+</style>

@@ -1,6 +1,24 @@
 import { createTranslation } from './types';
 
 export const registration = {
+  meta: {
+    title: createTranslation({
+      en: "Apply - IOAI Spain",
+      es: "Aplicar - IOAI España"
+    }),
+    description: createTranslation({
+      en: "Apply for the International Olympiad in Artificial Intelligence Spain program.",
+      es: "Aplica al programa de la Olimpiada Internacional de Inteligencia Artificial España."
+    })
+  },
+  title: createTranslation({
+    en: "Apply to IOAI Spain",
+    es: "Aplicar a IOAI España"
+  }),
+  subtitle: createTranslation({
+    en: "Join Spain's first AI Olympiad and compete with the brightest minds in artificial intelligence.",
+    es: "Únete a la primera Olimpiada de IA de España y compite con las mentes más brillantes en inteligencia artificial."
+  }),
   sectionTitle: createTranslation({
     en: "Registration Form",
     es: "Formulario de Registro"

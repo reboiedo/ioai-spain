@@ -60,6 +60,8 @@ const redirectUrl = locale === 'es' ? '/es/thank-you/' : '/thank-you/';
       accept-charset="UTF-8"
       enctype="application/x-www-form-urlencoded"
     >
+      <!-- Hidden formType field to identify this as a registration application -->
+      <input type="hidden" name="formType" value="Apply" />
 
       <!-- Full Name Field -->
       <div class="form-group">
@@ -356,7 +358,7 @@ const redirectUrl = locale === 'es' ? '/es/thank-you/' : '/thank-you/';
         // Always redirect after submission attempt (Formspark likely received the data)
         // Determine redirect URL based on current page locale
         const isSpanish = window.location.pathname.startsWith('/es');
-        const redirectUrl = isSpanish ? '/es/thank-you/' : '/thank-you/';
+        const redirectUrl = isSpanish ? '/es/thank-you-apply/' : '/thank-you-apply/';
 
         // Small delay to ensure form submission completed
         setTimeout(() => {
