@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
-import ioaiLogo from '../assets/ioai-logo.svg';
+import ioaiLogo from '../assets/ioai-logo.png';
 import harbourLogo from '../assets/harbour-space-logo.svg';
 import leaguesLogo from '../assets/icons/leagues-logo.svg';
 
@@ -43,7 +43,7 @@ const { t } = Astro.props;
             width={180}
             height={48}
             loading="lazy"
-            format="svg"
+            format="png"
           />
         </a>
       </div>
@@ -156,8 +156,9 @@ const { t } = Astro.props;
     
     .sponsors-grid {
       display: flex;
-    
-      gap: var(--space-xs);
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-m);
       max-width: 100%;
     }
 

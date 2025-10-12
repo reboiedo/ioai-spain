@@ -32,8 +32,8 @@ export interface Props {
 
 const { formData, locale } = Astro.props;
 
-// Calculate redirect URL for Formspark (must be absolute URL)
-const redirectUrl = `${Astro.url.origin}/${locale === 'es' ? 'es/' : ''}form/${formData.slug}/thank-you/`;
+// Calculate redirect path (will be made absolute at runtime)
+const redirectPath = `/${locale === 'es' ? 'es/' : ''}form/${formData.slug}/thank-you/`;
 
 
 // Resolve form configuration - either from template or direct config
@@ -79,8 +79,8 @@ const form = resolvedForm;
           <!-- Hidden field to identify form type -->
           <input type="hidden" name="formType" value={formData.slug} />
 
-          <!-- Formspark redirect URL -->
-          <input type="hidden" name="_redirect" value={redirectUrl} />
+          <!-- Formspark redirect URL (will be set by JavaScript) -->
+          <input type="hidden" name="_redirect" id={`redirect-${formData.slug}`} value="" />
 
 
           {form.fields.map((field) => (
@@ -372,20 +372,30 @@ const form = resolvedForm;
   }
 </style>
 
-<script define:vars={{ formData, form, locale }}>
-  // Handle form submission with JavaScript redirect
+<script define:vars={{ formData, form, locale, redirectPath }}>
+  // Handle form submission with runtime redirect URL
   document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 GenericForm script loaded for form:', formData.slug);
     const formElement = document.getElementById(`form-${formData.slug}`);
+    const redirectField = document.getElementById(`redirect-${formData.slug}`);
 
     if (!formElement) {
       console.error('🚀 Form element not found:', `form-${formData.slug}`);
       return;
     }
 
+    if (!redirectField) {
+      console.error('🚀 Redirect field not found:', `redirect-${formData.slug}`);
+      return;
+    }
+
+    // Build absolute redirect URL using current origin
+    const redirectUrl = `${window.location.origin}${redirectPath}`;
+    redirectField.value = redirectUrl;
+
     console.log('🚀 Form element found:', formElement);
     console.log('🚀 Form action URL:', formElement.action);
-
+    console.log('🚀 Redirect URL set to:', redirectUrl);
 
     formElement.addEventListener('submit', function(e) {
       console.log('🚀 Form submit event triggered - using native submission!');

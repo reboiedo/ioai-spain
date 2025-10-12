@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
-import ioaiLogo from '../assets/ioai-logo.svg';
+import ioaiLogo from '../assets/ioai-logo.png';
 import harbourSpaceLogo from '../assets/harbour-space-logo.svg';
 import CardFlair from './ui/CardFlair.astro';
 
@@ -44,10 +44,10 @@ const { t } = Astro.props;
             src={ioaiLogo}
             alt={t.about.ioai2026.title}
             class="card-logo"
-            width={120}
-            height={40}
+            width={240}
+            height={80}
             loading="lazy"
-            format="svg"
+            format="png"
           />
         </a>
         <p class="card-subtitle heading-m">{t.about.ioai2026.date}</p>
@@ -101,7 +101,7 @@ const { t } = Astro.props;
 
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--space-l);
     margin-top: var(--space-2xl);
   }
