@@ -1,59 +1,108 @@
 ---
 title: "Política de Privacidad"
-lastUpdated: "2024-12-01"
+lastUpdated: "2025-10-13"
 locale: "es"
-description: "Política de privacidad para el programa de la Olimpiada Española de IA administrada por Harbour.Space BCN, S.L.U."
+description: "Política de privacidad para la Olimpiada Internacional de Inteligencia Artificial en España administrada por Harbour.Space BCN, S.L.U."
 ---
 
-De conformidad con el Reglamento (UE) 2016/679 de 27 de abril de 2016, relativo a la protección de las personas físicas en lo que respecta al tratamiento de datos personales y a la libre circulación de estos datos, así como con la Ley Orgánica 3/2018 de 5 de diciembre de 2018 de protección de datos y garantía de los derechos digitales (LOPDGDD), la dirección del Instituto informa que el responsable del tratamiento es: Harbour.Space BCN, S.L.U. B6667064, Calle Rosa Sensat 9-11, Barcelona 08005, España info@harbour.space.
+De conformidad con el Reglamento (UE) 2016/679 de 27 de abril de 2016, relativo a la protección de las personas físicas en lo que respecta al tratamiento de datos personales y a la libre circulación de estos datos, así como con la Ley Orgánica 3/2018 de 5 de diciembre de 2018 de protección de datos y garantía de los derechos digitales (LOPDGDD), la dirección del Instituto informa que el responsable del tratamiento es: Harbour.Space BCN, S.L.U. B6667064, Calle Rosa Sensat 9-11, Barcelona 08005, España (en adelante denominada "Harbour.Space") info@harbour.space.
 
-## Finalidad
+Esta Política de Privacidad explica cómo Harbour.Space recopila, utiliza y protege los datos personales en relación con la Olimpiada Internacional de Inteligencia Artificial en España (en adelante denominada "Olimpiada") organizada para estudiantes en España de 14 años o más.
 
-Los datos del interesado serán tratados para las siguientes finalidades. Por favor, indique si lo autoriza o no en la tabla adjunta en la última página de este documento.
+## Responsable del Tratamiento
 
-- Facilitar la participación continua en la Olimpiada Española de IA
-- Gestionar los datos personales del estudiante con fines educativos; realizando la función de enseñanza y orientación.
+- **Responsable del Tratamiento**: Harbour.Space BCN, S.L.U.
+- **CIF**: B6667064
+- **Dirección**: Calle Rosa Sensat 9-11, Barcelona 08005, España
+- **Email**: info@harbour.space
 
-## Base legal
+## Finalidad del Tratamiento de Datos
 
-El tratamiento de datos personales se legitima por el consentimiento otorgado por el padre o tutor legal en este documento, así como por el cumplimiento de cualquier obligación legal aplicable.
+Los datos personales se recopilan y tratan para las siguientes finalidades:
 
-## Criterios de conservación de datos
+- Registro y gestión de participantes de la Olimpiada
+- Verificación de elegibilidad de participantes (14+ años)
+- Administración y entrega de pruebas y competiciones en línea
+- Comunicación con participantes (notificaciones por email, actualizaciones)
+- Emisión de certificados y premios
+- Publicación de resultados utilizando tokens anónimos de participantes
+- Análisis estadístico y mejora de futuras Olimpiadas
+- Envío de información sobre actividades educativas futuras relacionadas
 
-Los datos no se conservarán por más tiempo del necesario para los fines para los que fueron recopilados, a menos que exista una obligación legal.
+## Base Legal
 
-## Comunicación de datos
+El tratamiento de datos personales se basa en el consentimiento del participante y en la necesidad de cumplir las obligaciones educativas y administrativas legítimas de Harbour.Space.
 
-Los datos serán compartidos con entidades con las que el centro educativo realice actividades educativas, solidarias o deportivas, sean públicas o privadas, sujeto a autorización expresa. Los datos no serán compartidos con terceros excepto donde sea legalmente requerido.
+## Categorías de Datos Personales
 
-## Transferencias internacionales de datos
+Se recopila la siguiente información durante el registro:
 
-No se realizan transferencias internacionales de datos a terceros países fuera de la Unión Europea.
+- Nombre completo
+- Dirección de correo electrónico
+- Región de residencia en España
+- Nombre del centro educativo
 
-## Decisiones automatizadas
+## Retención de Datos
 
-Harbour.Space BCN, S.L.U. declara que no toma decisiones automatizadas que puedan causar daño a los interesados.
+Los datos personales se conservarán hasta 12 meses después de que concluya la Olimpiada, a menos que la ley requiera una conservación más prolongada.
 
-## Derechos del interesado
+## Compartición de Datos
 
-El interesado tiene derecho a retirar el consentimiento en cualquier momento. También tiene derecho a acceder, rectificar o suprimir sus datos ("derecho al olvido"), a restringir el tratamiento, a la portabilidad de datos y a oponerse, escribiendo a Calle Rosa Sensat 9-11, Barcelona 08005, España, o enviando un correo electrónico a info@harbour.space.
+Los datos pueden ser compartidos con centros educativos españoles que participen en la Olimpiada y con proveedores de servicios autorizados involucrados en la organización del evento. Estos incluyen:
 
-También pueden presentar una queja ante la autoridad de protección de datos competente, actualmente la Agencia Española de Protección de Datos (AEPD), a través de su sede electrónica www.sedeagpd.gob.es/sede-electronica-web, o escribiendo a C/ Jorge Juan nº6, 28001 Madrid.
+- **Google Forms** (para la gestión de registro de participantes)
+- **Formspark** (utilizado para el envío seguro de formularios en línea)
+- **ActiveCampaign** (utilizado para comunicación por email y actualizaciones de participantes)
+- **Zapier** (para automatización e integración entre herramientas internas)
+- **Google Analytics** (para análisis estadístico del tráfico y uso del sitio web)
 
-## Consentimiento requerido
+Todos los proveedores terceros cumplen con los requisitos del RGPD y garantizan la protección de datos a través de Cláusulas Contractuales Estándar cuando sea aplicable. No se transfieren datos fuera de la Unión Europea.
 
-Proporcionar los datos personales solicitados es un requisito necesario para que el centro educativo pueda prestar adecuadamente sus servicios educativos. Como se ha declarado anteriormente, Harbour.Space BCN, S.L.U solicita el consentimiento expreso del interesado para lo siguiente:
+## Derechos de los Interesados
 
-### 1. Autorización para la comunicación de datos: Transferencia de datos
+Los participantes tienen los siguientes derechos bajo el RGPD y la LOPDGDD:
 
-Sus datos y los datos de su hijo serán transferidos a Leagues of Code, que es responsable de la gestión y administración de recursos, así como a entidades asociadas involucradas en el programa de Servicio Comunitario para estudiantes de ESO4.
+### El derecho de acceso
+Tiene derecho a solicitar copias de sus datos personales. Podemos cobrar una pequeña tarifa por este servicio.
 
-### 2. Comunicaciones electrónicas
+### El derecho de rectificación
+Tiene derecho a solicitar que corrijamos cualquier información que considere inexacta. También tiene derecho a solicitar que completemos la información que considere incompleta.
 
-De acuerdo con la legislación vigente (Ley 34/2002 de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico), para el envío de comunicaciones vía telefónica y/o correo electrónico u otros medios electrónicos equivalentes, sobre actividades realizadas por Harbour.Space BCN, S.L.U para cada año escolar, así como otras circunstancias relacionadas.
+### El derecho de supresión
+Tiene derecho a solicitar que eliminemos sus datos personales, bajo ciertas condiciones.
 
-A este respecto, se informa al interesado que puede revocar su consentimiento para recibir comunicaciones enviando un correo electrónico a info@harbour.space.
+### El derecho a restringir el tratamiento
+Tiene derecho a solicitar que restrinjamos el tratamiento de sus datos personales, bajo ciertas condiciones.
 
-## Declaración final
+### El derecho de oposición al tratamiento
+Tiene derecho a oponerse a nuestro tratamiento de sus datos personales, bajo ciertas condiciones.
 
-Finalmente, Harbour.Space BCN, S.L.U declara que cumple con todos los requisitos establecidos por la Ley de Protección de Datos e implementa todas las medidas técnicas y organizativas necesarias para garantizar la seguridad de los datos personales.
+### El derecho a la portabilidad de datos
+Tiene derecho a solicitar que transfiramos los datos que hemos recopilado a otra organización, o directamente a usted, bajo ciertas condiciones.
+
+Si hace una solicitud, tenemos un mes para responderle. Si desea ejercer alguno de estos derechos, póngase en contacto con info@harbour.space.
+
+## Datos de Menores
+
+Otra parte de nuestra prioridad es añadir protección para los niños mientras usan internet. Alentamos a los padres y tutores a observar, participar y/o monitorear y guiar su actividad en línea.
+
+La participación en la Olimpiada está estrictamente limitada a personas de 14 años o más. Harbour.Space no recopila, almacena ni procesa conscientemente datos personales de niños menores de 14 años.
+
+Si nos damos cuenta de que se han proporcionado datos personales por alguien menor de esta edad sin el consentimiento verificable de los padres o tutores, tomaremos medidas inmediatas para eliminar dichos datos.
+
+## Cookies y Análisis
+
+El sitio web de la Olimpiada utiliza únicamente cookies analíticas para mejorar la funcionalidad y comprender la interacción del usuario. Estas cookies no recopilan información personalmente identificable. Al continuar navegando por el sitio, los usuarios consienten el uso de cookies analíticas. Puede deshabilitar las cookies en cualquier momento en la configuración de su navegador.
+
+## Seguridad de los Datos
+
+Harbour.Space aplica medidas técnicas y organizativas apropiadas para proteger los datos personales contra el acceso no autorizado, alteración, divulgación o destrucción. El acceso a los datos está limitado al personal autorizado involucrado en la organización de la Olimpiada.
+
+## Información de Contacto
+
+Para cualquier pregunta sobre esta Política de Privacidad o sus datos personales, póngase en contacto con:
+
+Harbour.Space BCN, S.L.U.
+Calle Rosa Sensat 9-11
+Barcelona 08005, España
+Email: info@harbour.space
