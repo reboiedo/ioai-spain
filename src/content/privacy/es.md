@@ -62,23 +62,17 @@ Todos los proveedores terceros cumplen con los requisitos del RGPD y garantizan 
 
 Los participantes tienen los siguientes derechos bajo el RGPD y la LOPDGDD:
 
-### El derecho de acceso
-Tiene derecho a solicitar copias de sus datos personales. Podemos cobrar una pequeña tarifa por este servicio.
+**El derecho de acceso:** Tiene derecho a solicitar copias de sus datos personales. Podemos cobrar una pequeña tarifa por este servicio.
 
-### El derecho de rectificación
-Tiene derecho a solicitar que corrijamos cualquier información que considere inexacta. También tiene derecho a solicitar que completemos la información que considere incompleta.
+**El derecho de rectificación:** Tiene derecho a solicitar que corrijamos cualquier información que considere inexacta. También tiene derecho a solicitar que completemos la información que considere incompleta.
 
-### El derecho de supresión
-Tiene derecho a solicitar que eliminemos sus datos personales, bajo ciertas condiciones.
+**El derecho de supresión:** Tiene derecho a solicitar que eliminemos sus datos personales, bajo ciertas condiciones.
 
-### El derecho a restringir el tratamiento
-Tiene derecho a solicitar que restrinjamos el tratamiento de sus datos personales, bajo ciertas condiciones.
+**El derecho a restringir el tratamiento:** Tiene derecho a solicitar que restrinjamos el tratamiento de sus datos personales, bajo ciertas condiciones.
 
-### El derecho de oposición al tratamiento
-Tiene derecho a oponerse a nuestro tratamiento de sus datos personales, bajo ciertas condiciones.
+**El derecho de oposición al tratamiento:** Tiene derecho a oponerse a nuestro tratamiento de sus datos personales, bajo ciertas condiciones.
 
-### El derecho a la portabilidad de datos
-Tiene derecho a solicitar que transfiramos los datos que hemos recopilado a otra organización, o directamente a usted, bajo ciertas condiciones.
+**El derecho a la portabilidad de datos:** Tiene derecho a solicitar que transfiramos los datos que hemos recopilado a otra organización, o directamente a usted, bajo ciertas condiciones.
 
 Si hace una solicitud, tenemos un mes para responderle. Si desea ejercer alguno de estos derechos, póngase en contacto con info@harbour.space.
 
