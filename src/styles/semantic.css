@@ -33,6 +33,7 @@
   --font-weight-light: 300;
   --font-weight-medium: 500;
   --font-weight-bold: 700;
+  --font-weight-black: 800;
 
   /* Letter spacing */
   --tracking-tighter: -0.05em;

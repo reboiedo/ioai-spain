@@ -6,3 +6,9 @@
 body {
   font-size: var(--font-size-base);
 }
+
+/* Typography - Bold elements */
+strong, b {
+  font-weight: var(--font-weight-black);
+  color: var(--text-primary);
+}
