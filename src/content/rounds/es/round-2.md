@@ -4,7 +4,6 @@ title: "Ronda 2"
 date: "Comienza el 1 de diciembre de 2025"
 introSentence: "Mayor dificultad manteniendo la accesibilidad. Enfoque en resolución de problemas, razonamiento y comprensión aplicada de IA."
 phase: "basic"
-qualification: "50%+ en ambas rondas para certificado • 80%+ para avanzar al Ciclo Preparatorio"
 ---
 
 ## Qué Esperar

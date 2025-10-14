@@ -4,7 +4,6 @@ title: "Round 2"
 date: "Starts December 01, 2025"
 introSentence: "Higher difficulty while maintaining accessibility. Focus on problem-solving, reasoning and applied AI understanding."
 phase: "basic"
-qualification: "50%+ in both rounds for certificate • 80%+ to advance to Preparatory Cycle"
 ---
 
 ## What to Expect
