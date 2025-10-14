@@ -4,6 +4,7 @@ title: "Round 3"
 date: "Starts February 2026"
 introSentence: "Practical AI tasks combined with theoretical challenges. Students apply their skills and critical thinking through hands-on problem-solving."
 phase: "preparatory"
+qualification: "Up to 100 participants will be selected to continue to the next rounds"
 ---
 
 ## What to Expect
