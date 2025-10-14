@@ -4,6 +4,7 @@ enabled: true
 formTemplate: "application"
 form:
   title: "Aplicar a IOAI España"
+  subtitle: "Las Rondas 1 y 2 están abiertas para estudiantes de todas las edades, así como para padres y profesores."
 thankYou:
   title: "¡Solicitud Enviada Exitosamente!"
   message: "¡Gracias por solicitar el programa IOAI España! Hemos recibido tu solicitud y la revisaremos cuidadosamente. Recibirás un correo de confirmación en breve con más detalles sobre el proceso de selección y los próximos pasos."
