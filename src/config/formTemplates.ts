@@ -1,4 +1,4 @@
-import { getFieldsForLocale, type FormFieldDefinition } from './formFields';
+import { getFieldsForLocale, type FormFieldDefinition } from "./formFields";
 
 export interface FormSubmitButton {
   default: string;
@@ -35,52 +35,49 @@ export interface ResolvedFormTemplate {
 // Form template definitions
 export const FORM_TEMPLATES: Record<string, FormTemplate> = {
   application: {
-    fields: ['fullName', 'email', 'schoolName', 'role', 'consent'],
+    fields: ["fullName", "email", "schoolName", "role", "consent"],
     submitButton: {
-      en: { default: 'Submit', loading: 'Submitting...' },
-      es: { default: 'Enviar', loading: 'Enviando...' }
+      en: { default: "Submit", loading: "Submitting..." },
+      es: { default: "Enviar", loading: "Enviando..." },
     },
     confirmationMessage: {
-      en: 'You will receive an email to confirm that you are on the waitlist.',
-      es: 'Recibirá un correo electrónico para confirmar que está en la lista de espera.'
+      en: "You will receive an email to confirm that you are on the waitlist.",
+      es: "Recibirá un correo electrónico para confirmar que está en la lista de espera.",
     },
-    action: 'https://submit-form.com/p2kDhINPt'
+    action: "https://submit-form.com/p2kDhINPt",
   },
 
   download: {
-    fields: ['fullName', 'email', 'organization', 'consent'],
-    fieldOverrides: {
-      organization: { required: false }
-    },
+    fields: ["fullName", "email", "schoolName", "role", "consent"],
     submitButton: {
-      en: { default: 'Download', loading: 'Downloading...' },
-      es: { default: 'Descargar', loading: 'Descargando...' }
+      en: { default: "Download", loading: "Downloading..." },
+      es: { default: "Descargar", loading: "Descargando..." },
     },
     confirmationMessage: {
-      en: 'You will receive an email with the download link shortly.',
-      es: 'Recibirá un correo electrónico con el enlace de descarga en breve.'
+      en: "You will receive an email with the download link shortly.",
+      es: "Recibirá un correo electrónico con el enlace de descarga en breve.",
     },
-    action: 'https://submit-form.com/p2kDhINPt'
+    action: "https://submit-form.com/p2kDhINPt",
   },
 
   contact: {
-    fields: ['fullName', 'email', 'message'],
+    fields: ["fullName", "email", "message"],
     submitButton: {
-      en: { default: 'Send Message', loading: 'Sending...' },
-      es: { default: 'Enviar Mensaje', loading: 'Enviando...' }
+      en: { default: "Send Message", loading: "Sending..." },
+      es: { default: "Enviar Mensaje", loading: "Enviando..." },
     },
     confirmationMessage: {
-      en: 'Thank you for your message. We will get back to you shortly.',
-      es: 'Gracias por su mensaje. Nos pondremos en contacto con usted en breve.'
+      en: "Thank you for your message. We will get back to you shortly.",
+      es: "Gracias por su mensaje. Nos pondremos en contacto con usted en breve.",
     },
-    action: 'https://submit-form.com/p2kDhINPt'
-  }
+    action: "https://submit-form.com/p2kDhINPt",
+  },
 };
 
 // Helper function to resolve a template for a specific locale with optional field overrides
 export function resolveFormTemplate(
   templateName: string,
-  locale: 'en' | 'es'
+  locale: "en" | "es"
 ): ResolvedFormTemplate {
   const template = FORM_TEMPLATES[templateName];
   if (!template) {
@@ -92,14 +89,20 @@ export function resolveFormTemplate(
 
   // Apply template-level field overrides if defined
   if (template.fieldOverrides) {
-    fields = fields.map(field => {
+    fields = fields.map((field) => {
       const override = template.fieldOverrides![field.name];
       if (override) {
         return {
           ...field,
-          required: override.required !== undefined ? override.required : field.required,
-          placeholder: override.placeholder !== undefined ? override.placeholder : field.placeholder,
-          label: override.label !== undefined ? override.label : field.label
+          required:
+            override.required !== undefined
+              ? override.required
+              : field.required,
+          placeholder:
+            override.placeholder !== undefined
+              ? override.placeholder
+              : field.placeholder,
+          label: override.label !== undefined ? override.label : field.label,
         };
       }
       return field;
@@ -110,7 +113,7 @@ export function resolveFormTemplate(
     fields,
     submitButton: template.submitButton[locale],
     confirmationMessage: template.confirmationMessage[locale],
-    action: template.action
+    action: template.action,
   };
 }
 

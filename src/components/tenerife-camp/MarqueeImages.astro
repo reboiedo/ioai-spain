@@ -36,21 +36,27 @@ const {
 
   function initMarquee() {
     document.querySelectorAll('[data-marquee]').forEach((marquee) => {
-      const track = marquee.querySelector('.marquee-images__track');
+      const track = marquee.querySelector('.marquee-images__track') as HTMLElement;
       if (!track) return;
 
       const direction = marquee.getAttribute('data-direction') || 'left';
-      const speed = parseFloat(marquee.getAttribute('data-speed')) || 50;
+      const speed = parseFloat(marquee.getAttribute('data-speed') || '50');
 
       // Clone the track content to create seamless loop
-      const clone = track.cloneNode(true);
+      const clone = track.cloneNode(true) as HTMLElement;
       marquee.appendChild(clone);
 
-      // Get the width of one track
-      const trackWidth = track.offsetWidth;
+      // Get the width of one track including gap
+      const items = track.querySelectorAll('.marquee-images__item');
+      const computedStyle = window.getComputedStyle(track);
+      const gap = parseFloat(computedStyle.gap) || 24;
+      const trackWidth = track.offsetWidth + gap;
+
+      console.log('Track width:', track.offsetWidth, 'Gap:', gap, 'Total:', trackWidth);
 
       // Position both tracks side by side
-      gsap.set([track, clone], { x: (i) => i * trackWidth });
+      gsap.set(track, { x: 0 });
+      gsap.set(clone, { x: trackWidth });
 
       // Create infinite animation using wrap
       const wrapValue = gsap.utils.wrap(-trackWidth, trackWidth);
@@ -61,7 +67,7 @@ const {
         ease: 'none',
         repeat: -1,
         modifiers: {
-          x: (x) => wrapValue(parseFloat(x)) + 'px'
+          x: (x: string) => wrapValue(parseFloat(x)) + 'px'
         }
       });
     });
@@ -81,12 +87,15 @@ const {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
+    height: 358px;
   }
 
   .marquee-images__track {
     display: flex;
     gap: 24px;
     position: absolute;
+    left: 0;
+    top: 0;
     will-change: transform;
   }
 
@@ -110,6 +119,7 @@ const {
   @media (max-width: 768px) {
     .marquee-images {
       margin: 32px 0 0;
+      height: 280px;
     }
 
     .marquee-images__track {
@@ -125,6 +135,7 @@ const {
   @media (max-width: 480px) {
     .marquee-images {
       margin: 24px 0 0;
+      height: 220px;
     }
 
     .marquee-images__item img {

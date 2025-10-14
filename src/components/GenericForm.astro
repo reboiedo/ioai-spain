@@ -35,9 +35,31 @@ const { formData, locale } = Astro.props;
 // Calculate redirect path (will be made absolute at runtime)
 const redirectPath = `/${locale === 'es' ? 'es/' : ''}form/${formData.slug}/thank-you/`;
 
+// Define the complete form type
+type ResolvedForm = {
+  title: string;
+  subtitle?: string;
+  action: string;
+  fields: Array<{
+    type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox';
+    name: string;
+    label: string;
+    placeholder?: string;
+    required: boolean;
+    options?: Array<{
+      value: string;
+      label: string;
+    }>;
+  }>;
+  submitButton: {
+    default: string;
+    loading: string;
+  };
+  confirmationMessage?: string;
+};
 
 // Resolve form configuration - either from template or direct config
-let resolvedForm;
+let resolvedForm: ResolvedForm;
 
 if (formData.formTemplate && isValidTemplate(formData.formTemplate)) {
   // Use template resolution
@@ -55,7 +77,7 @@ if (formData.formTemplate && isValidTemplate(formData.formTemplate)) {
   if (!formData.form.fields || !formData.form.submitButton || !formData.form.action) {
     throw new Error(`Form "${formData.slug}" must either use a formTemplate or provide complete form configuration (fields, submitButton, action)`);
   }
-  resolvedForm = formData.form;
+  resolvedForm = formData.form as ResolvedForm;
 }
 
 const form = resolvedForm;
