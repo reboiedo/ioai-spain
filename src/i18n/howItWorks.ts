@@ -24,8 +24,8 @@ export const howItWorks = {
         es: "Ciclo Básico"
       }),
       intro: createTranslation({
-        en: "New to AI? Perfect—that's exactly who we designed this for. Dive into foundational concepts through simple online tests, and yes, using ChatGPT along the way is absolutely encouraged!",
-        es: "¿Nuevo en IA? Perfecto, es exactamente para quien diseñamos esto. Sumérgete en conceptos fundamentales a través de pruebas simples en línea, ¡y sí, usar ChatGPT en el proceso está totalmente recomendado!"
+        en: "No AI Experience? No Problem. Artificial intelligence may feel unfamiliar, but that's the point; you don't need prior experience to begin. The Basic Cycle introduces core AI ideas and applications through simple online tests. Feel free to explore resources while you participate; even using tools like ChatGPT is encouraged!",
+        es: "¿Sin experiencia en IA? No hay problema. La inteligencia artificial puede parecer desconocida, pero ese es el punto; no necesitas experiencia previa para empezar. El Ciclo Básico introduce ideas y aplicaciones fundamentales de IA a través de pruebas simples en línea. ¡Siéntete libre de explorar recursos mientras participas; incluso se recomienda usar herramientas como ChatGPT!"
       })
     },
     preparatory: {

@@ -1,0 +1,304 @@
+---
+import MarqueeImages from './MarqueeImages.astro';
+
+export interface Props {
+  mainTitle: string;
+  dateSubtitle: string;
+  tagline: string;
+  description: string;
+  paragraph: string;
+}
+
+const { mainTitle, dateSubtitle, tagline, description, paragraph } = Astro.props;
+
+// Define carousel images
+const carouselImages = [
+  { src: '/images/tenerife-camp/about-carousel-1.jpg', alt: 'Camp activity 1' },
+  { src: '/images/tenerife-camp/about-carousel-2.jpg', alt: 'Camp activity 2', circular: true },
+  { src: '/images/tenerife-camp/about-carousel-3.jpg', alt: 'Camp activity 3' },
+  { src: '/images/tenerife-camp/about-carousel-4.jpg', alt: 'Camp activity 4', circular: true },
+  { src: '/images/tenerife-camp/about-carousel-5.jpg', alt: 'Camp activity 5' },
+];
+---
+
+<section class="camp-overview">
+  <div class="camp-overview__container">
+    <!-- Top: Date + Tagline (centered) -->
+    <div class="camp-overview__top-text">
+      <h2 class="camp-overview__date-subtitle">{dateSubtitle}</h2>
+      <h1 class="camp-overview__tagline">{tagline}</h1>
+    </div>
+
+    <!-- 3-Column Layout: Left Image | Center (Image + Text) | Right Image -->
+    <div class="camp-overview__three-columns">
+      <div class="camp-overview__column-left">
+        <img
+          src="/images/tenerife-camp/gOiX6DyxV7QCEDxtEYiNtds4.jpg"
+          alt="Menorca Lighthouse"
+          loading="eager"
+          class="parallax-left"
+        />
+      </div>
+
+      <div class="camp-overview__column-center">
+        <img
+          src="/images/tenerife-camp/C8FhPXN8mu6lqt7N9PtNEAHcgso.jpeg"
+          alt="Swimming in crystal clear waters"
+          loading="eager"
+        />
+        <div class="camp-overview__center-text">
+          <h2 class="camp-overview__description">{description}</h2>
+          <p class="camp-overview__paragraph">{paragraph}</p>
+        </div>
+      </div>
+
+      <div class="camp-overview__column-right">
+        <img
+          src="/images/tenerife-camp/7OM6JdlwlX5qr4pbwwCiYKTCcXc.jpg"
+          alt="Kids enjoying the beach"
+          loading="eager"
+          class="parallax-right"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Marquee Image Carousel -->
+  <MarqueeImages images={carouselImages} direction="left" speed={20} scrollSpeed={15} duplicate={2} />
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Initialize parallax effect
+  function initParallax() {
+    const leftImage = document.querySelector('.parallax-left');
+    const rightImage = document.querySelector('.parallax-right');
+
+    if (leftImage) {
+      gsap.to(leftImage, {
+        y: -100,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.camp-overview__three-columns',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1,
+        }
+      });
+    }
+
+    if (rightImage) {
+      gsap.to(rightImage, {
+        y: -100,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.camp-overview__three-columns',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1,
+        }
+      });
+    }
+  }
+
+  // Run on initial load and Astro navigation
+  initParallax();
+  document.addEventListener('astro:page-load', initParallax);
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@800&family=Inter+Tight:wght@400&display=swap');
+
+  .camp-overview {
+    background: var(--camp-bg-primary);
+    color: rgb(241, 241, 241);
+    padding: 60px 48px 80px;
+    width: 100%;
+    position: relative;
+  }
+
+  .camp-overview__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Top Text Section (centered) */
+  .camp-overview__top-text {
+    text-align: center;
+    margin: 0 auto 40px;
+    max-width: 920px;
+    z-index: 3;
+    position: inherit;
+  }
+
+  /* 3-Column Layout */
+  .camp-overview__three-columns {
+    display: grid;
+    margin-top: -64px;
+    grid-template-columns: 1fr 2.5fr 1fr;
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 48px;
+    z-index: 0;
+
+  }
+
+  .camp-overview__column-left,
+  .camp-overview__column-right {
+    position: relative;
+  }
+
+  .camp-overview__column-left img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: 24px;
+    margin-top: 360px;
+  }
+
+  .camp-overview__column-right img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: 24px;
+    margin-top: 680px;
+  }
+
+  .camp-overview__column-center {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .camp-overview__column-center img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    border-radius: 32px;
+  }
+
+  .camp-overview__center-text {
+    text-align: left;
+    padding: 0 20px;
+  }
+
+  .camp-overview__date-subtitle {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    color: rgb(255, 255, 255);
+  }
+
+  .camp-overview__tagline {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(36px, 5vw, 57px);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 32px;
+    color: rgb(255, 255, 255);
+  }
+
+  .camp-overview__description {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    line-height: 1.3;
+    margin: 0 0 24px;
+    color: rgb(255, 255, 255);
+  }
+
+  .camp-overview__paragraph {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(18px, 2.5vw, 22px);
+    font-weight: 400;
+    line-height: 1.6;
+    margin: 0;
+    color: rgb(255, 255, 255);
+  }
+
+  /* Responsive design */
+  @media (max-width: 1200px) {
+    .camp-overview__three-columns {
+      gap: 16px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .camp-overview {
+      padding: 50px 32px 60px;
+    }
+
+    .camp-overview__three-columns {
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .camp-overview__column-left img,
+    .camp-overview__column-center img,
+    .camp-overview__column-right img {
+      border-radius: 20px;
+    }
+
+    .camp-overview__column-center {
+      gap: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .camp-overview {
+      padding: 40px 0 50px;
+      overflow-x: hidden;
+    }
+
+    .camp-overview__container {
+      padding: 0 24px;
+    }
+
+    .camp-overview__three-columns {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .camp-overview__column-left,
+    .camp-overview__column-right {
+      display: none;
+    }
+
+    .camp-overview__center-text {
+      padding: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .camp-overview__container {
+      padding: 0 20px;
+    }
+
+    .camp-overview__three-columns {
+      gap: 12px;
+      margin-bottom: 44px;
+    }
+
+    .camp-overview__column-left img,
+    .camp-overview__column-center img,
+    .camp-overview__column-right img {
+      border-radius: 16px;
+    }
+
+    .camp-overview__column-center {
+      gap: 20px;
+    }
+  }
+</style>

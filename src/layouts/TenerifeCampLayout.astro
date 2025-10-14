@@ -1,0 +1,45 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import '@/styles/tenerife-camp.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  showNavigation?: boolean;
+  hideNavItems?: boolean;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  canonical?: string;
+}
+
+const {
+  title,
+  description,
+  showNavigation = true,
+  hideNavItems = false,
+  ogImage,
+  ogType,
+  canonical
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  showNavigation={showNavigation}
+  hideNavItems={hideNavItems}
+  ogImage={ogImage}
+  ogType={ogType}
+  canonical={canonical}
+>
+  <div class="tenerife-camp-page">
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .tenerife-camp-page {
+    /* Override any conflicting base layout styles */
+    min-height: 100vh;
+  }
+</style>

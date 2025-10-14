@@ -1,7 +1,7 @@
 ---
 roundNumber: 5
 title: "Intensive Training Program"
-date: "June–July 2026"
+date: "Starts June–July 2026"
 introSentence: "Comprehensive preparation with experienced faculty to master IOAI competition standards."
 phase: "team"
 ---

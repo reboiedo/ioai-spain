@@ -10,6 +10,7 @@ import { whyJoin } from './whyJoin';
 import { sponsors } from './sponsors';
 import { finalCTA } from './finalCTA';
 import { banner } from './banner';
+import { tenerifeCamp } from './tenerifeCamp';
 import type { Language } from './types';
 import { getTranslation } from './types';
 
@@ -25,7 +26,8 @@ export const translations = {
   whyJoin,
   sponsors,
   finalCTA,
-  banner
+  banner,
+  tenerifeCamp
 } as const;
 
 export function useTranslations(locale: Language | undefined) {
@@ -209,6 +211,94 @@ export function useTranslations(locale: Language | undefined) {
       description: getTranslation(banner.description, locale),
       downloadButton: getTranslation(banner.downloadButton, locale),
       downloadUrl: getTranslation(banner.downloadUrl, locale)
+    },
+    tenerifeCamp: {
+      meta: {
+        title: getTranslation(tenerifeCamp.meta.title, locale),
+        description: getTranslation(tenerifeCamp.meta.description, locale)
+      },
+      hero: {
+        eyebrow: getTranslation(tenerifeCamp.hero.eyebrow, locale),
+        title: getTranslation(tenerifeCamp.hero.title, locale),
+        subtitle: getTranslation(tenerifeCamp.hero.subtitle, locale),
+        ctaButton: getTranslation(tenerifeCamp.hero.ctaButton, locale),
+        ctaUrl: getTranslation(tenerifeCamp.hero.ctaUrl, locale),
+        dates: getTranslation(tenerifeCamp.hero.dates, locale),
+        location: getTranslation(tenerifeCamp.hero.location, locale)
+      },
+      about: {
+        eyebrow: getTranslation(tenerifeCamp.about.eyebrow, locale),
+        title: getTranslation(tenerifeCamp.about.title, locale),
+        description: getTranslation(tenerifeCamp.about.description, locale)
+      },
+      courses: {
+        eyebrow: getTranslation(tenerifeCamp.courses.eyebrow, locale),
+        sectionTitle: getTranslation(tenerifeCamp.courses.sectionTitle, locale),
+        viewAll: getTranslation(tenerifeCamp.courses.viewAll, locale)
+      },
+      instructors: {
+        eyebrow: getTranslation(tenerifeCamp.instructors.eyebrow, locale),
+        sectionTitle: getTranslation(tenerifeCamp.instructors.sectionTitle, locale),
+        description: getTranslation(tenerifeCamp.instructors.description, locale)
+      },
+      schedule: {
+        eyebrow: getTranslation(tenerifeCamp.schedule.eyebrow, locale),
+        sectionTitle: getTranslation(tenerifeCamp.schedule.sectionTitle, locale),
+        description: getTranslation(tenerifeCamp.schedule.description, locale)
+      },
+      faq: {
+        eyebrow: getTranslation(tenerifeCamp.faq.eyebrow, locale),
+        sectionTitle: getTranslation(tenerifeCamp.faq.sectionTitle, locale),
+        viewAll: getTranslation(tenerifeCamp.faq.viewAll, locale)
+      },
+      features: {
+        handson: {
+          title: getTranslation(tenerifeCamp.features.handson.title, locale),
+          description: getTranslation(tenerifeCamp.features.handson.description, locale)
+        },
+        mentorship: {
+          title: getTranslation(tenerifeCamp.features.mentorship.title, locale),
+          description: getTranslation(tenerifeCamp.features.mentorship.description, locale)
+        },
+        community: {
+          title: getTranslation(tenerifeCamp.features.community.title, locale),
+          description: getTranslation(tenerifeCamp.features.community.description, locale)
+        },
+        location: {
+          title: getTranslation(tenerifeCamp.features.location.title, locale),
+          description: getTranslation(tenerifeCamp.features.location.description, locale)
+        }
+      },
+      cta: {
+        eyebrow: getTranslation(tenerifeCamp.cta.eyebrow, locale),
+        title: getTranslation(tenerifeCamp.cta.title, locale),
+        description: getTranslation(tenerifeCamp.cta.description, locale),
+        button: getTranslation(tenerifeCamp.cta.button, locale),
+        buttonUrl: getTranslation(tenerifeCamp.cta.buttonUrl, locale)
+      },
+      logistics: {
+        eyebrow: getTranslation(tenerifeCamp.logistics.eyebrow, locale),
+        sectionTitle: getTranslation(tenerifeCamp.logistics.sectionTitle, locale),
+        accommodation: {
+          title: getTranslation(tenerifeCamp.logistics.accommodation.title, locale),
+          description: getTranslation(tenerifeCamp.logistics.accommodation.description, locale)
+        },
+        meals: {
+          title: getTranslation(tenerifeCamp.logistics.meals.title, locale),
+          description: getTranslation(tenerifeCamp.logistics.meals.description, locale)
+        },
+        activities: {
+          title: getTranslation(tenerifeCamp.logistics.activities.title, locale),
+          description: getTranslation(tenerifeCamp.logistics.activities.description, locale)
+        }
+      },
+      common: {
+        learnMore: getTranslation(tenerifeCamp.common.learnMore, locale),
+        register: getTranslation(tenerifeCamp.common.register, locale),
+        viewDetails: getTranslation(tenerifeCamp.common.viewDetails, locale),
+        download: getTranslation(tenerifeCamp.common.download, locale),
+        brochure: getTranslation(tenerifeCamp.common.brochure, locale)
+      }
     }
   };
 }

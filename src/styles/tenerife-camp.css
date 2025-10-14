@@ -1,0 +1,309 @@
+/* ========================================
+   Tenerife Summer Camp - Custom Styles
+   ======================================== */
+
+/*
+  Color Palette extracted from target page:
+  - Primary: Bright Red/Orange (#e34b2a)
+  - Secondary: Deep Blue (#0100af)
+  - Tertiary: Yellow/Gold (#f8cd46, #f2b555)
+  - Accent: Soft Lavender Blue (#8585e2, #9191ed)
+  - Neutrals: Light Gray (#f1f1f1), Medium Gray (#969696)
+  - Links: Bright Blue (#0099ff)
+*/
+
+:root {
+  /* Primary Colors */
+  --camp-primary: rgb(227, 75, 42);        /* #e34b2a - Bright Red/Orange */
+  --camp-primary-rgb: 227, 75, 42;
+
+  --camp-secondary: rgb(1, 0, 175);        /* #0100af - Deep Blue */
+  --camp-secondary-rgb: 1, 0, 175;
+
+  /* Tertiary Colors */
+  --camp-tertiary: rgb(248, 205, 70);      /* #f8cd46 - Bright Yellow */
+  --camp-tertiary-rgb: 248, 205, 70;
+
+  --camp-tertiary-gold: rgb(242, 181, 85); /* #f2b555 - Gold */
+  --camp-tertiary-gold-rgb: 242, 181, 85;
+
+  /* Accent Colors */
+  --camp-accent-lavender: rgb(133, 133, 226);  /* #8585e2 - Soft Lavender */
+  --camp-accent-blue: rgb(145, 145, 237);      /* #9191ed - Lavender Blue */
+  --camp-accent-bright-blue: #0099ff;          /* Bright Blue for links */
+
+  /* Neutral Colors */
+  --camp-neutral-light: #f1f1f1;           /* Light Gray background */
+  --camp-neutral-medium: #969696;          /* Medium Gray */
+  --camp-white: #ffffff;
+  --camp-black: #000000;
+
+  /* Functional Colors */
+  --camp-bg-primary: var(--camp-primary);
+  --camp-bg-secondary: var(--camp-secondary);
+  --camp-bg-tertiary: var(--camp-tertiary);
+  --camp-bg-light: var(--camp-neutral-light);
+  --camp-bg-white: var(--camp-white);
+
+  --camp-text-on-primary: var(--camp-white);
+  --camp-text-on-secondary: var(--camp-white);
+  --camp-text-on-tertiary: var(--camp-black);
+  --camp-text-on-light: var(--camp-black);
+  --camp-text-on-dark: var(--camp-white);
+
+  --camp-link-color: var(--camp-accent-bright-blue);
+  --camp-link-hover: var(--camp-primary);
+
+  --camp-border-accent: var(--camp-accent-lavender);
+  --camp-shadow-color: var(--camp-neutral-medium);
+
+  /* Opacity variants */
+  --camp-primary-10: rgba(var(--camp-primary-rgb), 0.1);
+  --camp-primary-20: rgba(var(--camp-primary-rgb), 0.2);
+  --camp-primary-50: rgba(var(--camp-primary-rgb), 0.5);
+  --camp-primary-80: rgba(var(--camp-primary-rgb), 0.8);
+
+  --camp-secondary-10: rgba(var(--camp-secondary-rgb), 0.1);
+  --camp-secondary-20: rgba(var(--camp-secondary-rgb), 0.2);
+  --camp-secondary-50: rgba(var(--camp-secondary-rgb), 0.5);
+  --camp-secondary-80: rgba(var(--camp-secondary-rgb), 0.8);
+
+  --camp-tertiary-10: rgba(var(--camp-tertiary-rgb), 0.1);
+  --camp-tertiary-20: rgba(var(--camp-tertiary-rgb), 0.2);
+  --camp-tertiary-50: rgba(var(--camp-tertiary-rgb), 0.5);
+  --camp-tertiary-80: rgba(var(--camp-tertiary-rgb), 0.8);
+}
+
+/* ========================================
+   Camp Page Base Styles
+   ======================================== */
+
+.tenerife-camp-page {
+  background: var(--camp-bg-white);
+  color: var(--camp-text-on-light);
+}
+
+/* ========================================
+   Section Backgrounds
+   ======================================== */
+
+.camp-section {
+  padding: 4rem 2rem;
+  width: 100%;
+}
+
+.camp-section--primary {
+  background: var(--camp-bg-primary);
+  color: var(--camp-text-on-primary);
+}
+
+.camp-section--secondary {
+  background: var(--camp-bg-secondary);
+  color: var(--camp-text-on-secondary);
+}
+
+.camp-section--tertiary {
+  background: var(--camp-bg-tertiary);
+  color: var(--camp-text-on-tertiary);
+}
+
+.camp-section--light {
+  background: var(--camp-bg-light);
+  color: var(--camp-text-on-light);
+}
+
+.camp-section--white {
+  background: var(--camp-bg-white);
+  color: var(--camp-text-on-light);
+}
+
+/* ========================================
+   Typography
+   ======================================== */
+
+.camp-heading {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.camp-heading--hero {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+}
+
+.camp-heading--section {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+.camp-heading--subsection {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.camp-text {
+  line-height: 1.6;
+  font-size: 1.125rem;
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+
+.camp-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.camp-button--primary {
+  background: var(--camp-primary);
+  color: var(--camp-white);
+}
+
+.camp-button--primary:hover {
+  background: var(--camp-primary-80);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px var(--camp-primary-20);
+}
+
+.camp-button--secondary {
+  background: var(--camp-secondary);
+  color: var(--camp-white);
+}
+
+.camp-button--secondary:hover {
+  background: var(--camp-secondary-80);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px var(--camp-secondary-20);
+}
+
+.camp-button--tertiary {
+  background: var(--camp-tertiary);
+  color: var(--camp-black);
+}
+
+.camp-button--tertiary:hover {
+  background: var(--camp-tertiary-80);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px var(--camp-tertiary-20);
+}
+
+.camp-button--outline {
+  background: transparent;
+  border: 2px solid var(--camp-primary);
+  color: var(--camp-primary);
+}
+
+.camp-button--outline:hover {
+  background: var(--camp-primary);
+  color: var(--camp-white);
+}
+
+/* ========================================
+   Cards
+   ======================================== */
+
+.camp-card {
+  background: var(--camp-white);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.camp-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.camp-card--bordered {
+  border: 2px solid var(--camp-border-accent);
+}
+
+.camp-card--primary {
+  background: var(--camp-primary);
+  color: var(--camp-white);
+}
+
+.camp-card--secondary {
+  background: var(--camp-secondary);
+  color: var(--camp-white);
+}
+
+.camp-card--tertiary {
+  background: var(--camp-tertiary);
+  color: var(--camp-black);
+}
+
+/* ========================================
+   Links
+   ======================================== */
+
+.camp-link {
+  color: var(--camp-link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.camp-link:hover {
+  color: var(--camp-link-hover);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Container & Layout
+   ======================================== */
+
+.camp-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.camp-container--narrow {
+  max-width: 960px;
+}
+
+.camp-container--wide {
+  max-width: 1440px;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .camp-section {
+    padding: 3rem 1.5rem;
+  }
+
+  .camp-container {
+    padding: 0 1.5rem;
+  }
+
+  .camp-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .camp-section {
+    padding: 2rem 1rem;
+  }
+
+  .camp-container {
+    padding: 0 1rem;
+  }
+
+  .camp-button {
+    width: 100%;
+  }
+}

@@ -22,7 +22,7 @@ const { title, date, introSentence, qualification, t } = Astro.props;
   <summary class="round-header">
     <div class="round-title-wrapper">
       <h4 class="round-title">{title}</h4>
-      <span class="round-date">{date && date.trim() ? `${t.howItWorks.labels.starts} ${date}` : t.howItWorks.labels.tbd}</span>
+      <span class="round-date">{date && date.trim() ? date : t.howItWorks.labels.tbd}</span>
     </div>
     <p class="round-intro text-base">{introSentence}</p>
     <span class="expand-icon" aria-hidden="true"></span>

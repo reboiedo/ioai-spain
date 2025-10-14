@@ -23,8 +23,8 @@ export const about = {
       es: "2-8 de agosto de 2026 en Abu Dabi"
     }),
     description: createTranslation({
-      en: "The global competition bringing together the brightest high school minds to tackle cutting-edge AI challenges. IOAI sets the Olympic standard for young AI talent worldwide.",
-      es: "La competencia global que reúne a las mentes más brillantes de secundaria para abordar desafíos de IA de vanguardia. IOAI establece el estándar olímpico para jóvenes talentos de IA en todo el mundo."
+      en: "The global competition bringing together the brightest high school minds to tackle cutting-edge AI challenges. IOAI sets the Olympiad standard for young AI talent worldwide.",
+      es: "La competencia global que reúne a las mentes más brillantes de secundaria para abordar desafíos de IA de vanguardia. IOAI establece el estándar de Olimpiada para jóvenes talentos de IA en todo el mundo."
     })
   },
   harbourSpace: {
@@ -37,8 +37,8 @@ export const about = {
       es: "Acreditación oficial de IOAI para España"
     }),
     description: createTranslation({
-      en: "As the organization authorized by IOAI, Harbour.Space is solely responsible for selecting and preparing Spain's national teams with world-class faculty.",
-      es: "Como la organización autorizada por IOAI, Harbour.Space es la única responsable de seleccionar y preparar los equipos nacionales de España con profesorado de clase mundial."
+      en: "As the organization authorized by IOAI, Harbour.Space is solely responsible for selecting and preparing Spain's national teams for the Olympiad.",
+      es: "Como la organización autorizada por IOAI, Harbour.Space es la única responsable de seleccionar y preparar los equipos nacionales de España para la Olimpiada."
     })
   }
 } as const;

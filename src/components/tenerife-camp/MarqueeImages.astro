@@ -1,0 +1,318 @@
+---
+export interface Props {
+  images: Array<{
+    src: string;
+    alt: string;
+    circular?: boolean;
+  }>;
+  direction?: 'left' | 'right';
+  speed?: number;
+  scrollSpeed?: number;
+  duplicate?: number;
+}
+
+const {
+  images,
+  direction = 'left',
+  speed = 15,
+  scrollSpeed = 10,
+  duplicate = 2
+} = Astro.props;
+---
+
+<div
+  data-marquee-duplicate={duplicate}
+  data-marquee-scroll-direction-target=""
+  data-marquee-direction={direction}
+  data-marquee-status="normal"
+  data-marquee-speed={speed}
+  data-marquee-scroll-speed={scrollSpeed}
+  class="marquee-images"
+>
+  <div data-marquee-scroll-target="" class="marquee-images__scroll">
+    <div data-marquee-collection-target="" class="marquee-images__collection">
+      {images.map((image) => (
+        <div class="marquee-images__item">
+          <img
+            src={image.src}
+            alt={image.alt}
+            loading="lazy"
+            class:list={[{ circular: image.circular }]}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Store ticker functions and animations to clean up later
+  const tickerFunctions = [];
+  const animations = [];
+
+  function initMarqueeScrollDirection() {
+    // Clean up any existing ticker functions and animations
+    tickerFunctions.forEach(fn => gsap.ticker.remove(fn));
+    tickerFunctions.length = 0;
+    animations.forEach(anim => anim.kill());
+    animations.length = 0;
+
+    document.querySelectorAll('[data-marquee-scroll-direction-target]').forEach((marquee) => {
+      // Query marquee elements
+      const marqueeContent = marquee.querySelector('[data-marquee-collection-target]');
+      const marqueeScroll = marquee.querySelector('[data-marquee-scroll-target]');
+      if (!marqueeContent || !marqueeScroll) return;
+
+      // Get data attributes
+      const { marqueeSpeed: speed, marqueeDirection: direction, marqueeDuplicate: duplicate, marqueeScrollSpeed: scrollSpeed } = marquee.dataset;
+
+      // Convert data attributes to usable types
+      const marqueeSpeedAttr = parseFloat(speed);
+      const marqueeDirectionAttr = direction === 'right' ? 1 : -1; // 1 for right, -1 for left
+      const duplicateAmount = parseInt(duplicate || 0);
+      const scrollSpeedAttr = parseFloat(scrollSpeed);
+      const speedMultiplier = window.innerWidth < 479 ? 0.25 : window.innerWidth < 991 ? 0.5 : 1;
+      // Reduce scroll speed effect on mobile to prevent overflow
+      const scrollSpeedMultiplier = window.innerWidth < 768 ? 0 : 1;
+
+      let marqueeSpeed = marqueeSpeedAttr * (marqueeContent.offsetWidth / window.innerWidth) * speedMultiplier;
+
+      // Precompute styles for the scroll container
+      const adjustedScrollSpeed = scrollSpeedAttr * scrollSpeedMultiplier;
+      marqueeScroll.style.marginLeft = `${adjustedScrollSpeed * -1}%`;
+      marqueeScroll.style.width = `${(adjustedScrollSpeed * 2) + 100}%`;
+
+      // Duplicate marquee content
+      if (duplicateAmount > 0) {
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < duplicateAmount; i++) {
+          fragment.appendChild(marqueeContent.cloneNode(true));
+        }
+        marqueeScroll.appendChild(fragment);
+      }
+
+      // GSAP animation for marquee content
+      const marqueeItems = marquee.querySelectorAll('[data-marquee-collection-target]');
+
+      // Measure width and get gap from CSS
+      const contentWidth = marqueeContent.offsetWidth;
+      const computedStyle = window.getComputedStyle(marqueeContent);
+      const cssGap = parseFloat(computedStyle.gap) || 24;
+      // Double the gap to match the spacing between collections
+      const collectionWidth = contentWidth + (cssGap * 2);
+      const totalWidth = collectionWidth * marqueeItems.length;
+
+      // Position each duplicate side-by-side with explicit gap
+      marqueeItems.forEach((item, index) => {
+        gsap.set(item, { x: index * collectionWidth });
+      });
+
+      // Create a timeline that continuously moves all items
+      const animation = gsap.timeline({ repeat: -1 });
+      animation.to(marqueeItems, {
+        x: `-=${totalWidth}`,
+        duration: marqueeSpeed * marqueeItems.length,
+        ease: 'none'
+      }, 0);
+
+      animations.push(animation);
+
+      // Use GSAP's wrap utility for seamless looping
+      const wrap = gsap.utils.wrap(-collectionWidth, collectionWidth * (marqueeItems.length - 1));
+
+      const tickerFn = () => {
+        marqueeItems.forEach((item, i) => {
+          let x = gsap.getProperty(item, 'x');
+
+          if (marqueeDirectionAttr === -1) {
+            // Moving left
+            if (x < -collectionWidth) {
+              // Find the rightmost item's position
+              let maxX = -Infinity;
+              marqueeItems.forEach(otherItem => {
+                const otherX = gsap.getProperty(otherItem, 'x');
+                if (otherX > maxX) maxX = otherX;
+              });
+              gsap.set(item, { x: maxX + collectionWidth });
+            }
+          } else {
+            // Moving right
+            if (x > collectionWidth * (marqueeItems.length - 1) + collectionWidth) {
+              // Find the leftmost item's position
+              let minX = Infinity;
+              marqueeItems.forEach(otherItem => {
+                const otherX = gsap.getProperty(otherItem, 'x');
+                if (otherX < minX) minX = otherX;
+              });
+              gsap.set(item, { x: minX - collectionWidth });
+            }
+          }
+        });
+      };
+
+      gsap.ticker.add(tickerFn);
+      tickerFunctions.push(tickerFn);
+
+      animation.timeScale(marqueeDirectionAttr);
+
+      // Set initial marquee status
+      marquee.setAttribute('data-marquee-status', 'normal');
+
+      // ScrollTrigger logic for direction inversion
+      ScrollTrigger.create({
+        trigger: marquee,
+        start: 'top bottom',
+        end: 'bottom top',
+        onUpdate: (self) => {
+          const isInverted = self.direction === 1; // Scrolling down
+          const currentDirection = isInverted ? -marqueeDirectionAttr : marqueeDirectionAttr;
+
+          // Update animation direction and marquee status
+          animation.timeScale(currentDirection);
+          marquee.setAttribute('data-marquee-status', isInverted ? 'normal' : 'inverted');
+        }
+      });
+
+      // Extra speed effect on scroll
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: marquee,
+          start: '0% 100%',
+          end: '100% 0%',
+          scrub: 0
+        }
+      });
+
+      const scrollStart = marqueeDirectionAttr === -1 ? adjustedScrollSpeed : -adjustedScrollSpeed;
+      const scrollEnd = -scrollStart;
+
+      tl.fromTo(marqueeScroll, { x: `${scrollStart}vw` }, { x: `${scrollEnd}vw`, ease: 'none' });
+
+      animations.push(tl);
+    });
+  }
+
+  // Initialize on load and Astro navigation
+  function init() {
+    // Kill any existing ScrollTriggers to prevent conflicts
+    ScrollTrigger.getAll().forEach(st => st.kill());
+    initMarqueeScrollDirection();
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
+
+  // Reinitialize on window resize to recalculate widths
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      init();
+    }, 250);
+  });
+</script>
+
+<style>
+  .marquee-images {
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+    overflow-x: hidden;
+    margin: 48px 0 0;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+
+  @media (max-width: 768px) {
+    .marquee-images {
+      width: 100vw;
+      left: 0;
+      right: 0;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  .marquee-images__scroll {
+    will-change: transform;
+    width: 100%;
+    display: block;
+    position: relative;
+    height: 358px;
+  }
+
+  .marquee-images__collection {
+    will-change: transform;
+    display: flex;
+    position: absolute;
+    gap: 24px;
+    left: 0;
+    top: 0;
+  }
+
+  .marquee-images__item {
+    flex-shrink: 0;
+  }
+
+  .marquee-images__item img {
+    width: 358px;
+    height: 358px;
+    object-fit: cover;
+    border-radius: 48px;
+    display: block;
+  }
+
+  .marquee-images__item img.circular {
+    border-radius: 358px;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .marquee-images {
+      margin: 32px 0 0;
+    }
+
+    .marquee-images__scroll {
+      height: 280px;
+    }
+
+    .marquee-images__collection {
+      gap: 16px;
+    }
+
+    .marquee-images__item img {
+      width: 280px;
+      height: 280px;
+    }
+
+    .marquee-images__item img.circular {
+      border-radius: 280px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .marquee-images {
+      margin: 24px 0 0;
+    }
+
+    .marquee-images__scroll {
+      height: 220px;
+    }
+
+    .marquee-images__item img {
+      width: 220px;
+      height: 220px;
+    }
+
+    .marquee-images__item img.circular {
+      border-radius: 220px;
+    }
+  }
+</style>

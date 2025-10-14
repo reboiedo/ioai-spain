@@ -15,12 +15,12 @@ export const eligibility = {
   }),
   criteria: {
     point1: createTranslation({
-      en: "Be a Spanish citizen, Permanent Resident, or full-time high school student in Spain",
-      es: "Ser ciudadano español, Residente Permanente o estudiante de secundaria a tiempo completo en España"
+      en: "Be a Spanish citizen, Permanent Resident, or full-time school student in Spain",
+      es: "Ser ciudadano español, Residente Permanente o estudiante a tiempo completo en España"
     }),
     point2: createTranslation({
-      en: "Be under 20 years old on July 1st, 2026",
-      es: "Tener menos de 20 años el 1 de julio de 2026"
+      en: "Be at least 14 at registration and no older than 20 on July 1, 2026",
+      es: "Tener al menos 14 años en el registro y no más de 20 años el 1 de julio de 2026"
     }),
     point3: createTranslation({
       en: "Be enrolled in secondary/high school for 2025-2026",

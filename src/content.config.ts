@@ -99,9 +99,19 @@ const privacy = defineCollection({
   })
 });
 
+const campFaq = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/camp-faq' }),
+  schema: z.object({
+    question: z.string(),
+    category: z.string().optional(),
+    order: z.number(),
+  })
+});
+
 export const collections = {
   faq,
   rounds,
   forms,
-  privacy
+  privacy,
+  campFaq
 };

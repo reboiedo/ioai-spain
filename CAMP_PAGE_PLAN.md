@@ -1,17 +1,17 @@
-# Summer Camp Page Implementation Plan
+# Tenerife Summer Camp Page Implementation Plan
 
 ## Overview
-Integration of a new summer camp page (based on https://join.leaguesofcode.com/camps/menorca-summer) into the IOAI Spain project with isolated styling and component architecture.
+Integration of a new Tenerife summer camp page (based on https://join.leaguesofcode.com/camps/menorca-summer) into the IOAI Spain project with isolated styling and component architecture.
 
 ## Architecture Strategy
 
 ### File Organization
-- **Components**: `src/components/summer-camp/` - All camp-specific components
-- **Styles**: `src/styles/summer-camp.css` - Dedicated stylesheet for camp page
-- **Layout**: `src/layouts/SummerCampLayout.astro` - Custom layout importing camp styles
+- **Components**: `src/components/tenerife-camp/` - All camp-specific components
+- **Styles**: `src/styles/tenerife-camp.css` - Dedicated stylesheet for camp page
+- **Layout**: `src/layouts/TenerifeCampLayout.astro` - Custom layout importing camp styles
 - **Config**: `src/config/camp*.ts` - JSON-based structured data
 - **Collections**: `src/content/camp-faq/` - Rich text FAQ with links
-- **i18n**: `src/i18n/summerCamp.ts` - All camp translations
+- **i18n**: `src/i18n/tenerifeCamp.ts` - All camp translations
 
 ### Content Strategy
 - **Collections** (needs markdown/rich text): `camp-faq`
@@ -21,36 +21,37 @@ Integration of a new summer camp page (based on https://join.leaguesofcode.com/c
 
 ## Implementation Stages
 
-### Stage 1: Foundation & Content Structure ⏳
+### Stage 1: Foundation & Content Structure ✅
 **Goal**: Set up all necessary files, collections, and configuration structure
 
 #### Tasks
-- [ ] **1.1** Update `src/content.config.ts` to add `campFaq` collection
+- [x] **1.1** Update `src/content.config.ts` to add `campFaq` collection
   - Schema: `question: string`, `category?: string`, `order: number`
   - Loader: `glob({ pattern: '**/*.md', base: './src/content/camp-faq' })`
 
-- [ ] **1.2** Create `src/config/campCourses.ts`
+- [x] **1.2** Create `src/config/campCourses.ts`
   - TypeScript interface for course data
   - Initial course array (can be populated later)
 
-- [ ] **1.3** Create `src/config/campInstructors.ts`
+- [x] **1.3** Create `src/config/campInstructors.ts`
   - TypeScript interface for instructor data
   - Initial instructor array (can be populated later)
 
-- [ ] **1.4** Create `src/config/campSchedule.ts`
+- [x] **1.4** Create `src/config/campSchedule.ts`
   - TypeScript interface for schedule/timeline data
   - Initial schedule structure
 
-- [ ] **1.5** Create `src/i18n/summerCamp.ts`
+- [x] **1.5** Create `src/i18n/tenerifeCamp.ts`
   - Translation structure following existing pattern
   - Export all camp-related text keys
   - Both `en` and `es` translations
+  - Location updated to Tenerife
 
-- [ ] **1.6** Update `src/i18n/index.ts` to export summer camp translations
+- [x] **1.6** Update `src/i18n/index.ts` to export Tenerife camp translations
   - Import and add to translations object
   - Add to `useTranslations()` return object
 
-**Deliverable**: All foundation files created and wired into existing systems
+**Deliverable**: All foundation files created and wired into existing systems ✅
 
 ---
 
@@ -58,15 +59,15 @@ Integration of a new summer camp page (based on https://join.leaguesofcode.com/c
 **Goal**: Create isolated stylesheet and layout for camp page
 
 #### Tasks
-- [ ] **2.1** Create `src/styles/summer-camp.css`
+- [ ] **2.1** Create `src/styles/tenerife-camp.css`
   - Define camp-specific CSS custom properties
   - Color palette matching target page
   - Typography scale if different from main site
   - Utility classes for camp sections
 
-- [ ] **2.2** Create `src/layouts/SummerCampLayout.astro`
+- [ ] **2.2** Create `src/layouts/TenerifeCampLayout.astro`
   - Extend/use `BaseLayout.astro` as foundation
-  - Import `summer-camp.css`
+  - Import `tenerife-camp.css`
   - Accept props: `title`, `description`, `ogImage`, etc.
   - Optional: custom navigation styling
 
@@ -87,7 +88,7 @@ Integration of a new summer camp page (based on https://join.leaguesofcode.com/c
   - Note interactive elements, animations, special styling
   - Take screenshots/notes for reference
 
-- [ ] **3.2** Create `src/components/summer-camp/` directory structure
+- [ ] **3.2** Create `src/components/tenerife-camp/` directory structure
 
 - [ ] **3.3** Build `CampHero.astro`
   - Hero section with title, subtitle, CTA
@@ -162,13 +163,13 @@ Integration of a new summer camp page (based on https://join.leaguesofcode.com/c
 **Goal**: Create the actual summer camp pages in both languages
 
 #### Tasks
-- [ ] **5.1** Create `src/pages/summer-camp.astro` (English)
-  - Use `SummerCampLayout`
+- [ ] **5.1** Create `src/pages/tenerife-camp.astro` (English)
+  - Use `TenerifeCampLayout`
   - Import and compose all camp components
   - Wire up content collections and configs
   - Set proper meta tags
 
-- [ ] **5.2** Create `src/pages/es/summer-camp.astro` (Spanish)
+- [ ] **5.2** Create `src/pages/es/tenerife-camp.astro` (Spanish)
   - Same structure as English version
   - Pass `locale='es'` to all components
 
@@ -262,7 +263,7 @@ Integration of a new summer camp page (based on https://join.leaguesofcode.com/c
 ### New Files
 ```
 src/
-├── components/summer-camp/
+├── components/tenerife-camp/
 │   ├── CampHero.astro
 │   ├── CampCourses.astro
 │   ├── CampInstructors.astro
@@ -270,9 +271,9 @@ src/
 │   ├── CampFAQ.astro
 │   └── [additional sections].astro
 ├── config/
-│   ├── campCourses.ts
-│   ├── campInstructors.ts
-│   └── campSchedule.ts
+│   ├── campCourses.ts            ✅
+│   ├── campInstructors.ts        ✅
+│   └── campSchedule.ts           ✅
 ├── content/camp-faq/
 │   ├── en/
 │   │   ├── 01-question.md
@@ -281,22 +282,22 @@ src/
 │       ├── 01-question.md
 │       └── ...
 ├── i18n/
-│   └── summerCamp.ts
+│   └── tenerifeCamp.ts           ✅
 ├── layouts/
-│   └── SummerCampLayout.astro
+│   └── TenerifeCampLayout.astro
 ├── pages/
-│   ├── summer-camp.astro
+│   ├── tenerife-camp.astro
 │   └── es/
-│       └── summer-camp.astro
+│       └── tenerife-camp.astro
 └── styles/
-    └── summer-camp.css
+    └── tenerife-camp.css
 ```
 
 ### Modified Files
 ```
 src/
-├── content.config.ts          (add campFaq collection)
-└── i18n/index.ts              (export summerCamp translations)
+├── content.config.ts          ✅ (add campFaq collection)
+└── i18n/index.ts              ✅ (export tenerifeCamp translations)
 ```
 
 ---

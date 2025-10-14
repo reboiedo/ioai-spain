@@ -1,7 +1,7 @@
 ---
 roundNumber: 5
 title: "Programa de Entrenamiento Intensivo"
-date: "Junio–Julio 2026"
+date: "Comienza en junio–julio 2026"
 introSentence: "Preparación integral con profesorado experimentado para dominar los estándares de competición IOAI."
 phase: "team"
 ---
