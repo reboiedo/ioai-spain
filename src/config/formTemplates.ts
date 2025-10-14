@@ -36,11 +36,11 @@ export interface ResolvedFormTemplate {
 export const FORM_TEMPLATES: Record<string, FormTemplate> = {
   application: {
     fields: [
-      "signUpFor",       // Step 1: Who's filling out the form?
-      "role",            // Step 2: What describes you? (conditional: only if signUpFor === 'myself')
-      "participantAge",  // Step 3: Age check (conditional: shown based on signUpFor + role)
-      "guardianName",    // Conditional: shown if under 14 or signing up someone else
-      "guardianEmail",   // Conditional: shown if under 14 or signing up someone else
+      "role",            // Step 1: What describes you? (everyone)
+      "signUpFor",       // Step 2: Who's filling out the form? (conditional: only if role === 'parent')
+      "participantAge",  // Step 3: Age check (conditional: shown based on role + signUpFor)
+      "guardianName",    // Conditional: shown if under 14 or parent signing up child
+      "guardianEmail",   // Conditional: shown if under 14 or parent signing up child
       "fullName",        // Participant name
       "email",           // Participant email
       "schoolName",      // School name

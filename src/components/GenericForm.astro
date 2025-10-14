@@ -548,6 +548,7 @@ const form = resolvedForm;
     };
 
     const roleGroup = getFieldGroup('role');
+    const signUpForGroup = getFieldGroup('signUpFor');
     const participantAgeGroup = getFieldGroup('participantAge');
     const guardianNameGroup = getFieldGroup('guardianName');
     const guardianEmailGroup = getFieldGroup('guardianEmail');
@@ -555,12 +556,14 @@ const form = resolvedForm;
     // Debug: Check if all fields exist
     console.log('📋 Field groups found:', {
       roleGroup: !!roleGroup,
+      signUpForGroup: !!signUpForGroup,
       participantAgeGroup: !!participantAgeGroup,
       guardianNameGroup: !!guardianNameGroup,
       guardianEmailGroup: !!guardianEmailGroup
     });
 
     if (!roleGroup) console.error('❌ role field group not found!');
+    if (!signUpForGroup) console.error('❌ signUpFor field group not found!');
     if (!participantAgeGroup) console.error('❌ participantAge field group not found!');
     if (!guardianNameGroup) console.error('❌ guardianName field group not found!');
     if (!guardianEmailGroup) console.error('❌ guardianEmail field group not found!');
@@ -617,31 +620,27 @@ const form = resolvedForm;
 
     // Update form display based on current selections
     function updateFormDisplay() {
-      const signUpFor = formElement.querySelector('input[name="signUpFor"]:checked')?.value;
       const role = formElement.querySelector('select[name="role"]')?.value;
+      const signUpFor = formElement.querySelector('input[name="signUpFor"]:checked')?.value;
       const participantAge = formElement.querySelector('input[name="participantAge"]:checked')?.value;
 
-      console.log('🔄 Update form display:', { signUpFor, role, participantAge });
+      console.log('🔄 Update form display:', { role, signUpFor, participantAge });
 
-      // Rule 1: Show role field only if "myself" is selected
-      const showRole = signUpFor === 'myself';
-      console.log('  → Rule 1 (role):', { signUpFor, showRole });
-      if (showRole) {
-        setFieldVisibility(roleGroup, true, true);
-      } else {
-        setFieldVisibility(roleGroup, false, false);
-      }
+      // Rule 1: Show signUpFor field only if role is "parent"
+      const showSignUpFor = role === 'parent';
+      console.log('  → Rule 1 (signUpFor):', { role, showSignUpFor });
+      setFieldVisibility(signUpForGroup, showSignUpFor, showSignUpFor);
 
-      // Rule 2: Show participantAge field based on signUpFor + role
+      // Rule 2: Show participantAge field based on role + signUpFor
       let showAge = false;
-      if (signUpFor === 'myself' && role === 'student') {
-        console.log('  → Rule 2 (age): myself + student = SHOW');
+      if (role === 'student') {
+        console.log('  → Rule 2 (age): student = SHOW');
         showAge = true;
-      } else if (signUpFor === 'my-child') {
-        console.log('  → Rule 2 (age): my-child = SHOW');
+      } else if (role === 'parent' && signUpFor === 'my-child') {
+        console.log('  → Rule 2 (age): parent + my-child = SHOW');
         showAge = true;
       } else {
-        console.log('  → Rule 2 (age): conditions not met = HIDE', { signUpFor, role });
+        console.log('  → Rule 2 (age): conditions not met = HIDE', { role, signUpFor });
       }
       setFieldVisibility(participantAgeGroup, showAge, showAge);
 
@@ -649,10 +648,10 @@ const form = resolvedForm;
       let showGuardian = false;
       let showNotification = false;
 
-      if (signUpFor === 'myself' && role === 'student' && participantAge === 'under14') {
+      if (role === 'student' && participantAge === 'under14') {
         showGuardian = true;
         showNotification = true; // Show notification for under-14 students
-      } else if (signUpFor === 'my-child') {
+      } else if (role === 'parent' && signUpFor === 'my-child') {
         showGuardian = true;
         showNotification = false; // Don't show notification for parents signing up child
       }
@@ -692,16 +691,16 @@ const form = resolvedForm;
       if (participantAgeLabel) {
         const labels = {
           en: {
-            myself: 'Are you 14 years old or older?',
-            someoneElse: 'Is the participant 14 years old or older?'
+            student: 'Are you 14 years old or older?',
+            parentChild: 'Is your child 14 years old or older?'
           },
           es: {
-            myself: '¿Tienes 14 años o más?',
-            someoneElse: '¿El participante tiene 14 años o más?'
+            student: '¿Tienes 14 años o más?',
+            parentChild: '¿Tu hijo/a tiene 14 años o más?'
           }
         };
         const lang = locale || 'en';
-        const labelKey = signUpFor === 'myself' ? 'myself' : 'someoneElse';
+        const labelKey = (role === 'parent' && signUpFor === 'my-child') ? 'parentChild' : 'student';
         participantAgeLabel.childNodes[0].textContent = labels[lang][labelKey] + ' ';
       }
 
@@ -709,21 +708,21 @@ const form = resolvedForm;
       if (fullNameLabel && emailLabel) {
         const labels = {
           en: {
-            participantName: 'Participant Full Name',
+            participantName: 'Child\'s Full Name',
             yourName: 'Your Full Name',
-            participantEmail: 'Participant Email',
+            participantEmail: 'Child\'s Email',
             yourEmail: 'Your Email'
           },
           es: {
-            participantName: 'Nombre Completo del Participante',
+            participantName: 'Nombre Completo del Hijo/a',
             yourName: 'Tu Nombre Completo',
-            participantEmail: 'Email del Participante',
+            participantEmail: 'Email del Hijo/a',
             yourEmail: 'Tu Email'
           }
         };
         const lang = locale || 'en';
 
-        if (signUpFor === 'my-child') {
+        if (role === 'parent' && signUpFor === 'my-child') {
           fullNameLabel.childNodes[0].textContent = labels[lang].participantName + ' ';
           emailLabel.childNodes[0].textContent = labels[lang].participantEmail + ' ';
         } else {
@@ -732,8 +731,8 @@ const form = resolvedForm;
         }
       }
 
-      // Update guardian field labels when signing up child
-      if (signUpFor === 'my-child') {
+      // Update guardian field labels
+      if (showGuardian) {
         const guardianNameLabel = guardianNameGroup?.querySelector('label');
         const guardianEmailLabel = guardianEmailGroup?.querySelector('label');
 
@@ -772,9 +771,9 @@ const form = resolvedForm;
 
         // Determine which consent text to use
         let consentKey = 'default';
-        if (signUpFor === 'myself' && role === 'student' && participantAge === 'under14') {
+        if (role === 'student' && participantAge === 'under14') {
           consentKey = 'under14';
-        } else if (signUpFor === 'my-child') {
+        } else if (role === 'parent' && signUpFor === 'my-child') {
           consentKey = 'guardianForSomeone';
         }
 
@@ -783,12 +782,12 @@ const form = resolvedForm;
     }
 
     // Add event listeners
-    const signUpForRadios = formElement.querySelectorAll('input[name="signUpFor"]');
     const roleSelect = formElement.querySelector('select[name="role"]');
+    const signUpForRadios = formElement.querySelectorAll('input[name="signUpFor"]');
     const participantAgeRadios = formElement.querySelectorAll('input[name="participantAge"]');
 
-    signUpForRadios.forEach(radio => radio.addEventListener('change', updateFormDisplay));
     if (roleSelect) roleSelect.addEventListener('change', updateFormDisplay);
+    signUpForRadios.forEach(radio => radio.addEventListener('change', updateFormDisplay));
     participantAgeRadios.forEach(radio => radio.addEventListener('change', updateFormDisplay));
 
     // Initial display update
