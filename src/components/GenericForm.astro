@@ -104,6 +104,14 @@ const form = resolvedForm;
           <!-- Formspark redirect URL (will be set by JavaScript) -->
           <input type="hidden" name="_redirect" id={`redirect-${formData.slug}`} value="" />
 
+          <!-- Guardian Notification (shown dynamically for under-14 students) -->
+          <div id="guardian-notification" class="guardian-notification" style="display: none;">
+            <div class="notification-icon">ℹ️</div>
+            <div class="notification-content">
+              <p class="notification-title" id="notification-title"></p>
+              <p class="notification-message" id="notification-message"></p>
+            </div>
+          </div>
 
           {form.fields.map((field) => (
             <div class="form-group">
@@ -418,6 +426,39 @@ const form = resolvedForm;
     transition: color 0.2s, font-weight 0.2s;
   }
 
+  .guardian-notification {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .notification-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .notification-content {
+    flex: 1;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    color: #1e40af;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+  }
+
+  .notification-message {
+    color: #1e3a8a;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
   .confirmation-message {
     color: var(--text-secondary);
     font-size: 0.9rem;
@@ -529,6 +570,9 @@ const form = resolvedForm;
     const fullNameLabel = formElement.querySelector('label[for="fullName"]');
     const emailLabel = formElement.querySelector('label[for="email"]');
     const consentLabel = formElement.querySelector('input[name="consent"]')?.closest('.checkbox-label')?.querySelector('.consent-text');
+    const guardianNotification = document.getElementById('guardian-notification');
+    const notificationTitle = document.getElementById('notification-title');
+    const notificationMessage = document.getElementById('notification-message');
 
     // Helper function to show/hide and manage required state
     function setFieldVisibility(fieldGroup, visible, required = false) {
@@ -601,15 +645,48 @@ const form = resolvedForm;
       }
       setFieldVisibility(participantAgeGroup, showAge, showAge);
 
-      // Rule 3: Show guardian fields
+      // Rule 3: Show guardian fields and notification
       let showGuardian = false;
+      let showNotification = false;
+
       if (signUpFor === 'myself' && role === 'student' && participantAge === 'under14') {
         showGuardian = true;
+        showNotification = true; // Show notification for under-14 students
       } else if (signUpFor === 'my-child') {
         showGuardian = true;
+        showNotification = false; // Don't show notification for parents signing up child
       }
+
       setFieldVisibility(guardianNameGroup, showGuardian, showGuardian);
       setFieldVisibility(guardianEmailGroup, showGuardian, showGuardian);
+
+      // Show/hide guardian notification and position it correctly
+      if (guardianNotification && notificationTitle && notificationMessage) {
+        if (showNotification) {
+          const notificationTexts = {
+            en: {
+              title: 'Parent/Guardian Required',
+              message: 'Since you are under 14, a parent or guardian must complete the rest of this application on your behalf.'
+            },
+            es: {
+              title: 'Se Requiere Padre/Madre/Tutor',
+              message: 'Como eres menor de 14 años, un padre/madre o tutor debe completar el resto de esta solicitud en tu nombre.'
+            }
+          };
+          const lang = locale || 'en';
+          notificationTitle.textContent = notificationTexts[lang].title;
+          notificationMessage.textContent = notificationTexts[lang].message;
+          guardianNotification.style.display = 'flex';
+
+          // Position notification between age question and guardian name
+          if (participantAgeGroup && guardianNameGroup) {
+            // Insert notification after the age group
+            participantAgeGroup.parentNode.insertBefore(guardianNotification, guardianNameGroup);
+          }
+        } else {
+          guardianNotification.style.display = 'none';
+        }
+      }
 
       // Rule 4: Update dynamic labels
       if (participantAgeLabel) {
@@ -682,12 +759,12 @@ const form = resolvedForm;
         const consentTexts = {
           en: {
             default: 'I consent to receiving emails',
-            under14: 'My parent/guardian (listed above) has given consent for me to participate and receive emails',
+            under14: 'I am the parent/guardian and give consent for my child to participate and receive emails',
             guardianForSomeone: 'I give consent for my child to participate and receive emails'
           },
           es: {
             default: 'Acepto recibir correos electrónicos',
-            under14: 'Mi padre/madre/tutor (mencionado arriba) ha dado su consentimiento para que yo participe y reciba correos electrónicos',
+            under14: 'Soy el padre/madre/tutor y doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos',
             guardianForSomeone: 'Doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos'
           }
         };
