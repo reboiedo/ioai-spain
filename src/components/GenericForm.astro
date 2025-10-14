@@ -10,7 +10,7 @@ export interface Props {
       subtitle?: string;
       action?: string;
       fields?: Array<{
-        type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox';
+        type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio';
         name: string;
         label: string;
         placeholder?: string;
@@ -41,7 +41,7 @@ type ResolvedForm = {
   subtitle?: string;
   action: string;
   fields: Array<{
-    type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox';
+    type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio';
     name: string;
     label: string;
     placeholder?: string;
@@ -163,6 +163,27 @@ const form = resolvedForm;
                     rows="4"
                   ></textarea>
                 </>
+              ) : field.type === 'radio' ? (
+                <!-- Radio Button Field -->
+                <div class="radio-group">
+                  <label class="form-label">
+                    {field.label}
+                    {field.required && <span class="required">*</span>}
+                  </label>
+                  <div class="radio-options">
+                    {field.options?.map((option) => (
+                      <label class="radio-label">
+                        <input
+                          type="radio"
+                          name={field.name}
+                          value={option.value}
+                          required={field.required}
+                        />
+                        <span class="radio-text">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
               ) : (
                 <!-- Text/Email Fields -->
                 <>
@@ -241,7 +262,8 @@ const form = resolvedForm;
   }
 
   .form-subtitle {
-    font-size: 1.125rem;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-light);
     color: var(--text-secondary);
     margin-bottom: 2rem;
     text-align: center;
@@ -267,7 +289,7 @@ const form = resolvedForm;
   }
 
   .required {
-    color: #ef4444;
+    color: #ef4444 !important;
     margin-left: 0.25rem;
   }
 
@@ -294,7 +316,8 @@ const form = resolvedForm;
 
   .form-input::placeholder,
   .form-textarea::placeholder {
-    color: var(--text-muted);
+    color: #6b7280;
+    font-weight: 400;
   }
 
   .form-select {
@@ -305,6 +328,10 @@ const form = resolvedForm;
     background-repeat: no-repeat;
     background-size: 1.5rem;
     padding-right: 2.5rem;
+  }
+
+  .form-select option[value=""][disabled] {
+    color: #9ca3af;
   }
 
   .form-textarea {
@@ -336,6 +363,59 @@ const form = resolvedForm;
   .checkbox-label .consent-text {
     flex: 1;
     line-height: 1.5;
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .radio-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .radio-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--background-primary);
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .radio-label:hover {
+    border-color: #0066cc;
+    background: rgba(0, 102, 204, 0.02);
+  }
+
+  .radio-label input[type="radio"] {
+    margin-right: 0.75rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    cursor: pointer;
+    accent-color: #0066cc;
+  }
+
+  .radio-label input[type="radio"]:checked + .radio-text {
+    font-weight: 600;
+    color: #0066cc;
+  }
+
+  .radio-label:has(input[type="radio"]:checked) {
+    border-color: #0066cc;
+    background: rgba(0, 102, 204, 0.05);
+  }
+
+  .radio-text {
+    flex: 1;
+    line-height: 1.5;
+    color: var(--text-primary);
+    transition: color 0.2s, font-weight 0.2s;
   }
 
   .confirmation-message {
@@ -419,8 +499,230 @@ const form = resolvedForm;
     console.log('🚀 Form action URL:', formElement.action);
     console.log('🚀 Redirect URL set to:', redirectUrl);
 
+    // === Conditional Form Logic ===
+    // Get field groups
+    const getFieldGroup = (fieldName) => {
+      const input = formElement.querySelector(`[name="${fieldName}"]`);
+      return input?.closest('.form-group');
+    };
+
+    const roleGroup = getFieldGroup('role');
+    const participantAgeGroup = getFieldGroup('participantAge');
+    const guardianNameGroup = getFieldGroup('guardianName');
+    const guardianEmailGroup = getFieldGroup('guardianEmail');
+
+    // Debug: Check if all fields exist
+    console.log('📋 Field groups found:', {
+      roleGroup: !!roleGroup,
+      participantAgeGroup: !!participantAgeGroup,
+      guardianNameGroup: !!guardianNameGroup,
+      guardianEmailGroup: !!guardianEmailGroup
+    });
+
+    if (!roleGroup) console.error('❌ role field group not found!');
+    if (!participantAgeGroup) console.error('❌ participantAge field group not found!');
+    if (!guardianNameGroup) console.error('❌ guardianName field group not found!');
+    if (!guardianEmailGroup) console.error('❌ guardianEmail field group not found!');
+
+    // Get labels for dynamic updates
+    const participantAgeLabel = formElement.querySelector('label.form-label:has(+ .radio-options input[name="participantAge"])');
+    const fullNameLabel = formElement.querySelector('label[for="fullName"]');
+    const emailLabel = formElement.querySelector('label[for="email"]');
+    const consentLabel = formElement.querySelector('input[name="consent"]')?.closest('.checkbox-label')?.querySelector('.consent-text');
+
+    // Helper function to show/hide and manage required state
+    function setFieldVisibility(fieldGroup, visible, required = false) {
+      if (!fieldGroup) return;
+
+      fieldGroup.style.display = visible ? 'flex' : 'none';
+
+      // Find input/select/textarea in the group
+      const input = fieldGroup.querySelector('input:not([type="radio"]), select, textarea');
+      if (input) {
+        input.required = required;
+        input.disabled = !visible; // Disabled fields don't submit
+        if (!visible) input.value = '';
+      }
+
+      // Handle radio buttons separately
+      const radioInputs = fieldGroup.querySelectorAll('input[type="radio"]');
+      radioInputs.forEach(radio => {
+        radio.required = required;
+        radio.disabled = !visible; // Disabled fields don't submit
+        if (!visible) radio.checked = false;
+      });
+
+      // Update the asterisk in the label
+      const label = fieldGroup.querySelector('label.form-label, label[for]');
+      if (label) {
+        let asterisk = label.querySelector('.required');
+        if (required && !asterisk) {
+          // Add asterisk if it doesn't exist
+          asterisk = document.createElement('span');
+          asterisk.className = 'required';
+          asterisk.style.color = '#ef4444';
+          asterisk.style.marginLeft = '0.25rem';
+          asterisk.textContent = ' *';
+          label.appendChild(asterisk);
+        } else if (!required && asterisk) {
+          // Remove asterisk if it exists
+          asterisk.remove();
+        }
+      }
+    }
+
+    // Update form display based on current selections
+    function updateFormDisplay() {
+      const signUpFor = formElement.querySelector('input[name="signUpFor"]:checked')?.value;
+      const role = formElement.querySelector('select[name="role"]')?.value;
+      const participantAge = formElement.querySelector('input[name="participantAge"]:checked')?.value;
+
+      console.log('🔄 Update form display:', { signUpFor, role, participantAge });
+
+      // Rule 1: Show role field only if "myself" is selected
+      const showRole = signUpFor === 'myself';
+      console.log('  → Rule 1 (role):', { signUpFor, showRole });
+      if (showRole) {
+        setFieldVisibility(roleGroup, true, true);
+      } else {
+        setFieldVisibility(roleGroup, false, false);
+      }
+
+      // Rule 2: Show participantAge field based on signUpFor + role
+      let showAge = false;
+      if (signUpFor === 'myself' && role === 'student') {
+        console.log('  → Rule 2 (age): myself + student = SHOW');
+        showAge = true;
+      } else if (signUpFor === 'my-child') {
+        console.log('  → Rule 2 (age): my-child = SHOW');
+        showAge = true;
+      } else {
+        console.log('  → Rule 2 (age): conditions not met = HIDE', { signUpFor, role });
+      }
+      setFieldVisibility(participantAgeGroup, showAge, showAge);
+
+      // Rule 3: Show guardian fields
+      let showGuardian = false;
+      if (signUpFor === 'myself' && role === 'student' && participantAge === 'under14') {
+        showGuardian = true;
+      } else if (signUpFor === 'my-child') {
+        showGuardian = true;
+      }
+      setFieldVisibility(guardianNameGroup, showGuardian, showGuardian);
+      setFieldVisibility(guardianEmailGroup, showGuardian, showGuardian);
+
+      // Rule 4: Update dynamic labels
+      if (participantAgeLabel) {
+        const labels = {
+          en: {
+            myself: 'Are you 14 years old or older?',
+            someoneElse: 'Is the participant 14 years old or older?'
+          },
+          es: {
+            myself: '¿Tienes 14 años o más?',
+            someoneElse: '¿El participante tiene 14 años o más?'
+          }
+        };
+        const lang = locale || 'en';
+        const labelKey = signUpFor === 'myself' ? 'myself' : 'someoneElse';
+        participantAgeLabel.childNodes[0].textContent = labels[lang][labelKey] + ' ';
+      }
+
+      // Update fullName and email labels
+      if (fullNameLabel && emailLabel) {
+        const labels = {
+          en: {
+            participantName: 'Participant Full Name',
+            yourName: 'Your Full Name',
+            participantEmail: 'Participant Email',
+            yourEmail: 'Your Email'
+          },
+          es: {
+            participantName: 'Nombre Completo del Participante',
+            yourName: 'Tu Nombre Completo',
+            participantEmail: 'Email del Participante',
+            yourEmail: 'Tu Email'
+          }
+        };
+        const lang = locale || 'en';
+
+        if (signUpFor === 'my-child') {
+          fullNameLabel.childNodes[0].textContent = labels[lang].participantName + ' ';
+          emailLabel.childNodes[0].textContent = labels[lang].participantEmail + ' ';
+        } else {
+          fullNameLabel.childNodes[0].textContent = labels[lang].yourName + ' ';
+          emailLabel.childNodes[0].textContent = labels[lang].yourEmail + ' ';
+        }
+      }
+
+      // Update guardian field labels when signing up child
+      if (signUpFor === 'my-child') {
+        const guardianNameLabel = guardianNameGroup?.querySelector('label');
+        const guardianEmailLabel = guardianEmailGroup?.querySelector('label');
+
+        const labels = {
+          en: {
+            guardianName: 'Your Full Name (Guardian)',
+            guardianEmail: 'Your Email (Guardian)'
+          },
+          es: {
+            guardianName: 'Tu Nombre Completo (Tutor)',
+            guardianEmail: 'Tu Email (Tutor)'
+          }
+        };
+        const lang = locale || 'en';
+
+        if (guardianNameLabel) guardianNameLabel.childNodes[0].textContent = labels[lang].guardianName + ' ';
+        if (guardianEmailLabel) guardianEmailLabel.childNodes[0].textContent = labels[lang].guardianEmail + ' ';
+      }
+
+      // Rule 5: Update consent checkbox label based on context
+      // Only apply dynamic label if form has conditional fields (signUpForRadios exist)
+      if (consentLabel && signUpForRadios.length > 0) {
+        const consentTexts = {
+          en: {
+            default: 'I consent to receiving emails',
+            under14: 'My parent/guardian (listed above) has given consent for me to participate and receive emails',
+            guardianForSomeone: 'I give consent for my child to participate and receive emails'
+          },
+          es: {
+            default: 'Acepto recibir correos electrónicos',
+            under14: 'Mi padre/madre/tutor (mencionado arriba) ha dado su consentimiento para que yo participe y reciba correos electrónicos',
+            guardianForSomeone: 'Doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos'
+          }
+        };
+        const lang = locale || 'en';
+
+        // Determine which consent text to use
+        let consentKey = 'default';
+        if (signUpFor === 'myself' && role === 'student' && participantAge === 'under14') {
+          consentKey = 'under14';
+        } else if (signUpFor === 'my-child') {
+          consentKey = 'guardianForSomeone';
+        }
+
+        consentLabel.textContent = consentTexts[lang][consentKey];
+      }
+    }
+
+    // Add event listeners
+    const signUpForRadios = formElement.querySelectorAll('input[name="signUpFor"]');
+    const roleSelect = formElement.querySelector('select[name="role"]');
+    const participantAgeRadios = formElement.querySelectorAll('input[name="participantAge"]');
+
+    signUpForRadios.forEach(radio => radio.addEventListener('change', updateFormDisplay));
+    if (roleSelect) roleSelect.addEventListener('change', updateFormDisplay);
+    participantAgeRadios.forEach(radio => radio.addEventListener('change', updateFormDisplay));
+
+    // Initial display update
+    updateFormDisplay();
+
+    // Form submission handler
     formElement.addEventListener('submit', function(e) {
       console.log('🚀 Form submit event triggered - using native submission!');
+
+      // Disable signUpFor field so it doesn't submit (UI-only field)
+      signUpForRadios.forEach(radio => radio.disabled = true);
 
       const submitButton = formElement.querySelector('button[type="submit"]');
 

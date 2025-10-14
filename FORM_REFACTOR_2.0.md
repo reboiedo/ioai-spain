@@ -273,24 +273,40 @@ guardianName + guardianEmail visible AND required IF:
 - `signUpFor === 'someone-else'` → "Your Full Name (Guardian)", "Your Email (Guardian)"
 - `signUpFor === 'myself'` → "Guardian Full Name", "Guardian Email"
 
+### Rule 5: Dynamic Consent Label
+
+The consent checkbox text changes based on who is providing consent:
+
+**English:**
+- **Default** (adult self-registration): "I consent to receiving emails"
+- **Under 14 student** (`signUpFor === 'myself' AND role === 'student' AND participantAge === 'no'`): "My parent/guardian (listed above) has given consent for me to participate and receive emails"
+- **Guardian for someone else** (`signUpFor === 'someone-else'`): "I give consent on behalf of the participant to participate and receive emails"
+
+**Spanish:**
+- **Default**: "Acepto recibir correos electrónicos"
+- **Under 14 student**: "Mi padre/madre/tutor (mencionado arriba) ha dado su consentimiento para que yo participe y reciba correos electrónicos"
+- **Guardian for someone else**: "Doy mi consentimiento en nombre del participante para que participe y reciba correos electrónicos"
+
+**Rationale**: This ensures legally appropriate consent is given by the correct person in each scenario.
+
 ---
 
 ## Implementation Checklist
 
 ### Phase 1: Add Radio Button Support
-- [ ] Add `'radio'` to `FormFieldType` in `formFields.ts`
-- [ ] Add `'radio'` to field type enum in `content.config.ts`
-- [ ] Add radio button rendering in `GenericForm.astro`
-- [ ] Add radio button CSS styling
+- [x] Add `'radio'` to `FormFieldType` in `formFields.ts`
+- [x] Add `'radio'` to field type enum in `content.config.ts`
+- [x] Add radio button rendering in `GenericForm.astro`
+- [x] Add radio button CSS styling
 
 ### Phase 2: Add New Fields
-- [ ] Add `signUpFor` field to `formFields.ts`
-- [ ] Add `participantAge` field to `formFields.ts`
-- [ ] Add `guardianName` field to `formFields.ts`
-- [ ] Add `guardianEmail` field to `formFields.ts`
+- [x] Add `signUpFor` field to `formFields.ts`
+- [x] Add `participantAge` field to `formFields.ts`
+- [x] Add `guardianName` field to `formFields.ts`
+- [x] Add `guardianEmail` field to `formFields.ts`
 
 ### Phase 3: Update Template
-- [ ] Update `application` template in `formTemplates.ts`:
+- [x] Update `application` template in `formTemplates.ts`:
   ```typescript
   application: {
     fields: [
@@ -308,14 +324,15 @@ guardianName + guardianEmail visible AND required IF:
   ```
 
 ### Phase 4: Add Conditional Logic to GenericForm.astro
-- [ ] Add event listener for `signUpFor` radio change
-- [ ] Show/hide `role` field based on `signUpFor`
-- [ ] Show/hide `participantAge` field based on `signUpFor` + `role`
-- [ ] Show/hide guardian fields based on conditions
-- [ ] Update `participantAge` label dynamically
-- [ ] Update `fullName` and `email` labels dynamically
-- [ ] Make guardian fields required when visible
-- [ ] Clear guardian fields when hidden
+- [x] Add event listener for `signUpFor` radio change
+- [x] Show/hide `role` field based on `signUpFor`
+- [x] Show/hide `participantAge` field based on `signUpFor` + `role`
+- [x] Show/hide guardian fields based on conditions
+- [x] Update `participantAge` label dynamically
+- [x] Update `fullName` and `email` labels dynamically
+- [x] Update `consent` label dynamically based on context
+- [x] Make guardian fields required when visible
+- [x] Clear guardian fields when hidden
 
 ### Phase 5: Testing
 - [ ] Test: Student 14+ self-registration (no guardian)

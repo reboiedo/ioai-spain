@@ -1,4 +1,4 @@
-export type FormFieldType = 'text' | 'email' | 'select' | 'textarea' | 'checkbox';
+export type FormFieldType = 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio';
 
 export interface FormFieldOption {
   value: string;
@@ -148,6 +148,86 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       label: 'Mensaje',
       placeholder: 'Ingrese su mensaje',
       required: true
+    }
+  },
+
+  signUpFor: {
+    en: {
+      type: 'radio',
+      name: 'signUpFor',
+      label: 'Are you signing up yourself or your child?',
+      required: true,
+      options: [
+        { value: 'myself', label: 'I want to participate myself' },
+        { value: 'my-child', label: "I'm signing up my child" }
+      ]
+    },
+    es: {
+      type: 'radio',
+      name: 'signUpFor',
+      label: '¿Te inscribes tú mismo o a tu hijo/a?',
+      required: true,
+      options: [
+        { value: 'myself', label: 'Quiero participar yo mismo/a' },
+        { value: 'my-child', label: 'Estoy inscribiendo a mi hijo/a' }
+      ]
+    }
+  },
+
+  participantAge: {
+    en: {
+      type: 'radio',
+      name: 'participantAge',
+      label: 'Are you 14 years old or older?',
+      required: true,
+      options: [
+        { value: 'over14', label: 'Yes (14 or older)' },
+        { value: 'under14', label: 'No (under 14)' }
+      ]
+    },
+    es: {
+      type: 'radio',
+      name: 'participantAge',
+      label: '¿Tienes 14 años o más?',
+      required: true,
+      options: [
+        { value: 'over14', label: 'Sí (14 años o más)' },
+        { value: 'under14', label: 'No (menor de 14)' }
+      ]
+    }
+  },
+
+  guardianName: {
+    en: {
+      type: 'text',
+      name: 'guardianName',
+      label: 'Guardian Full Name',
+      placeholder: 'Enter guardian full name',
+      required: false
+    },
+    es: {
+      type: 'text',
+      name: 'guardianName',
+      label: 'Nombre Completo del Tutor',
+      placeholder: 'Ingrese el nombre completo del tutor',
+      required: false
+    }
+  },
+
+  guardianEmail: {
+    en: {
+      type: 'email',
+      name: 'guardianEmail',
+      label: 'Guardian Email',
+      placeholder: 'Enter guardian email',
+      required: false
+    },
+    es: {
+      type: 'email',
+      name: 'guardianEmail',
+      label: 'Email del Tutor',
+      placeholder: 'Ingrese el email del tutor',
+      required: false
     }
   }
 };

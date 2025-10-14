@@ -46,7 +46,7 @@ const forms = defineCollection({
       subtitle: z.string().optional(),
       action: z.string().optional(), // Optional when using template
       fields: z.array(z.object({
-        type: z.enum(['text', 'email', 'select', 'textarea', 'checkbox']),
+        type: z.enum(['text', 'email', 'select', 'textarea', 'checkbox', 'radio']),
         name: z.string(),
         label: z.string(),
         placeholder: z.string().optional(),
@@ -54,7 +54,7 @@ const forms = defineCollection({
         options: z.array(z.object({
           value: z.string(),
           label: z.string()
-        })).optional() // For select fields
+        })).optional() // For select and radio fields
       })).optional(), // Optional when using template
       submitButton: z.object({
         default: z.string(),

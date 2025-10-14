@@ -7,8 +7,8 @@ export interface FormSubmitButton {
 
 export interface FieldOverride {
   required?: boolean;
-  placeholder?: string;
-  label?: string;
+  placeholder?: string | { en: string; es: string };
+  label?: string | { en: string; es: string };
 }
 
 export interface FormTemplate {
@@ -35,7 +35,17 @@ export interface ResolvedFormTemplate {
 // Form template definitions
 export const FORM_TEMPLATES: Record<string, FormTemplate> = {
   application: {
-    fields: ["fullName", "email", "schoolName", "role", "consent"],
+    fields: [
+      "signUpFor",       // Step 1: Who's filling out the form?
+      "role",            // Step 2: What describes you? (conditional: only if signUpFor === 'myself')
+      "participantAge",  // Step 3: Age check (conditional: shown based on signUpFor + role)
+      "guardianName",    // Conditional: shown if under 14 or signing up someone else
+      "guardianEmail",   // Conditional: shown if under 14 or signing up someone else
+      "fullName",        // Participant name
+      "email",           // Participant email
+      "schoolName",      // School name
+      "consent"          // Consent checkbox
+    ],
     submitButton: {
       en: { default: "Submit", loading: "Submitting..." },
       es: { default: "Enviar", loading: "Enviando..." },
@@ -49,6 +59,14 @@ export const FORM_TEMPLATES: Record<string, FormTemplate> = {
 
   download: {
     fields: ["fullName", "email", "schoolName", "role", "consent"],
+    fieldOverrides: {
+      consent: {
+        label: {
+          en: "I confirm that I am 14 years or older and consent to receiving emails",
+          es: "Confirmo que tengo 14 años o más y acepto recibir correos electrónicos"
+        }
+      }
+    },
     submitButton: {
       en: { default: "Download", loading: "Downloading..." },
       es: { default: "Descargar", loading: "Descargando..." },
@@ -92,17 +110,21 @@ export function resolveFormTemplate(
     fields = fields.map((field) => {
       const override = template.fieldOverrides![field.name];
       if (override) {
+        // Helper to resolve locale-aware or simple values
+        const resolveValue = (value: string | { en: string; es: string } | undefined, defaultValue: string): string => {
+          if (value === undefined) return defaultValue;
+          if (typeof value === 'string') return value;
+          return value[locale];
+        };
+
         return {
           ...field,
           required:
             override.required !== undefined
               ? override.required
               : field.required,
-          placeholder:
-            override.placeholder !== undefined
-              ? override.placeholder
-              : field.placeholder,
-          label: override.label !== undefined ? override.label : field.label,
+          placeholder: field.placeholder ? resolveValue(override.placeholder, field.placeholder) : field.placeholder,
+          label: resolveValue(override.label, field.label),
         };
       }
       return field;
