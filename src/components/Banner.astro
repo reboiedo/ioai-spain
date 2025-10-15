@@ -10,6 +10,7 @@ export interface Props {
       buttonText: string;
       buttonUrl: string;
       backgroundJson: string;
+      backgroundColor: string;
       order: number;
     }>;
   };
@@ -20,7 +21,7 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
 ---
 
 <section class="banner-section">
-  <div class="banner" data-slides={JSON.stringify(sortedBanners.map(b => ({ id: b.id, backgroundJson: b.backgroundJson })))}>
+  <div class="banner" data-slides={JSON.stringify(sortedBanners.map(b => ({ id: b.id, backgroundJson: b.backgroundJson, backgroundColor: b.backgroundColor })))}>
     <!-- Unicorn Studio Backgrounds - One for each banner -->
     {sortedBanners.map((banner, index) => (
       <div
@@ -33,10 +34,15 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
       ></div>
     ))}
 
-    <!-- Slider Container with Single Wrapper -->
-    <div class="wrapper">
-      <div class="slider-container">
-        {sortedBanners.map((banner, index) => (
+    <!-- Wrappers with Background Colors - One for each banner -->
+    {sortedBanners.map((banner, index) => (
+      <div
+        class="wrapper"
+        data-wrapper-index={index}
+        data-active={index === 0}
+        style={`background-color: ${banner.backgroundColor};`}
+      >
+        <div class="slider-container">
           <div
             class="slide"
             data-slide-index={index}
@@ -53,9 +59,9 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
               {banner.buttonText}
             </Button>
           </div>
-        ))}
+        </div>
       </div>
-    </div>
+    ))}
 
     <!-- Dot Indicators -->
     {sortedBanners.length > 1 && (
@@ -91,14 +97,29 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
     min-height: 280px;
   }
 
-  /* Black wrapper stays constant */
+  /* Wrappers with different background colors */
   .wrapper {
     max-width: 600px;
-    background-color: black;
     padding: var(--space-xl) var(--card-inline);
     margin: 0 auto;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0s 0.5s;
+    width: 100%;
+  }
+
+  .wrapper[data-active="true"] {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    transform: none;
+    left: auto;
+    transition: opacity 0.5s ease-in-out, visibility 0s 0s;
   }
 
   /* Slider Container */
@@ -112,26 +133,11 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
   }
 
   .slide {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.5s ease-in-out, visibility 0s 0.5s;
-    pointer-events: none;
     display: flex;
     flex-direction: column;
     gap: 40px;
     align-items: center;
-  }
-
-  .slide[data-active="true"] {
-    opacity: 1;
-    visibility: visible;
-    position: relative;
-    pointer-events: auto;
-    transition: opacity 0.5s ease-in-out, visibility 0s 0s;
   }
 
   .text-wrapper {
@@ -228,6 +234,7 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
   interface BannerSlide {
     id: string;
     backgroundJson: string;
+    backgroundColor: string;
   }
 
   // Slide data embedded from Astro
@@ -238,6 +245,7 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
     const slides = document.querySelectorAll('.banner .slide');
     const dots = document.querySelectorAll('.banner .dot');
     const backgrounds = document.querySelectorAll('.banner .unicorn-background');
+    const wrappers = document.querySelectorAll('.banner .wrapper');
 
     if (!banner || slides.length <= 1) return;
 
@@ -262,6 +270,11 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
       // Update backgrounds
       backgrounds.forEach((bg, i) => {
         bg.setAttribute('data-active', i === index ? 'true' : 'false');
+      });
+
+      // Update wrappers
+      wrappers.forEach((wrapper, i) => {
+        wrapper.setAttribute('data-active', i === index ? 'true' : 'false');
       });
 
       currentIndex = index;

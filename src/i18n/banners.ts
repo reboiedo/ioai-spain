@@ -24,6 +24,7 @@ export const banners = [
       es: "/es/form/download/"
     }),
     backgroundJson: '/banner.json',
+    backgroundColor: '#000000',
     order: 1
   },
   {
@@ -45,6 +46,7 @@ export const banners = [
       es: "/es/tenerife-summer-camp/"
     }),
     backgroundJson: '/summer-camp.json',
+    backgroundColor: '#251392',
     order: 2
   }
 ] as const;
