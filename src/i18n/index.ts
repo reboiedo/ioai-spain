@@ -213,6 +213,7 @@ export function useTranslations(locale: Language | undefined) {
       buttonText: getTranslation(banner.buttonText, locale),
       buttonUrl: getTranslation(banner.buttonUrl, locale),
       backgroundJson: banner.backgroundJson,
+      backgroundColor: banner.backgroundColor,
       order: banner.order
     })),
     tenerifeCamp: {
