@@ -9,9 +9,10 @@ import logoSvg from '@/assets/icons/ioai-spain.svg';
 
 export interface Props {
   hideNavItems?: boolean;
+  ctaUrlOverride?: string;
 }
 
-const { hideNavItems = false } = Astro.props;
+const { hideNavItems = false, ctaUrlOverride } = Astro.props;
 
 // Get current locale from Astro's i18n
 const currentLocale = (Astro.currentLocale || 'en') as Language;
@@ -79,7 +80,7 @@ const navItems = [
       />
 
       <!-- CTA Button -->
-      <Button variant="primary" size="small" href={t.ui.nav.joinNowUrl}>
+      <Button variant="primary" size="small" href={ctaUrlOverride || t.ui.nav.joinNowUrl}>
         {t.ui.nav.joinNow}
       </Button>
     </div>

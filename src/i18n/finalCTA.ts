@@ -6,8 +6,8 @@ export const finalCTA = {
     es: "¿Listo para Unirte a IOAI España?"
   }),
   ctaButton: createTranslation({
-    en: "Join the Waitlist",
-    es: "Únete a la Lista de Espera"
+    en: "Join Now",
+    es: "Únete Ahora"
   }),
   ctaUrl: createTranslation({
     en: "/form/join-training/",

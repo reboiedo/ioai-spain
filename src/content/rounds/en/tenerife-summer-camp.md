@@ -4,6 +4,9 @@ title: "Tenerife Summer Camp"
 date: "Starts July 2026"
 introSentence: "Elite residential training camp in Tenerife bringing together Spain's top AI talents for final intensive preparation with world-class experts. Free for Team Spain members, open to all passionate AI students."
 phase: "team"
+link:
+  url: "/tenerife-summer-camp/"
+  text: "Learn More About Camp"
 ---
 
 ## Training Experience

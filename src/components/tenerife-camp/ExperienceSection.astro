@@ -1,0 +1,121 @@
+---
+import { Image } from 'astro:assets';
+import { useCampTranslations, type Language } from '@/i18n/camp';
+import MarqueeImages from './MarqueeImages.astro';
+import experience1 from '@/assets/tenerife-camp/experience-carousel1.jpg';
+import experience2 from '@/assets/tenerife-camp/experience-carousel2.jpg';
+import experience3 from '@/assets/tenerife-camp/experience-carousel3.jpg';
+import experience4 from '@/assets/tenerife-camp/experience-carousel4.jpg';
+import experience5 from '@/assets/tenerife-camp/experience-carousel5.jpg';
+import experience6 from '@/assets/tenerife-camp/experience-carousel6.jpg';
+
+export interface Props {
+  locale?: Language;
+}
+
+const { locale } = Astro.props;
+const t = useCampTranslations(locale);
+
+const experienceImages = [
+  { src: experience1.src, alt: 'Kayaking in crystal clear waters' },
+  { src: experience2.src, alt: 'Mediterranean street scene', circular: true },
+  { src: experience3.src, alt: 'Child paddleboarding', circular: true },
+  { src: experience4.src, alt: 'Tenerife lighthouse at sunset' },
+  { src: experience5.src, alt: 'Boats in turquoise Mediterranean water' },
+  { src: experience6.src, alt: 'Water sports in Tenerife' },
+];
+---
+
+<section class="experience-section">
+  <div class="experience-container">
+    <div class="experience-content">
+      <h2 class="experience-heading">{t.experience.heading}</h2>
+      <div class="experience-text">
+        <p>
+          {t.experience.paragraph1}
+        </p>
+        <p>
+          {t.experience.paragraph2}
+        </p>
+      </div>
+    </div>
+
+    <div class="experience-marquee">
+      <MarqueeImages images={experienceImages} speed={60} direction="right" />
+    </div>
+  </div>
+</section>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@800&family=Inter+Tight:wght@400&display=swap');
+
+  .experience-section {
+    padding: 120px 0;
+    background-color: #1E0FB5;
+    position: relative;
+  }
+
+  .experience-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .experience-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-bottom: 80px;
+  }
+
+  .experience-heading {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(36px, 5vw, 57px);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .experience-text {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .experience-text p {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(18px, 2.5vw, 22px);
+    font-weight: 400;
+    line-height: 1.6;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .experience-content {
+      grid-template-columns: 1fr;
+      gap: 48px;
+      margin-bottom: 64px;
+    }
+
+    .experience-heading {
+      font-size: clamp(40px, 6vw, 64px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .experience-section {
+      padding: 80px 0;
+    }
+
+    .experience-content {
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+
+    .experience-heading {
+      font-size: clamp(32px, 8vw, 48px);
+    }
+  }
+</style>

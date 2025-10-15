@@ -9,6 +9,10 @@ interface RoundData {
   introSentence: string;
   qualification?: string;
   phase: 'basic' | 'preparatory' | 'team';
+  link?: {
+    url: string;
+    text: string;
+  };
   Content: any; // Astro component type
 }
 
@@ -75,6 +79,7 @@ const teamRounds = rounds.filter(r => r.phase === 'team');
               date={round.date}
               introSentence={round.introSentence}
               qualification={round.qualification}
+              link={round.link}
               t={t}
             >
               <round.Content />
@@ -96,6 +101,7 @@ const teamRounds = rounds.filter(r => r.phase === 'team');
               date={round.date}
               introSentence={round.introSentence}
               qualification={round.qualification}
+              link={round.link}
               t={t}
             >
               <round.Content />
@@ -116,6 +122,7 @@ const teamRounds = rounds.filter(r => r.phase === 'team');
             date={round.date}
             introSentence={round.introSentence}
             qualification={round.qualification}
+            link={round.link}
             t={t}
           >
             <round.Content />

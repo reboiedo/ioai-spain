@@ -9,7 +9,9 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@iconify-json/streamline-cyber": "^1.2.2",
     "astro": "^5.14.1",
+    "astro-icon": "^1.1.5",
     "astro-tunnel": "^0.1.8",
     "gsap": "^3.13.0"
   }

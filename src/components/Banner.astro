@@ -3,40 +3,73 @@ import Button from "@/components/ui/Button.astro";
 
 export interface Props {
   t: {
-    banner: {
+    banners: Array<{
+      id: string;
       title: string;
       description: string;
-      downloadButton: string;
-      downloadUrl: string;
-    };
+      buttonText: string;
+      buttonUrl: string;
+      backgroundJson: string;
+      order: number;
+    }>;
   };
 }
 
 const { t } = Astro.props;
+const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
 ---
 
 <section class="banner-section">
-  <div class="banner">
-    <!-- Unicorn Studio Background -->
-    <div
-      class="unicorn-embed unicorn-background"
-      data-us-project-src="/banner.json"
-      data-us-scale="1"
-      data-us-dpi="1.5"
-    ></div>
+  <div class="banner" data-slides={JSON.stringify(sortedBanners.map(b => ({ id: b.id, backgroundJson: b.backgroundJson })))}>
+    <!-- Unicorn Studio Backgrounds - One for each banner -->
+    {sortedBanners.map((banner, index) => (
+      <div
+        class="unicorn-embed unicorn-background"
+        data-us-project-src={banner.backgroundJson}
+        data-us-scale="1"
+        data-us-dpi="1.5"
+        data-background-index={index}
+        data-active={index === 0}
+      ></div>
+    ))}
 
+    <!-- Slider Container with Single Wrapper -->
     <div class="wrapper">
-      <div class="text-wrapper">
-        <h3>{t.banner.title}</h3>
-        <p>{t.banner.description}</p>
+      <div class="slider-container">
+        {sortedBanners.map((banner, index) => (
+          <div
+            class="slide"
+            data-slide-index={index}
+            data-active={index === 0}
+          >
+            <div class="text-wrapper">
+              <h3>{banner.title}</h3>
+              <p>{banner.description}</p>
+            </div>
+            <Button
+              variant="secondary"
+              href={banner.buttonUrl}
+            >
+              {banner.buttonText}
+            </Button>
+          </div>
+        ))}
       </div>
-      <Button
-        variant="secondary"
-        href={t.banner.downloadUrl}
-      >
-        {t.banner.downloadButton}
-      </Button>
     </div>
+
+    <!-- Dot Indicators -->
+    {sortedBanners.length > 1 && (
+      <div class="dot-indicators">
+        {sortedBanners.map((_, index) => (
+          <button
+            class="dot"
+            data-slide={index}
+            aria-label={`Go to slide ${index + 1}`}
+            data-active={index === 0}
+          />
+        ))}
+      </div>
+    )}
   </div>
 </section>
 
@@ -55,25 +88,57 @@ const { t } = Astro.props;
     text-align: center;
     position: relative;
     overflow: hidden;
+    min-height: 280px;
+  }
+
+  /* Black wrapper stays constant */
+  .wrapper {
+    max-width: 600px;
+    background-color: black;
+    padding: var(--space-xl) var(--card-inline);
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Slider Container */
+  .slider-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0s 0.5s;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .slide[data-active="true"] {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    pointer-events: auto;
+    transition: opacity 0.5s ease-in-out, visibility 0s 0s;
   }
 
   .text-wrapper {
     display: flex;
     flex-direction: column;
     row-gap: 8px;
-  }
-
-  .wrapper {
-    max-width: 600px;
-    background-color: black;
-    padding: var(--space-xl) var(--card-inline);
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    margin: 0 auto;
-    align-items: center;
-    position: relative;
-    z-index: 1;
+    text-align: center;
   }
 
   /* Unicorn Studio Background Styles */
@@ -86,6 +151,15 @@ const { t } = Astro.props;
     z-index: 0;
     pointer-events: none;
     border-radius: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0s 0.5s;
+  }
+
+  .unicorn-background[data-active="true"] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease-in-out, visibility 0s 0s;
   }
 
   .unicorn-background canvas {
@@ -94,11 +168,48 @@ const { t } = Astro.props;
     display: block !important;
   }
 
+  /* Dot Indicators */
+  .dot-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+  }
+
+  .dot:hover {
+    background-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
+  }
+
+  .dot[data-active="true"] {
+    background-color: rgba(255, 255, 255, 0.9);
+    width: 12px;
+    height: 12px;
+  }
+
   @media(max-width: 810px) {
     .banner {
       padding: var(--space-xl) 0;
+      min-height: 320px;
     }
 
+    .dot-indicators {
+      bottom: 16px;
+    }
   }
 </style>
 
@@ -112,24 +223,115 @@ const { t } = Astro.props;
   }
 </script>
 
-<!-- Initialize Unicorn Studio for Banner -->
-<script is:inline>
-  function initBannerUnicorn() {
-    if (window.UnicornStudio) {
-      UnicornStudio.init()
-        .then((scenes) => {
-          console.log('Banner Unicorn Studio initialized successfully:', scenes);
-        })
-        .catch((err) => {
-          console.error('Banner Unicorn Studio initialization error:', err);
-        });
-    } else {
-      // Retry after a short delay if UnicornStudio isn't loaded yet
-      setTimeout(initBannerUnicorn, 100);
-    }
+<!-- Banner Slider Logic -->
+<script>
+  interface BannerSlide {
+    id: string;
+    backgroundJson: string;
   }
 
-  window.addEventListener('DOMContentLoaded', initBannerUnicorn);
-  // Also try on astro page load for client-side navigation
-  document.addEventListener('astro:page-load', initBannerUnicorn);
+  // Slide data embedded from Astro
+  const bannerSlides = JSON.parse(document.querySelector('.banner')?.dataset.slides || '[]') as BannerSlide[];
+
+  function initBannerSlider() {
+    const banner = document.querySelector('.banner');
+    const slides = document.querySelectorAll('.banner .slide');
+    const dots = document.querySelectorAll('.banner .dot');
+    const backgrounds = document.querySelectorAll('.banner .unicorn-background');
+
+    if (!banner || slides.length <= 1) return;
+
+    let currentIndex = 0;
+    let autoRotateTimer: number | null = null;
+    let isHovering = false;
+
+    // Switch to a specific slide
+    function goToSlide(index: number) {
+      if (index === currentIndex) return;
+
+      // Update slides
+      slides.forEach((slide, i) => {
+        slide.setAttribute('data-active', i === index ? 'true' : 'false');
+      });
+
+      // Update dots
+      dots.forEach((dot, i) => {
+        dot.setAttribute('data-active', i === index ? 'true' : 'false');
+      });
+
+      // Update backgrounds
+      backgrounds.forEach((bg, i) => {
+        bg.setAttribute('data-active', i === index ? 'true' : 'false');
+      });
+
+      currentIndex = index;
+    }
+
+    // Auto-rotate slides
+    function startAutoRotate() {
+      if (autoRotateTimer) clearInterval(autoRotateTimer);
+      autoRotateTimer = window.setInterval(() => {
+        if (!isHovering) {
+          const nextIndex = (currentIndex + 1) % slides.length;
+          goToSlide(nextIndex);
+        }
+      }, 6500); // 6.5 seconds
+    }
+
+    // Dot click handlers
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        goToSlide(index);
+        startAutoRotate(); // Reset timer
+      });
+    });
+
+    // Pause on hover
+    banner.addEventListener('mouseenter', () => {
+      isHovering = true;
+    });
+
+    banner.addEventListener('mouseleave', () => {
+      isHovering = false;
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+        goToSlide(prevIndex);
+        startAutoRotate();
+      } else if (e.key === 'ArrowRight') {
+        const nextIndex = (currentIndex + 1) % slides.length;
+        goToSlide(nextIndex);
+        startAutoRotate();
+      }
+    });
+
+    // Initialize Unicorn Studio
+    function initUnicorn() {
+      if (window.UnicornStudio) {
+        window.UnicornStudio.init()
+          .then(() => {
+            console.log('Banner slider initialized');
+            startAutoRotate();
+          })
+          .catch((err) => console.error('Unicorn init error:', err));
+      } else {
+        setTimeout(initUnicorn, 100);
+      }
+    }
+
+    initUnicorn();
+  }
+
+  // Initialize on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBannerSlider);
+  } else {
+    initBannerSlider();
+  }
+
+  // Also support Astro view transitions
+  document.addEventListener('astro:page-load', initBannerSlider);
 </script>

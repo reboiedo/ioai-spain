@@ -1,0 +1,422 @@
+---
+import { useCampTranslations, type Language } from '@/i18n/camp';
+import { Icon } from 'astro-icon/components';
+import { courseIcons } from '@/data/courseIcons';
+
+export interface Props {
+  locale?: Language;
+}
+
+const { locale } = Astro.props;
+const t = useCampTranslations(locale);
+
+// Course structure with colors and icons
+const beginnerCourses = [
+  { key: 'math', icon: courseIcons.beginner.math, backgroundColor: '#EFBD60', titleColor: '#000000', descriptionColor: '#000000', badgeColor: '#1E0FB5' },
+  { key: 'gameDev', icon: courseIcons.beginner.gameDev, backgroundColor: '#EFBD60', titleColor: '#000000', descriptionColor: '#000000', badgeColor: '#1E0FB5' },
+  { key: 'python', icon: courseIcons.beginner.python, backgroundColor: '#EFBD60', titleColor: '#000000', descriptionColor: '#000000', badgeColor: '#1E0FB5' },
+  { key: 'design', icon: courseIcons.beginner.design, backgroundColor: '#EFBD60', titleColor: '#000000', descriptionColor: '#000000', badgeColor: '#1E0FB5' },
+  { key: 'ai', icon: courseIcons.beginner.ai, backgroundColor: '#EFBD60', titleColor: '#000000', descriptionColor: '#000000', badgeColor: '#1E0FB5' },
+];
+
+const advancedCourses = [
+  { key: 'math', icon: courseIcons.advanced.math, backgroundColor: '#EA5938', titleColor: '#FFFFFF', descriptionColor: '#FFFFFF', badgeColor: '#1E0FB5' },
+  { key: 'algorithms', icon: courseIcons.advanced.algorithms, backgroundColor: '#EA5938', titleColor: '#FFFFFF', descriptionColor: '#FFFFFF', badgeColor: '#1E0FB5' },
+  { key: 'ai', icon: courseIcons.advanced.ai, backgroundColor: '#EA5938', titleColor: '#FFFFFF', descriptionColor: '#FFFFFF', badgeColor: '#1E0FB5' },
+];
+
+const ioaiTraining = { key: 'ioai', icon: courseIcons.ioai, backgroundColor: '#32C5FF', titleColor: '#000000', descriptionColor: '#000000', badgeColor: '#1E0FB5' };
+---
+
+<section class="courses-section">
+  <div class="courses-container">
+    <!-- Heading and Description -->
+    <h2 class="courses-heading">{t.courses.beginnerTitle} & {t.courses.advancedTitle}</h2>
+    <p class="courses-description">
+      Every child should have the opportunity to learn to code. That's why our classes are designed
+      for all levels, so every child can discover the joy of coding. Participants will be split into
+      classes based on their level and previous experience. Classes are taught in English.
+    </p>
+
+    <!-- Beginner Level -->
+    <div class="level-section">
+      <h3 class="level-heading">{t.courses.beginnerTitle}</h3>
+      <div class="courses-grid">
+        {beginnerCourses.map((course) => (
+          <div class="course-card" data-course-key={course.key} style={`background-color: ${course.backgroundColor};`}>
+            <div class="card-badge" style={`color: ${course.badgeColor};`}>
+              <svg width="221" height="218" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 221 218" class="badge-svg">
+                <path d="M94.004 5.568a27.624 27.624 0 0 1 33.264 0l10.364 7.816a27.628 27.628 0 0 0 15.196 5.53l12.963.675a27.625 27.625 0 0 1 25.482 21.382l2.916 12.65a27.63 27.63 0 0 0 8.085 14.004l9.497 8.85a27.624 27.624 0 0 1 5.776 32.758l-5.897 11.564a27.626 27.626 0 0 0-2.808 15.925l1.586 12.884a27.624 27.624 0 0 1-16.632 28.807l-11.95 5.068a27.627 27.627 0 0 0-12.388 10.395l-7.066 10.889a27.625 27.625 0 0 1-31.258 11.377l-12.412-3.8a27.625 27.625 0 0 0-16.171 0l-12.413 3.8a27.625 27.625 0 0 1-31.258-11.377l-7.066-10.889a27.627 27.627 0 0 0-12.387-10.395l-11.951-5.068a27.624 27.624 0 0 1-16.632-28.807l1.586-12.884a27.624 27.624 0 0 0-2.808-15.925l-5.897-11.564a27.624 27.624 0 0 1 5.776-32.759l9.497-8.85a27.625 27.625 0 0 0 8.085-14.004L30 40.971A27.624 27.624 0 0 1 55.481 19.59l12.963-.675a27.624 27.624 0 0 0 15.196-5.53l10.364-7.816Z" fill="currentColor"></path>
+              </svg>
+              <Icon name={course.icon} class="card-badge-icon" />
+            </div>
+            <h4 class="card-title" style={`color: ${course.titleColor};`}>{t.courses.beginner[course.key].title}</h4>
+            <p class="card-description" style={`color: ${course.descriptionColor};`}>{t.courses.beginner[course.key].description}</p>
+            <p class="card-hint card-hint--more">{t.courses.tapToLearnMore}</p>
+            <p class="card-hint card-hint--close">{t.courses.close}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Advanced Level -->
+    <div class="level-section">
+      <h3 class="level-heading">{t.courses.advancedTitle}</h3>
+      <div class="courses-grid">
+        {advancedCourses.map((course) => (
+          <div class="course-card" data-course-key={course.key} style={`background-color: ${course.backgroundColor};`}>
+            <div class="card-badge" style={`color: ${course.badgeColor};`}>
+              <svg width="221" height="218" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 221 218" class="badge-svg">
+                <path d="M94.004 5.568a27.624 27.624 0 0 1 33.264 0l10.364 7.816a27.628 27.628 0 0 0 15.196 5.53l12.963.675a27.625 27.625 0 0 1 25.482 21.382l2.916 12.65a27.63 27.63 0 0 0 8.085 14.004l9.497 8.85a27.624 27.624 0 0 1 5.776 32.758l-5.897 11.564a27.626 27.626 0 0 0-2.808 15.925l1.586 12.884a27.624 27.624 0 0 1-16.632 28.807l-11.95 5.068a27.627 27.627 0 0 0-12.388 10.395l-7.066 10.889a27.625 27.625 0 0 1-31.258 11.377l-12.412-3.8a27.625 27.625 0 0 0-16.171 0l-12.413 3.8a27.625 27.625 0 0 1-31.258-11.377l-7.066-10.889a27.627 27.627 0 0 0-12.387-10.395l-11.951-5.068a27.624 27.624 0 0 1-16.632-28.807l1.586-12.884a27.624 27.624 0 0 0-2.808-15.925l-5.897-11.564a27.624 27.624 0 0 1 5.776-32.759l9.497-8.85a27.625 27.625 0 0 0 8.085-14.004L30 40.971A27.624 27.624 0 0 1 55.481 19.59l12.963-.675a27.624 27.624 0 0 0 15.196-5.53l10.364-7.816Z" fill="currentColor"></path>
+              </svg>
+              <Icon name={course.icon} class="card-badge-icon" />
+            </div>
+            <h4 class="card-title" style={`color: ${course.titleColor};`}>{t.courses.advanced[course.key].title}</h4>
+            <p class="card-description" style={`color: ${course.descriptionColor};`}>{t.courses.advanced[course.key].description}</p>
+            <p class="card-hint card-hint--more">{t.courses.tapToLearnMore}</p>
+            <p class="card-hint card-hint--close">{t.courses.close}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- IOAI Training (Special Section) -->
+    <div class="level-section ioai-section">
+      <h3 class="level-heading">{t.courses.ioaiTitle}</h3>
+      <div class="course-card course-card--special" data-course-key={ioaiTraining.key} style={`background-color: ${ioaiTraining.backgroundColor};`}>
+        <div class="card-badge" style={`color: ${ioaiTraining.badgeColor};`}>
+          <svg width="221" height="218" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 221 218" class="badge-svg">
+            <path d="M94.004 5.568a27.624 27.624 0 0 1 33.264 0l10.364 7.816a27.628 27.628 0 0 0 15.196 5.53l12.963.675a27.625 27.625 0 0 1 25.482 21.382l2.916 12.65a27.63 27.63 0 0 0 8.085 14.004l9.497 8.85a27.624 27.624 0 0 1 5.776 32.758l-5.897 11.564a27.626 27.626 0 0 0-2.808 15.925l1.586 12.884a27.624 27.624 0 0 1-16.632 28.807l-11.95 5.068a27.627 27.627 0 0 0-12.388 10.395l-7.066 10.889a27.625 27.625 0 0 1-31.258 11.377l-12.412-3.8a27.625 27.625 0 0 0-16.171 0l-12.413 3.8a27.625 27.625 0 0 1-31.258-11.377l-7.066-10.889a27.627 27.627 0 0 0-12.387-10.395l-11.951-5.068a27.624 27.624 0 0 1-16.632-28.807l1.586-12.884a27.624 27.624 0 0 0-2.808-15.925l-5.897-11.564a27.624 27.624 0 0 1 5.776-32.759l9.497-8.85a27.625 27.625 0 0 0 8.085-14.004L30 40.971A27.624 27.624 0 0 1 55.481 19.59l12.963-.675a27.624 27.624 0 0 0 15.196-5.53l10.364-7.816Z" fill="currentColor"></path>
+          </svg>
+          <Icon name={ioaiTraining.icon} class="card-badge-icon" />
+        </div>
+        <h4 class="card-title" style={`color: ${ioaiTraining.titleColor};`}>{t.courses.ioai.title}</h4>
+        <p class="card-description" style={`color: ${ioaiTraining.descriptionColor};`}>{t.courses.ioai.description}</p>
+        <p class="card-hint card-hint--more">{t.courses.tapToLearnMore}</p>
+        <p class="card-hint card-hint--close">{t.courses.close}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+
+  function initCourseCards() {
+    const courseCards = document.querySelectorAll('.course-card');
+
+    courseCards.forEach((card) => {
+      const badge = card.querySelector('.card-badge');
+      const description = card.querySelector('.card-description');
+
+      // Set initial state for description
+      if (description) {
+        gsap.set(description, { height: 0, opacity: 0 });
+      }
+
+      const toggleCard = () => {
+        const isExpanded = card.classList.contains('expanded');
+
+        if (!isExpanded) {
+          // Expand animation
+          card.classList.add('expanded');
+
+          // Animate badge out
+          if (badge) {
+            gsap.to(badge, {
+              scale: 0,
+              opacity: 0,
+              height: 0,
+              duration: 0.4,
+              ease: 'power2.inOut'
+            });
+          }
+
+          // Animate description in
+          if (description) {
+            gsap.to(description, {
+              height: 'auto',
+              opacity: 1,
+              duration: 0.4,
+              ease: 'power2.inOut'
+            });
+          }
+        } else {
+          // Collapse animation - remove class immediately
+          card.classList.remove('expanded');
+
+          // Animate description out first
+          if (description) {
+            gsap.to(description, {
+              height: 0,
+              opacity: 0,
+              duration: 0.4,
+              ease: 'power2.inOut'
+            });
+          }
+
+          // Animate badge back in
+          if (badge) {
+            gsap.to(badge, {
+              scale: 1,
+              opacity: 1,
+              height: 120,
+              duration: 0.4,
+              ease: 'power2.inOut',
+              delay: 0.1
+            });
+          }
+        }
+      };
+
+      // Click handler
+      card.addEventListener('click', toggleCard);
+
+      // Keyboard accessibility
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleCard();
+        }
+      });
+
+      // Make focusable
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', 'Click to expand card');
+    });
+  }
+
+  initCourseCards();
+  document.addEventListener('astro:page-load', initCourseCards);
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Inter+Tight:wght@400&display=swap');
+
+  .courses-section {
+    background: #F1F1F1;
+    padding: 80px 48px;
+    width: 100%;
+  }
+
+  .courses-container {
+    max-width: 1107px;
+    margin: 0 auto;
+  }
+
+  /* Heading and Description */
+  .courses-heading {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(36px, 5vw, 57px);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 24px;
+    color: #1E0FB5;
+    text-align: center;
+  }
+
+  .courses-description {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(18px, 2.5vw, 22px);
+    font-weight: 400;
+    line-height: 1.6;
+    margin: 0 auto 64px;
+    color: #000000;
+    text-align: center;
+    max-width: 920px;
+  }
+
+  /* Level Sections */
+  .level-section {
+    margin-bottom: 64px;
+  }
+
+  .level-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .level-heading {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 32px;
+    color: #1E0FB5;
+  }
+
+  .level-heading--special {
+    color: #EA5938;
+  }
+
+  /* Courses Grid */
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  /* Course Card */
+  .course-card {
+    cursor: pointer;
+    border-radius: 32px;
+    padding: 48px 32px 48px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: justify-content 0.4s ease, gap 0.4s ease, padding-bottom 0.4s ease;
+  }
+
+  .course-card.expanded {
+    justify-content: flex-start;
+    gap: 12px;
+    padding-bottom: 80px;
+  }
+
+  .course-card:focus {
+    outline: 3px solid #1E0FB5;
+    outline-offset: 4px;
+  }
+
+  /* Card Content Wrapper */
+  .card-badge,
+  .card-title,
+  .card-description {
+    max-width: 480px;
+    width: 100%;
+  }
+
+  /* Card Badge */
+  .card-badge {
+    position: relative;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center;
+  }
+
+  .badge-svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+
+  .card-badge-icon {
+    position: relative;
+    z-index: 1;
+    width: 48px;
+    height: 48px;
+    color: #FFFFFF;
+  }
+
+  /* Card Title */
+  .card-title {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0;
+    text-align: center;
+  }
+
+  /* Card Description */
+  .card-description {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 400;
+    line-height: 1.6;
+    margin: 0;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  /* Card Hints */
+  .card-hint {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin: 0;
+    opacity: 0.6;
+    position: absolute;
+    bottom: 32px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: inherit;
+    max-width: none;
+  }
+
+  /* Hint colors for different backgrounds */
+  .course-card[style*="background-color: #EFBD60"] .card-hint,
+  .course-card[style*="background-color: #32C5FF"] .card-hint {
+    color: #000000;
+  }
+
+  .course-card[style*="background-color: #EA5938"] .card-hint {
+    color: #FFFFFF;
+  }
+
+  .card-hint--more {
+    display: block;
+  }
+
+  .card-hint--close {
+    display: none;
+  }
+
+  .course-card.expanded .card-hint--more {
+    display: none;
+  }
+
+  .course-card.expanded .card-hint--close {
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .courses-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .courses-section {
+      padding: 60px 24px;
+    }
+
+    .courses-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .course-card {
+      padding: 40px 24px;
+    }
+
+    .card-badge {
+      width: 100px;
+      height: 100px;
+    }
+
+    .card-badge-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .card-hint {
+      bottom: 24px;
+    }
+
+    .level-section {
+      margin-bottom: 48px;
+    }
+  }
+</style>

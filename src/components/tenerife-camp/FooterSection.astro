@@ -1,0 +1,255 @@
+---
+import { useCampTranslations, type Language } from '@/i18n/camp';
+
+export interface Props {
+  locale?: Language;
+}
+
+const { locale } = Astro.props;
+const t = useCampTranslations(locale);
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer-section">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-left">
+        <h3 class="footer-brand">{t.footer.brand}</h3>
+        <p class="footer-description">
+          {t.footer.description}
+        </p>
+        <p class="footer-visit">{t.footer.visitLabel}</p>
+        <a href={t.footer.website} class="footer-link">{t.footer.website}</a>
+      </div>
+
+      <div class="footer-right">
+        <h3 class="footer-heading">{t.footer.contactHeading}</h3>
+        <p class="footer-text">
+          {t.footer.contactText}
+        </p>
+
+        <div class="footer-contact">
+          <div class="footer-contact-item">
+            <span class="footer-contact-label">{t.footer.emailLabel}</span>
+            <a href={`mailto:${t.footer.email}`} class="footer-contact-link">{t.footer.email}</a>
+          </div>
+          <div class="footer-contact-divider"></div>
+          <div class="footer-contact-item">
+            <span class="footer-contact-label">{t.footer.callLabel}</span>
+            <a href={`tel:${t.footer.phone.replace(/\s/g, '')}`} class="footer-contact-link">{t.footer.phone}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copyright">{t.footer.copyright} {currentYear}</p>
+      <a href="/privacy" class="footer-privacy">{t.footer.privacyPolicy}</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Inter+Tight:wght@400&display=swap');
+
+  .footer-section {
+    padding: 80px 0 80px;
+    background-color: #1E0FB5;
+  }
+
+  .footer-container {
+    max-width: 1107px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 80px;
+    margin-bottom: 80px;
+  }
+
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 320px;
+  }
+
+  .footer-brand {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .footer-description {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 400;
+    line-height: 1.6;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .footer-visit {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 400;
+    line-height: 1.6;
+    color: #ffffff;
+    margin: 8px 0 0;
+  }
+
+  .footer-link {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 700;
+    line-height: 1.6;
+    color: #ffffff;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-link:hover {
+    opacity: 0.8;
+  }
+
+  .footer-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .footer-heading {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .footer-text {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 400;
+    line-height: 1.6;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .footer-contact {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 24px 32px;
+    border: 2px solid #ffffff;
+    border-radius: 16px;
+    margin-top: 8px;
+  }
+
+  .footer-contact-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-contact-label {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(12px, 1.5vw, 14px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: #ffffff;
+  }
+
+  .footer-contact-link {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(16px, 2vw, 20px);
+    font-weight: 700;
+    line-height: 1.3;
+    color: #ffffff;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-contact-link:hover {
+    opacity: 0.8;
+  }
+
+  .footer-contact-divider {
+    width: 1px;
+    height: 40px;
+    background-color: #ffffff;
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 40px;
+    background-color: #3D38D9;
+    border-radius: 16px;
+  }
+
+  .footer-copyright {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .footer-privacy {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: #ffffff;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-privacy:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .footer-section {
+      padding: 60px 0 60px;
+    }
+
+    .footer-content {
+      grid-template-columns: 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .footer-left {
+      max-width: 100%;
+    }
+
+    .footer-contact {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 24px;
+    }
+
+    .footer-contact-divider {
+      width: 100%;
+      height: 1px;
+    }
+
+    .footer-bottom {
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 24px;
+      justify-content: center;
+    }
+  }
+</style>

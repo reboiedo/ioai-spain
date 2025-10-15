@@ -19,6 +19,10 @@ const rounds = defineCollection({
     introSentence: z.string(),
     phase: z.enum(['basic', 'preparatory', 'team']),
     qualification: z.string().optional(),
+    link: z.object({
+      url: z.string(),
+      text: z.string(),
+    }).optional(),
   })
 });
 

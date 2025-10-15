@@ -1,0 +1,188 @@
+---
+import { useCampTranslations, type Language } from '@/i18n/camp';
+
+export interface Props {
+  locale?: Language;
+}
+
+const { locale } = Astro.props;
+const t = useCampTranslations(locale);
+---
+
+<section class="faq-section">
+  <div class="faq-container">
+    <h2 class="faq-heading">{t.faq.heading}</h2>
+
+    <div class="faq-list">
+      {t.faq.items.map((item, index) => (
+        <div class="faq-item" data-index={index}>
+          <button class="faq-question" aria-expanded={index === 0 ? 'true' : 'false'}>
+            <span class="faq-question__text">{item.question}</span>
+            <span class="faq-question__icon" aria-hidden="true">
+              {index === 0 ? '×' : '+'}
+            </span>
+          </button>
+          <div class="faq-answer" style={index === 0 ? '' : 'display: none;'}>
+            <p class="faq-answer__text">{item.answer}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  function initFAQ() {
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach((item) => {
+      const button = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+      const icon = item.querySelector('.faq-question__icon');
+
+      if (!button || !answer || !icon) return;
+
+      button.addEventListener('click', () => {
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+        if (isExpanded) {
+          // Close
+          button.setAttribute('aria-expanded', 'false');
+          answer.style.display = 'none';
+          icon.textContent = '+';
+        } else {
+          // Open
+          button.setAttribute('aria-expanded', 'true');
+          answer.style.display = 'block';
+          icon.textContent = '×';
+        }
+      });
+    });
+  }
+
+  initFAQ();
+  document.addEventListener('astro:page-load', initFAQ);
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Inter+Tight:wght@400&display=swap');
+
+  .faq-section {
+    padding: 120px 0;
+    background-color: #F5F5F0;
+  }
+
+  .faq-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  .faq-heading {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(48px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1;
+    color: #000000;
+    margin: 0 0 64px;
+    text-align: center;
+  }
+
+  .faq-list {
+    columns: 2;
+    column-gap: 64px;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 32px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+  }
+
+  .faq-question:hover {
+    opacity: 0.8;
+  }
+
+  .faq-question__text {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(16px, 2vw, 19px);
+    font-weight: 700;
+    line-height: 1.4;
+    color: #1E0FB5;
+  }
+
+  .faq-question__icon {
+    flex-shrink: 0;
+    font-family: Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
+    color: #000000;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .faq-answer {
+    padding: 0 0 32px;
+  }
+
+  .faq-answer__text {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(16px, 2vw, 18px);
+    font-weight: 400;
+    line-height: 1.7;
+    color: #333333;
+    margin: 0;
+    white-space: pre-line;
+  }
+
+  @media (max-width: 1024px) {
+    .faq-container {
+      padding: 0 32px;
+    }
+
+    .faq-list {
+      columns: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .faq-section {
+      padding: 80px 0;
+    }
+
+    .faq-container {
+      padding: 0 24px;
+    }
+
+    .faq-heading {
+      margin-bottom: 48px;
+    }
+
+    .faq-question {
+      padding: 24px 0;
+      gap: 16px;
+    }
+
+    .faq-answer {
+      padding: 0 0 24px;
+    }
+  }
+</style>

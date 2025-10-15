@@ -1,23 +1,32 @@
 ---
+import { Image } from 'astro:assets';
+import { useCampTranslations, type Language } from '@/i18n/camp';
 import MarqueeImages from './MarqueeImages.astro';
 
+// Import images
+import leftImage from '@/assets/tenerife-camp/gOiX6DyxV7QCEDxtEYiNtds4.jpg';
+import centerImage from '@/assets/tenerife-camp/C8FhPXN8mu6lqt7N9PtNEAHcgso.jpeg';
+import rightImage from '@/assets/tenerife-camp/7OM6JdlwlX5qr4pbwwCiYKTCcXc.jpg';
+import carousel1 from '@/assets/tenerife-camp/about-carousel-1.jpg';
+import carousel2 from '@/assets/tenerife-camp/about-carousel-2.jpg';
+import carousel3 from '@/assets/tenerife-camp/about-carousel-3.jpg';
+import carousel4 from '@/assets/tenerife-camp/about-carousel-4.jpg';
+import carousel5 from '@/assets/tenerife-camp/about-carousel-5.jpg';
+
 export interface Props {
-  mainTitle: string;
-  dateSubtitle: string;
-  tagline: string;
-  description: string;
-  paragraph: string;
+  locale?: Language;
 }
 
-const { mainTitle, dateSubtitle, tagline, description, paragraph } = Astro.props;
+const { locale } = Astro.props;
+const t = useCampTranslations(locale);
 
 // Define carousel images
 const carouselImages = [
-  { src: '/images/tenerife-camp/about-carousel-1.jpg', alt: 'Camp activity 1' },
-  { src: '/images/tenerife-camp/about-carousel-2.jpg', alt: 'Camp activity 2', circular: true },
-  { src: '/images/tenerife-camp/about-carousel-3.jpg', alt: 'Camp activity 3' },
-  { src: '/images/tenerife-camp/about-carousel-4.jpg', alt: 'Camp activity 4', circular: true },
-  { src: '/images/tenerife-camp/about-carousel-5.jpg', alt: 'Camp activity 5' },
+  { src: carousel1.src, alt: 'Camp activity 1' },
+  { src: carousel2.src, alt: 'Camp activity 2', circular: true },
+  { src: carousel3.src, alt: 'Camp activity 3' },
+  { src: carousel4.src, alt: 'Camp activity 4', circular: true },
+  { src: carousel5.src, alt: 'Camp activity 5' },
 ];
 ---
 
@@ -25,39 +34,45 @@ const carouselImages = [
   <div class="camp-overview__container">
     <!-- Top: Date + Tagline (centered) -->
     <div class="camp-overview__top-text">
-      <h2 class="camp-overview__date-subtitle">{dateSubtitle}</h2>
-      <h1 class="camp-overview__tagline">{tagline}</h1>
+      <p class="camp-overview__date-subtitle">{t.hero.dateSubtitle}</p>
+      <h1 class="camp-overview__tagline">{t.hero.tagline}</h1>
     </div>
 
     <!-- 3-Column Layout: Left Image | Center (Image + Text) | Right Image -->
     <div class="camp-overview__three-columns">
       <div class="camp-overview__column-left">
-        <img
-          src="/images/tenerife-camp/gOiX6DyxV7QCEDxtEYiNtds4.jpg"
+        <Image
+          src={leftImage}
           alt="Menorca Lighthouse"
           loading="eager"
           class="parallax-left"
+          widths={[400, 600, 800]}
+          sizes="(max-width: 768px) 100vw, 400px"
         />
       </div>
 
       <div class="camp-overview__column-center">
-        <img
-          src="/images/tenerife-camp/C8FhPXN8mu6lqt7N9PtNEAHcgso.jpeg"
+        <Image
+          src={centerImage}
           alt="Swimming in crystal clear waters"
           loading="eager"
+          widths={[600, 900, 1200]}
+          sizes="(max-width: 768px) 100vw, 900px"
         />
         <div class="camp-overview__center-text">
-          <h2 class="camp-overview__description">{description}</h2>
-          <p class="camp-overview__paragraph">{paragraph}</p>
+          <h2 class="camp-overview__description">{t.hero.description}</h2>
+          <p class="camp-overview__paragraph">{t.hero.paragraph}</p>
         </div>
       </div>
 
       <div class="camp-overview__column-right">
-        <img
-          src="/images/tenerife-camp/7OM6JdlwlX5qr4pbwwCiYKTCcXc.jpg"
+        <Image
+          src={rightImage}
           alt="Kids enjoying the beach"
           loading="eager"
           class="parallax-right"
+          widths={[400, 600, 800]}
+          sizes="(max-width: 768px) 100vw, 400px"
         />
       </div>
     </div>
@@ -116,7 +131,7 @@ const carouselImages = [
   .camp-overview {
     background: var(--camp-bg-primary);
     color: rgb(241, 241, 241);
-    padding: 60px 48px 80px;
+    padding: 120px 48px 80px;
     width: 100%;
     position: relative;
   }
@@ -143,7 +158,7 @@ const carouselImages = [
     grid-template-columns: 1fr 2.5fr 1fr;
     gap: 20px;
     align-items: start;
-    margin-bottom: 48px;
+    margin-bottom: 128px;
     z-index: 0;
 
   }
@@ -192,7 +207,7 @@ const carouselImages = [
 
   .camp-overview__date-subtitle {
     font-family: 'Unbounded', serif;
-    font-size: clamp(28px, 4vw, 40px);
+    font-size: clamp(20px, 3vw, 28px);
     font-weight: 800;
     line-height: 1.2;
     margin: 0 0 16px;
@@ -235,12 +250,12 @@ const carouselImages = [
 
   @media (max-width: 1024px) {
     .camp-overview {
-      padding: 50px 32px 60px;
+      padding: 80px 32px 60px;
     }
 
     .camp-overview__three-columns {
       gap: 12px;
-      margin-bottom: 32px;
+      margin-bottom: 80px;
     }
 
     .camp-overview__column-left img,
@@ -256,7 +271,7 @@ const carouselImages = [
 
   @media (max-width: 768px) {
     .camp-overview {
-      padding: 40px 0 50px;
+      padding: 60px 0 50px;
       overflow-x: hidden;
     }
 
@@ -268,7 +283,7 @@ const carouselImages = [
       grid-template-columns: 1fr;
       grid-template-rows: auto;
       gap: 16px;
-      margin-bottom: 32px;
+      margin-bottom: 64px;
     }
 
     .camp-overview__column-left,
@@ -288,7 +303,7 @@ const carouselImages = [
 
     .camp-overview__three-columns {
       gap: 12px;
-      margin-bottom: 44px;
+      margin-bottom: 56px;
     }
 
     .camp-overview__column-left img,

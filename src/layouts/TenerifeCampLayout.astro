@@ -7,6 +7,7 @@ export interface Props {
   description?: string;
   showNavigation?: boolean;
   hideNavItems?: boolean;
+  ctaUrlOverride?: string;
   ogImage?: string;
   ogType?: 'website' | 'article';
   canonical?: string;
@@ -16,7 +17,8 @@ const {
   title,
   description,
   showNavigation = true,
-  hideNavItems = false,
+  hideNavItems = true,
+  ctaUrlOverride,
   ogImage,
   ogType,
   canonical
@@ -28,6 +30,7 @@ const {
   description={description}
   showNavigation={showNavigation}
   hideNavItems={hideNavItems}
+  ctaUrlOverride={ctaUrlOverride}
   ogImage={ogImage}
   ogType={ogType}
   canonical={canonical}

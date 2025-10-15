@@ -1,9 +1,15 @@
 ---
+import Button from './ui/Button.astro';
+
 export interface Props {
   title: string;
   date: string;
   introSentence: string;
   qualification?: string;
+  link?: {
+    url: string;
+    text: string;
+  };
   t: {
     howItWorks: {
       labels: {
@@ -15,7 +21,7 @@ export interface Props {
   };
 }
 
-const { title, date, introSentence, qualification, t } = Astro.props;
+const { title, date, introSentence, qualification, link, t } = Astro.props;
 ---
 
 <details class="round-card">
@@ -34,6 +40,14 @@ const { title, date, introSentence, qualification, t } = Astro.props;
     {qualification && (
       <div class="qualification">
         <strong>{t.howItWorks.labels.qualification}:</strong> {qualification}
+      </div>
+    )}
+
+    {link && (
+      <div class="round-link">
+        <Button variant="primary" size="small" href={link.url}>
+          {link.text}
+        </Button>
       </div>
     )}
   </div>
@@ -151,6 +165,12 @@ const { title, date, introSentence, qualification, t } = Astro.props;
 
   .qualification strong {
     font-weight: var(--font-weight-medium);
+  }
+
+  .round-link {
+    margin-top: var(--space-m);
+    display: flex;
+    align-items: center;
   }
 
   @media (max-width: 768px) {

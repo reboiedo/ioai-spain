@@ -4,6 +4,9 @@ title: "Campamento de Verano en Tenerife"
 date: "Comienza en julio 2026"
 introSentence: "Campamento residencial de élite en Tenerife que reúne a los mejores talentos de IA de España para la preparación intensiva final con expertos de clase mundial. Gratuito para miembros del Equipo España, abierto a todos los estudiantes apasionados por la IA."
 phase: "team"
+link:
+  url: "/es/tenerife-summer-camp/"
+  text: "Más Información Sobre el Campamento"
 ---
 
 ## Experiencia de Entrenamiento

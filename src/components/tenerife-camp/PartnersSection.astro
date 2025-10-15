@@ -1,0 +1,172 @@
+---
+import { Image } from 'astro:assets';
+import { useCampTranslations, type Language } from '@/i18n/camp';
+import partner1 from '@/assets/tenerife-camp/partner-1.png';
+import partner2 from '@/assets/tenerife-camp/partner-2.png';
+import partner3 from '@/assets/tenerife-camp/partner-3.png';
+import partner4 from '@/assets/tenerife-camp/partner-4.png';
+import partner5 from '@/assets/tenerife-camp/partner-5.png';
+import partner6 from '@/assets/tenerife-camp/partner-6.png';
+import partner7 from '@/assets/tenerife-camp/partner-7.png';
+
+export interface Props {
+  locale?: Language;
+}
+
+const { locale } = Astro.props;
+const t = useCampTranslations(locale);
+
+const partners = [
+  { id: 1, image: partner1, alt: 'Partner 1' },
+  { id: 2, image: partner2, alt: 'Partner 2' },
+  { id: 3, image: partner3, alt: 'Partner 3' },
+  { id: 4, image: partner4, alt: 'Partner 4' },
+  { id: 5, image: partner5, alt: 'Partner 5' },
+  { id: 6, image: partner6, alt: 'Partner 6' },
+  { id: 7, image: partner7, alt: 'Partner 7' },
+];
+---
+
+<section class="partners-section">
+  <div class="partners-container">
+    <h2 class="partners-heading">{t.partners.heading}</h2>
+
+    <div class="partners-marquee">
+      <div class="partners-track">
+        {partners.map((partner) => (
+          <div class="partner-card">
+            <Image
+              src={partner.image}
+              alt={partner.alt}
+              class="partner-image"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+
+  function initPartnersMarquee() {
+    const track = document.querySelector('.partners-track');
+    if (!track) return;
+
+    // Duplicate items for seamless loop
+    const items = Array.from(track.children);
+    items.forEach(item => {
+      const clone = item.cloneNode(true) as HTMLElement;
+      track.appendChild(clone);
+    });
+
+    const firstItem = track.querySelector('.partner-card') as HTMLElement;
+    if (!firstItem) return;
+
+    const gap = 32;
+    const itemWidth = firstItem.offsetWidth + gap;
+    const originalWidth = itemWidth * items.length;
+
+    gsap.set(track, { x: 0 });
+
+    const wrapValue = gsap.utils.wrap(-originalWidth, 0);
+
+    gsap.to(track, {
+      x: `-=${originalWidth}`,
+      duration: 30,
+      ease: 'none',
+      repeat: -1,
+      modifiers: {
+        x: (x: string) => wrapValue(parseFloat(x)) + 'px'
+      }
+    });
+  }
+
+  initPartnersMarquee();
+  document.addEventListener('astro:page-load', initPartnersMarquee);
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@800&display=swap');
+
+  .partners-section {
+    padding: 120px 0;
+    background-color: #EA5938;
+    overflow: hidden;
+  }
+
+  .partners-container {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .partners-heading {
+    font-family: 'Unbounded', serif;
+    font-size: clamp(36px, 5vw, 57px);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0 auto 64px;
+    text-align: center;
+    padding: 0 24px;
+    max-width: 920px;
+  }
+
+  .partners-marquee {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    overflow: hidden;
+  }
+
+  .partners-track {
+    display: flex;
+    gap: 32px;
+    will-change: transform;
+  }
+
+  .partner-card {
+    flex-shrink: 0;
+    width: 280px;
+    height: 200px;
+    background-color: var(--camp-neutral-light);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+  }
+
+  .partner-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  @media (max-width: 768px) {
+    .partners-section {
+      padding: 80px 0;
+    }
+
+    .partners-heading {
+      margin-bottom: 48px;
+    }
+
+    .partner-card {
+      width: 220px;
+      height: 160px;
+      padding: 24px;
+    }
+
+    .partners-track {
+      gap: 24px;
+    }
+  }
+</style>

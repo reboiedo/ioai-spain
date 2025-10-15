@@ -9,7 +9,7 @@ import { registration } from './registration';
 import { whyJoin } from './whyJoin';
 import { sponsors } from './sponsors';
 import { finalCTA } from './finalCTA';
-import { banner } from './banner';
+import { banners } from './banners';
 import { tenerifeCamp } from './tenerifeCamp';
 import type { Language } from './types';
 import { getTranslation } from './types';
@@ -26,7 +26,7 @@ export const translations = {
   whyJoin,
   sponsors,
   finalCTA,
-  banner,
+  banners,
   tenerifeCamp
 } as const;
 
@@ -206,12 +206,15 @@ export function useTranslations(locale: Language | undefined) {
       ctaButton: getTranslation(finalCTA.ctaButton, locale),
       ctaUrl: getTranslation(finalCTA.ctaUrl, locale)
     },
-    banner: {
+    banners: banners.map(banner => ({
+      id: banner.id,
       title: getTranslation(banner.title, locale),
       description: getTranslation(banner.description, locale),
-      downloadButton: getTranslation(banner.downloadButton, locale),
-      downloadUrl: getTranslation(banner.downloadUrl, locale)
-    },
+      buttonText: getTranslation(banner.buttonText, locale),
+      buttonUrl: getTranslation(banner.buttonUrl, locale),
+      backgroundJson: banner.backgroundJson,
+      order: banner.order
+    })),
     tenerifeCamp: {
       meta: {
         title: getTranslation(tenerifeCamp.meta.title, locale),

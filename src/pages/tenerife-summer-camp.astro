@@ -1,0 +1,31 @@
+---
+import TenerifeCampLayout from '@/layouts/TenerifeCampLayout.astro';
+import CampOverview from '@/components/tenerife-camp/CampOverview.astro';
+import CourseTabs from '@/components/tenerife-camp/CourseTabs.astro';
+import ExperienceSection from '@/components/tenerife-camp/ExperienceSection.astro';
+import SafetySection from '@/components/tenerife-camp/SafetySection.astro';
+import ScheduleSection from '@/components/tenerife-camp/ScheduleSection.astro';
+import PricingSection from '@/components/tenerife-camp/PricingSection.astro';
+import FAQSection from '@/components/tenerife-camp/FAQSection.astro';
+import PartnersSection from '@/components/tenerife-camp/PartnersSection.astro';
+import FooterSection from '@/components/tenerife-camp/FooterSection.astro';
+import { tenerifeCampConfig } from '@/data/tenerifeCampConfig';
+
+const locale = 'en';
+---
+
+<TenerifeCampLayout
+  title="Tenerife Summer Camp - IOAI Spain"
+  description="Join our 2-week tech summer camp in Tenerife for children aged 10-18. Learn coding, AI, game development, and more in a fun island environment."
+  ctaUrlOverride={tenerifeCampConfig.registrationUrl}
+>
+  <CampOverview locale={locale} />
+  <CourseTabs locale={locale} />
+  <ExperienceSection locale={locale} />
+  <SafetySection locale={locale} />
+  <ScheduleSection locale={locale} />
+  <PricingSection locale={locale} />
+  <FAQSection locale={locale} />
+  <PartnersSection locale={locale} />
+  <FooterSection locale={locale} />
+</TenerifeCampLayout>

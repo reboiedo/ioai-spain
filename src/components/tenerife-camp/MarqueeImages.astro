@@ -42,27 +42,30 @@ const {
       const direction = marquee.getAttribute('data-direction') || 'left';
       const speed = parseFloat(marquee.getAttribute('data-speed') || '50');
 
-      // Clone the track content to create seamless loop
-      const clone = track.cloneNode(true) as HTMLElement;
-      marquee.appendChild(clone);
+      // Duplicate images within the track for seamless loop
+      const items = Array.from(track.children);
+      items.forEach(item => {
+        const clone = item.cloneNode(true) as HTMLElement;
+        track.appendChild(clone);
+      });
 
-      // Get the width of one track including gap
-      const items = track.querySelectorAll('.marquee-images__item');
+      // Calculate width of original images only (before duplication)
       const computedStyle = window.getComputedStyle(track);
       const gap = parseFloat(computedStyle.gap) || 24;
-      const trackWidth = track.offsetWidth + gap;
 
-      console.log('Track width:', track.offsetWidth, 'Gap:', gap, 'Total:', trackWidth);
+      // Width of half the track (original images)
+      const originalWidth = items.reduce((total, item) => {
+        return total + (item as HTMLElement).offsetWidth + gap;
+      }, 0);
 
-      // Position both tracks side by side
-      gsap.set(track, { x: 0 });
-      gsap.set(clone, { x: trackWidth });
+      console.log('Original width:', originalWidth);
 
-      // Create infinite animation using wrap
-      const wrapValue = gsap.utils.wrap(-trackWidth, trackWidth);
+      // Use wrap to create seamless infinite scroll
+      // When we scroll past originalWidth, wrap resets us back to 0
+      const wrapValue = gsap.utils.wrap(-originalWidth, 0);
 
-      gsap.to([track, clone], {
-        x: direction === 'left' ? `-=${trackWidth}` : `+=${trackWidth}`,
+      gsap.to(track, {
+        x: direction === 'left' ? `-=${originalWidth}` : `+=${originalWidth}`,
         duration: speed,
         ease: 'none',
         repeat: -1,
@@ -120,6 +123,10 @@ const {
     .marquee-images {
       margin: 32px 0 0;
       height: 280px;
+      /* Add padding on mobile to prevent edge clipping */
+      width: calc(100vw - 48px);
+      margin-left: calc(-50vw + 24px);
+      margin-right: calc(-50vw + 24px);
     }
 
     .marquee-images__track {
@@ -136,6 +143,10 @@ const {
     .marquee-images {
       margin: 24px 0 0;
       height: 220px;
+      /* Smaller padding on smaller screens */
+      width: calc(100vw);
+      margin-left: calc(-50vw);
+      margin-right: calc(-50vw);
     }
 
     .marquee-images__item img {
