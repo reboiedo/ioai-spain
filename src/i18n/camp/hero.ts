@@ -6,8 +6,8 @@ export const hero = {
     es: 'Campamento de Verano en Tenerife'
   }),
   dateSubtitle: createTranslation({
-    en: 'July 1st — 15th, 2025',
-    es: '1 — 15 de Julio, 2025'
+    en: 'July 1st — 15th, 2026',
+    es: '1 — 15 de Julio, 2026'
   }),
   tagline: createTranslation({
     en: '2-Week Tech Summer Camp in Tenerife',
