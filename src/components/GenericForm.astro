@@ -203,13 +203,18 @@ const form = resolvedForm;
                     {field.label}
                     {field.required && <span class="required">*</span>}
                   </label>
-                  <input
-                    type="date"
-                    id={field.name}
-                    name={field.name}
-                    class="form-input date-input"
-                    required={field.required}
-                  />
+                  <div class="date-input-container">
+                    <input
+                      type="date"
+                      id={field.name}
+                      name={field.name}
+                      class="form-input date-input"
+                      required={field.required}
+                    />
+                    <span class="date-placeholder" data-date-for={field.name}>
+                      {locale === 'es' ? 'dd/mm/aaaa' : 'dd/mm/yyyy'}
+                    </span>
+                  </div>
                 </>
               ) : (
                 <!-- Text/Email Fields -->
@@ -367,6 +372,10 @@ const form = resolvedForm;
   }
 
   /* Date Input Enhancements */
+  .date-input-container {
+    position: relative;
+  }
+
   .date-input {
     position: relative;
     cursor: pointer;
@@ -376,6 +385,23 @@ const form = resolvedForm;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+  }
+
+  .date-placeholder {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    pointer-events: none;
+    font-size: 1rem;
+    transition: opacity 0.2s;
+  }
+
+  .date-input:focus + .date-placeholder,
+  .date-input:valid + .date-placeholder,
+  .date-input.has-value + .date-placeholder {
+    opacity: 0;
   }
 
   /* Desktop date input styles */
@@ -915,6 +941,30 @@ const form = resolvedForm;
 
     // Initial display update
     updateFormDisplay();
+
+    // Handle date input placeholder visibility
+    const dateInputs = formElement.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(dateInput => {
+      const placeholder = dateInput.nextElementSibling;
+
+      function updatePlaceholderVisibility() {
+        if (dateInput.value) {
+          dateInput.classList.add('has-value');
+        } else {
+          dateInput.classList.remove('has-value');
+        }
+      }
+
+      // Check on load
+      updatePlaceholderVisibility();
+
+      // Check on change
+      dateInput.addEventListener('change', updatePlaceholderVisibility);
+      dateInput.addEventListener('input', updatePlaceholderVisibility);
+
+      // Check on focus/blur (for iOS)
+      dateInput.addEventListener('blur', updatePlaceholderVisibility);
+    });
 
     // Form submission handler
     formElement.addEventListener('submit', function(e) {
