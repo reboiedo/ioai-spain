@@ -18,7 +18,7 @@ export const hero = {
     es: 'Un camino hacia el éxito tecnológico para tu hijo con una aventura de programación en nuestra isla'
   }),
   paragraph: createTranslation({
-    en: 'We\'re excited to offer an immersive and fun-filled coding experience for children aged 10 to 18 on the beautiful island of Tenerife. Our camp is designed to inspire and empower the next generation of tech leaders, and we can\'t wait to share our passion for coding with your child.',
-    es: 'Estamos emocionados de ofrecer una experiencia de programación inmersiva y divertida para niños de 10 a 18 años en la hermosa isla de Tenerife. Nuestro campamento está diseñado para inspirar y empoderar a la próxima generación de líderes tecnológicos, y estamos ansiosos por compartir nuestra pasión por la programación con tu hijo.'
+    en: 'We\'re thrilled to invite young innovators aged 10 to 20 on the beautiful island of Tenerife. Our camp is designed to inspire and empower the next generation of tech leaders, and we can\'t wait to share our passion for coding with your child.',
+    es: 'Estamos encantados de invitar a jóvenes innovadores de 10 a 20 años en la hermosa isla de Tenerife. Nuestro campamento está diseñado para inspirar y empoderar a la próxima generación de líderes tecnológicos, y estamos ansiosos por compartir nuestra pasión por la programación con tu hijo.'
   })
 } as const;

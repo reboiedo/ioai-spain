@@ -66,8 +66,12 @@ export const tenerifeCamp = {
       es: 'Plan de Estudios'
     },
     sectionTitle: {
-      en: 'What You\'ll Learn',
-      es: 'Lo Que Aprenderás'
+      en: 'From Beginner friendly to advanced courses',
+      es: 'De cursos para principiantes a avanzados'
+    },
+    description: {
+      en: 'Every child should have the opportunity to explore concepts in mathematics, coding, problem-solving, and AI through engaging workshops, team competitions, and cultural activities. Participants will be split into classes based on their level and previous experience. Classes are taught in English.',
+      es: 'Cada niño debería tener la oportunidad de explorar conceptos de matemáticas, programación, resolución de problemas e IA a través de talleres atractivos, competencias en equipo y actividades culturales. Los participantes se dividirán en clases según su nivel y experiencia previa. Las clases se imparten en inglés.'
     },
     viewAll: {
       en: 'View All Courses',

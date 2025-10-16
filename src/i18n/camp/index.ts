@@ -7,6 +7,7 @@ import { pricing } from './pricing';
 import { faq } from './faq';
 import { partners } from './partners';
 import { footer } from './footer';
+import { tenerifeCamp } from '../tenerifeCamp';
 import type { Language } from '../types';
 import { getTranslation } from '../types';
 
@@ -133,6 +134,12 @@ export function useCampTranslations(locale: Language | undefined) {
       phone: getTranslation(footer.phone, locale),
       copyright: getTranslation(footer.copyright, locale),
       privacyPolicy: getTranslation(footer.privacyPolicy, locale)
+    },
+    tenerifeCamp: {
+      courses: {
+        sectionTitle: getTranslation(tenerifeCamp.courses.sectionTitle, locale),
+        description: getTranslation(tenerifeCamp.courses.description, locale)
+      }
     }
   };
 }
