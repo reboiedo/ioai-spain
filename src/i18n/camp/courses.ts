@@ -33,8 +33,8 @@ export const courses = {
         es: 'Matemáticas'
       }),
       description: createTranslation({
-        en: 'In the exciting world of math at our summer camp you will learn how to distinguish truth from falsehood, make scientific predictions, and present convincing arguments. No previous mathematical experience is required, only a willingness to explore and discover new things. Join us and uncover the many hidden wonders of math!',
-        es: 'En el emocionante mundo de las matemáticas en nuestro campamento de verano aprenderás cómo distinguir la verdad de la falsedad, hacer predicciones científicas y presentar argumentos convincentes. No se requiere experiencia matemática previa, solo ganas de explorar y descubrir cosas nuevas. ¡Únete a nosotros y descubre las muchas maravillas ocultas de las matemáticas!'
+        en: 'Learn how to distinguish truth from falsehood, make scientific predictions, and present convincing arguments.',
+        es: 'Aprende cómo distinguir la verdad de la falsedad, hacer predicciones científicas y presentar argumentos convincentes.'
       })
     },
     gameDev: {
@@ -73,8 +73,8 @@ export const courses = {
         es: 'IA'
       }),
       description: createTranslation({
-        en: 'The summer school program on AI provides a theoretical foundation and hands-on experience on recent advances in Machine Learning, Deep Learning, and Language modeling fields. It includes a crash course on AI, a robotics workshop, GPT-like solutions adaptation',
-        es: 'El programa de escuela de verano sobre IA proporciona una base teórica y experiencia práctica en los avances recientes en los campos de Aprendizaje Automático, Aprendizaje Profundo y modelado de lenguaje. Incluye un curso intensivo sobre IA, un taller de robótica y adaptación de soluciones similares a GPT'
+        en: 'Learn basic AI concepts, pattern recognition, history of AI, search mechanisms and information retrieval, ethics and responsible use of AI. Maths foundations are required as well as problem-solving skills.',
+        es: 'Aprende conceptos básicos de IA, reconocimiento de patrones, historia de la IA, mecanismos de búsqueda y recuperación de información, ética y uso responsable de la IA. Se requieren fundamentos matemáticos así como habilidades de resolución de problemas.'
       })
     }
   },
@@ -87,8 +87,8 @@ export const courses = {
         es: 'Matemáticas'
       }),
       description: createTranslation({
-        en: 'In the exhilarating world of advanced math at our summer camp, you will dive deep into problem-solving, abstraction, and creative reasoning. Explore topics from combinatorics, number theory, and geometry to modern applications in algorithms and artificial intelligence. You\'ll learn to construct rigorous proofs, tackle Olympiad-style challenges, and think like a true mathematician. A solid foundation and curiosity for deeper exploration are all you need. Join us and push the boundaries of what you thought possible in mathematics!',
-        es: 'En el emocionante mundo de las matemáticas avanzadas en nuestro campamento de verano, te sumergirás profundamente en la resolución de problemas, la abstracción y el razonamiento creativo. Explora temas desde combinatoria, teoría de números y geometría hasta aplicaciones modernas en algoritmos e inteligencia artificial. Aprenderás a construir pruebas rigurosas, abordar desafíos estilo Olimpiada y pensar como un verdadero matemático. Una base sólida y curiosidad por una exploración más profunda es todo lo que necesitas. ¡Únete a nosotros y empuja los límites de lo que creías posible en matemáticas!'
+        en: 'Learn topics from combinatorics, number theory, and geometry to modern applications in algorithms and artificial intelligence; construct rigorous proofs, tackle Olympiad-style challenges, and develop advanced mathematical reasoning.',
+        es: 'Aprende temas desde combinatoria, teoría de números y geometría hasta aplicaciones modernas en algoritmos e inteligencia artificial; construye pruebas rigurosas, aborda desafíos estilo Olimpiada y desarrolla razonamiento matemático avanzado.'
       })
     },
     algorithms: {
@@ -120,8 +120,8 @@ export const courses = {
       es: 'Entrenamiento IOAI'
     }),
     description: createTranslation({
-      en: 'IOAI Spain - A dedicated track will focus on training the national team for the International Olympiad in Artificial Intelligence (IOAI) — a key milestone in the country\'s preparation for the global stage.',
-      es: 'IOAI España - Un programa dedicado se enfocará en entrenar al equipo nacional para la Olimpiada Internacional de Inteligencia Artificial (IOAI) — un hito clave en la preparación del país para el escenario global.'
+      en: 'Comprehensive preparation of the Team Spain selected through the previous four Rounds with experienced faculty to master IOAI competition standards.',
+      es: 'Preparación completa del Equipo España seleccionado a través de las cuatro rondas previas con profesorado experimentado para dominar los estándares de competición IOAI.'
     })
   }
 } as const;
