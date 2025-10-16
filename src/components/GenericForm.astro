@@ -209,7 +209,6 @@ const form = resolvedForm;
                     name={field.name}
                     class="form-input date-input"
                     required={field.required}
-                    placeholder="dd/mm/yyyy"
                   />
                 </>
               ) : (
@@ -370,23 +369,48 @@ const form = resolvedForm;
   /* Date Input Enhancements */
   .date-input {
     position: relative;
-    cursor: text;
+    cursor: pointer;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.01em;
+    min-height: 44px; /* iOS minimum tap target */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
 
-  .date-input::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    padding: 0.25rem;
-    margin-left: 0.5rem;
-    opacity: 0.7;
-    transition: opacity 0.2s;
+  /* Desktop date input styles */
+  @media (min-width: 769px) {
+    .date-input {
+      cursor: text;
+    }
+
+    .date-input::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      padding: 0.25rem;
+      margin-left: 0.5rem;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .date-input::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+      background-color: rgba(0, 102, 204, 0.1);
+      border-radius: 4px;
+    }
   }
 
-  .date-input::-webkit-calendar-picker-indicator:hover {
-    opacity: 1;
-    background-color: rgba(0, 102, 204, 0.1);
-    border-radius: 4px;
+  /* Mobile iOS optimizations */
+  @media (max-width: 768px) {
+    .date-input {
+      font-size: 16px; /* Prevent zoom on iOS */
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: var(--background-primary);
+    }
+
+    .date-input::-webkit-date-and-time-value {
+      text-align: left;
+    }
   }
 
   .date-input::-webkit-datetime-edit-fields-wrapper {
@@ -395,6 +419,10 @@ const form = resolvedForm;
 
   .date-input::-webkit-datetime-edit-text {
     padding: 0 0.125rem;
+  }
+
+  .date-input::-webkit-datetime-edit {
+    padding: 0;
   }
 
   .date-input:focus {
