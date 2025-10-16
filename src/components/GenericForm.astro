@@ -4,13 +4,14 @@ import { resolveFormTemplate, isValidTemplate } from '../config/formTemplates';
 export interface Props {
   formData: {
     slug: string;
-    formTemplate?: 'application' | 'download' | 'contact';
+    formTemplate?: 'application' | 'download' | 'contact' | 'campSignup';
+    ageThreshold?: number; // Age threshold for guardian requirement (default: 14)
     form: {
       title: string;
       subtitle?: string;
       action?: string;
       fields?: Array<{
-        type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio';
+        type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
         name: string;
         label: string;
         placeholder?: string;
@@ -41,7 +42,7 @@ type ResolvedForm = {
   subtitle?: string;
   action: string;
   fields: Array<{
-    type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio';
+    type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
     name: string;
     label: string;
     placeholder?: string;
@@ -57,6 +58,9 @@ type ResolvedForm = {
   };
   confirmationMessage?: string;
 };
+
+// Get age threshold (default to 14 for backward compatibility)
+const ageThreshold = formData.ageThreshold ?? 14;
 
 // Resolve form configuration - either from template or direct config
 let resolvedForm: ResolvedForm;
@@ -192,6 +196,21 @@ const form = resolvedForm;
                     ))}
                   </div>
                 </div>
+              ) : field.type === 'date' ? (
+                <!-- Date Field -->
+                <>
+                  <label for={field.name} class="form-label">
+                    {field.label}
+                    {field.required && <span class="required">*</span>}
+                  </label>
+                  <input
+                    type="date"
+                    id={field.name}
+                    name={field.name}
+                    class="form-input"
+                    required={field.required}
+                  />
+                </>
               ) : (
                 <!-- Text/Email Fields -->
                 <>
@@ -515,7 +534,7 @@ const form = resolvedForm;
   }
 </style>
 
-<script define:vars={{ formData, form, locale, redirectPath }}>
+<script define:vars={{ formData, form, locale, redirectPath, ageThreshold }}>
   // Handle form submission with runtime redirect URL
   document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 GenericForm script loaded for form:', formData.slug);
@@ -549,33 +568,49 @@ const form = resolvedForm;
 
     const roleGroup = getFieldGroup('role');
     const signUpForGroup = getFieldGroup('signUpFor');
-    const participantAgeGroup = getFieldGroup('participantAge');
+    const birthdateGroup = getFieldGroup('birthdate');
+    const participantAgeGroup = getFieldGroup('participantAge'); // For backward compatibility
     const guardianNameGroup = getFieldGroup('guardianName');
     const guardianEmailGroup = getFieldGroup('guardianEmail');
+    const campPricingGroup = getFieldGroup('campPricing');
+
+    // Determine which age field is present (birthdate or participantAge for backward compatibility)
+    const ageFieldGroup = birthdateGroup || participantAgeGroup;
+    const useBirthdate = !!birthdateGroup;
 
     // Debug: Check if all fields exist
     console.log('📋 Field groups found:', {
       roleGroup: !!roleGroup,
       signUpForGroup: !!signUpForGroup,
-      participantAgeGroup: !!participantAgeGroup,
+      ageFieldGroup: !!ageFieldGroup,
+      useBirthdate,
       guardianNameGroup: !!guardianNameGroup,
-      guardianEmailGroup: !!guardianEmailGroup
+      guardianEmailGroup: !!guardianEmailGroup,
+      campPricingGroup: !!campPricingGroup
     });
-
-    if (!roleGroup) console.error('❌ role field group not found!');
-    if (!signUpForGroup) console.error('❌ signUpFor field group not found!');
-    if (!participantAgeGroup) console.error('❌ participantAge field group not found!');
-    if (!guardianNameGroup) console.error('❌ guardianName field group not found!');
-    if (!guardianEmailGroup) console.error('❌ guardianEmail field group not found!');
+    console.log('📋 Age threshold:', ageThreshold);
 
     // Get labels for dynamic updates
-    const participantAgeLabel = formElement.querySelector('label.form-label:has(+ .radio-options input[name="participantAge"])');
+    const birthdateLabel = formElement.querySelector('label[for="birthdate"]');
     const fullNameLabel = formElement.querySelector('label[for="fullName"]');
     const emailLabel = formElement.querySelector('label[for="email"]');
     const consentLabel = formElement.querySelector('input[name="consent"]')?.closest('.checkbox-label')?.querySelector('.consent-text');
     const guardianNotification = document.getElementById('guardian-notification');
     const notificationTitle = document.getElementById('notification-title');
     const notificationMessage = document.getElementById('notification-message');
+
+    // Helper function to calculate age from birthdate
+    function calculateAge(birthdate) {
+      if (!birthdate) return null;
+      const today = new Date();
+      const birthDate = new Date(birthdate);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    }
 
     // Helper function to show/hide and manage required state
     function setFieldVisibility(fieldGroup, visible, required = false) {
@@ -622,36 +657,56 @@ const form = resolvedForm;
     function updateFormDisplay() {
       const role = formElement.querySelector('select[name="role"]')?.value;
       const signUpFor = formElement.querySelector('input[name="signUpFor"]:checked')?.value;
-      const participantAge = formElement.querySelector('input[name="participantAge"]:checked')?.value;
 
-      console.log('🔄 Update form display:', { role, signUpFor, participantAge });
+      // Determine effective signUpFor value:
+      // - If signUpForGroup doesn't exist (camp forms), treat parent as signing up child
+      // - Otherwise use the actual signUpFor value
+      const effectiveSignUpFor = !signUpForGroup && role === 'parent' ? 'my-child' : signUpFor;
 
-      // Rule 1: Show signUpFor field only if role is "parent"
-      const showSignUpFor = role === 'parent';
+      // Get age information - either from birthdate or participantAge (backward compatibility)
+      let isUnderThreshold = false;
+      let ageValue = null;
+
+      if (useBirthdate) {
+        // Modern approach: Use birthdate
+        const birthdateInput = formElement.querySelector('input[name="birthdate"]');
+        const birthdate = birthdateInput?.value;
+        ageValue = calculateAge(birthdate);
+        isUnderThreshold = ageValue !== null && ageValue < ageThreshold;
+        console.log('🔄 Update form display (birthdate):', { role, signUpFor, effectiveSignUpFor, birthdate, ageValue, ageThreshold, isUnderThreshold });
+      } else {
+        // Legacy approach: Use participantAge radio buttons
+        const participantAge = formElement.querySelector('input[name="participantAge"]:checked')?.value;
+        isUnderThreshold = participantAge === `under${ageThreshold}`;
+        console.log('🔄 Update form display (radio):', { role, signUpFor, effectiveSignUpFor, participantAge, isUnderThreshold });
+      }
+
+      // Rule 1: Show signUpFor field only if role is "parent" AND field exists
+      const showSignUpFor = signUpForGroup && role === 'parent';
       console.log('  → Rule 1 (signUpFor):', { role, showSignUpFor });
       setFieldVisibility(signUpForGroup, showSignUpFor, showSignUpFor);
 
-      // Rule 2: Show participantAge field based on role + signUpFor
+      // Rule 2: Show age field (birthdate or participantAge) based on role + effectiveSignUpFor
       let showAge = false;
       if (role === 'student') {
         console.log('  → Rule 2 (age): student = SHOW');
         showAge = true;
-      } else if (role === 'parent' && signUpFor === 'my-child') {
+      } else if (role === 'parent' && effectiveSignUpFor === 'my-child') {
         console.log('  → Rule 2 (age): parent + my-child = SHOW');
         showAge = true;
       } else {
-        console.log('  → Rule 2 (age): conditions not met = HIDE', { role, signUpFor });
+        console.log('  → Rule 2 (age): conditions not met = HIDE', { role, effectiveSignUpFor });
       }
-      setFieldVisibility(participantAgeGroup, showAge, showAge);
+      setFieldVisibility(ageFieldGroup, showAge, showAge);
 
       // Rule 3: Show guardian fields and notification
       let showGuardian = false;
       let showNotification = false;
 
-      if (role === 'student' && participantAge === 'under14') {
+      if (role === 'student' && isUnderThreshold) {
         showGuardian = true;
-        showNotification = true; // Show notification for under-14 students
-      } else if (role === 'parent' && signUpFor === 'my-child') {
+        showNotification = true; // Show notification for under-threshold students
+      } else if (role === 'parent' && effectiveSignUpFor === 'my-child') {
         showGuardian = true;
         showNotification = false; // Don't show notification for parents signing up child
       }
@@ -665,11 +720,11 @@ const form = resolvedForm;
           const notificationTexts = {
             en: {
               title: 'Parent/Guardian Required',
-              message: 'Since you are under 14, a parent or guardian must complete the rest of this application on your behalf.'
+              message: `Since you are under ${ageThreshold}, a parent or guardian must complete the rest of this application on your behalf.`
             },
             es: {
               title: 'Se Requiere Padre/Madre/Tutor',
-              message: 'Como eres menor de 14 años, un padre/madre o tutor debe completar el resto de esta solicitud en tu nombre.'
+              message: `Como eres menor de ${ageThreshold} años, un padre/madre o tutor debe completar el resto de esta solicitud en tu nombre.`
             }
           };
           const lang = locale || 'en';
@@ -677,31 +732,31 @@ const form = resolvedForm;
           notificationMessage.textContent = notificationTexts[lang].message;
           guardianNotification.style.display = 'flex';
 
-          // Position notification between age question and guardian name
-          if (participantAgeGroup && guardianNameGroup) {
+          // Position notification between age field and guardian name
+          if (ageFieldGroup && guardianNameGroup) {
             // Insert notification after the age group
-            participantAgeGroup.parentNode.insertBefore(guardianNotification, guardianNameGroup);
+            ageFieldGroup.parentNode.insertBefore(guardianNotification, guardianNameGroup);
           }
         } else {
           guardianNotification.style.display = 'none';
         }
       }
 
-      // Rule 4: Update dynamic labels
-      if (participantAgeLabel) {
+      // Rule 4: Update dynamic labels for birthdate field
+      if (birthdateLabel) {
         const labels = {
           en: {
-            student: 'Are you 14 years old or older?',
-            parentChild: 'Is your child 14 years old or older?'
+            student: 'Date of Birth',
+            parentChild: 'Child\'s Date of Birth'
           },
           es: {
-            student: '¿Tienes 14 años o más?',
-            parentChild: '¿Tu hijo/a tiene 14 años o más?'
+            student: 'Fecha de Nacimiento',
+            parentChild: 'Fecha de Nacimiento del Hijo/a'
           }
         };
         const lang = locale || 'en';
-        const labelKey = (role === 'parent' && signUpFor === 'my-child') ? 'parentChild' : 'student';
-        participantAgeLabel.childNodes[0].textContent = labels[lang][labelKey] + ' ';
+        const labelKey = (role === 'parent' && effectiveSignUpFor === 'my-child') ? 'parentChild' : 'student';
+        birthdateLabel.childNodes[0].textContent = labels[lang][labelKey] + ' ';
       }
 
       // Update fullName and email labels
@@ -722,7 +777,7 @@ const form = resolvedForm;
         };
         const lang = locale || 'en';
 
-        if (role === 'parent' && signUpFor === 'my-child') {
+        if (role === 'parent' && effectiveSignUpFor === 'my-child') {
           fullNameLabel.childNodes[0].textContent = labels[lang].participantName + ' ';
           emailLabel.childNodes[0].textContent = labels[lang].participantEmail + ' ';
         } else {
@@ -753,17 +808,17 @@ const form = resolvedForm;
       }
 
       // Rule 5: Update consent checkbox label based on context
-      // Only apply dynamic label if form has conditional fields (signUpForRadios exist)
-      if (consentLabel && signUpForRadios.length > 0) {
+      // Only apply dynamic label if form has conditional fields (signUpFor field exists OR role is parent)
+      if (consentLabel && (signUpForGroup || role === 'parent')) {
         const consentTexts = {
           en: {
             default: 'I consent to receiving emails',
-            under14: 'I am the parent/guardian and give consent for my child to participate and receive emails',
+            underThreshold: 'I am the parent/guardian and give consent for my child to participate and receive emails',
             guardianForSomeone: 'I give consent for my child to participate and receive emails'
           },
           es: {
             default: 'Acepto recibir correos electrónicos',
-            under14: 'Soy el padre/madre/tutor y doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos',
+            underThreshold: 'Soy el padre/madre/tutor y doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos',
             guardianForSomeone: 'Doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos'
           }
         };
@@ -771,9 +826,9 @@ const form = resolvedForm;
 
         // Determine which consent text to use
         let consentKey = 'default';
-        if (role === 'student' && participantAge === 'under14') {
-          consentKey = 'under14';
-        } else if (role === 'parent' && signUpFor === 'my-child') {
+        if (role === 'student' && isUnderThreshold) {
+          consentKey = 'underThreshold';
+        } else if (role === 'parent' && effectiveSignUpFor === 'my-child') {
           consentKey = 'guardianForSomeone';
         }
 
@@ -785,10 +840,13 @@ const form = resolvedForm;
     const roleSelect = formElement.querySelector('select[name="role"]');
     const signUpForRadios = formElement.querySelectorAll('input[name="signUpFor"]');
     const participantAgeRadios = formElement.querySelectorAll('input[name="participantAge"]');
+    const birthdateInput = formElement.querySelector('input[name="birthdate"]');
+    const campPricingRadios = formElement.querySelectorAll('input[name="campPricing"]');
 
     if (roleSelect) roleSelect.addEventListener('change', updateFormDisplay);
     signUpForRadios.forEach(radio => radio.addEventListener('change', updateFormDisplay));
     participantAgeRadios.forEach(radio => radio.addEventListener('change', updateFormDisplay));
+    if (birthdateInput) birthdateInput.addEventListener('change', updateFormDisplay);
 
     // Initial display update
     updateFormDisplay();
@@ -796,9 +854,27 @@ const form = resolvedForm;
     // Form submission handler
     formElement.addEventListener('submit', function(e) {
       console.log('🚀 Form submit event triggered - using native submission!');
+      console.log('📋 Camp pricing radios found:', campPricingRadios.length);
 
       // Disable signUpFor field so it doesn't submit (UI-only field)
       signUpForRadios.forEach(radio => radio.disabled = true);
+
+      // For camp forms: Append pricing parameter to redirect URL
+      if (campPricingRadios.length > 0) {
+        const selectedPricing = formElement.querySelector('input[name="campPricing"]:checked')?.value;
+        console.log('💰 Selected pricing:', selectedPricing);
+        if (selectedPricing) {
+          const currentRedirectUrl = redirectField.value;
+          const separator = currentRedirectUrl.includes('?') ? '&' : '?';
+          const newRedirectUrl = `${currentRedirectUrl}${separator}pricing=${selectedPricing}`;
+          redirectField.value = newRedirectUrl;
+          console.log('💰 Current redirect URL:', currentRedirectUrl);
+          console.log('💰 Updated redirect URL:', newRedirectUrl);
+          console.log('💰 Redirect field value now:', redirectField.value);
+        } else {
+          console.warn('⚠️ No pricing option selected!');
+        }
+      }
 
       const submitButton = formElement.querySelector('button[type="submit"]');
 

@@ -38,9 +38,9 @@ export const FORM_TEMPLATES: Record<string, FormTemplate> = {
     fields: [
       "role",            // Step 1: What describes you? (everyone)
       "signUpFor",       // Step 2: Who's filling out the form? (conditional: only if role === 'parent')
-      "participantAge",  // Step 3: Age check (conditional: shown based on role + signUpFor)
-      "guardianName",    // Conditional: shown if under 14 or parent signing up child
-      "guardianEmail",   // Conditional: shown if under 14 or parent signing up child
+      "birthdate",       // Step 3: Date of birth for age validation (conditional: shown based on role + signUpFor)
+      "guardianName",    // Conditional: shown if under threshold age or parent signing up child
+      "guardianEmail",   // Conditional: shown if under threshold age or parent signing up child
       "fullName",        // Participant name
       "email",           // Participant email
       "schoolName",      // School name
@@ -87,6 +87,29 @@ export const FORM_TEMPLATES: Record<string, FormTemplate> = {
     confirmationMessage: {
       en: "Thank you for your message. We will get back to you shortly.",
       es: "Gracias por su mensaje. Nos pondremos en contacto con usted en breve.",
+    },
+    action: "https://submit-form.com/p2kDhINPt",
+  },
+
+  campSignup: {
+    fields: [
+      "campRole",        // Step 1: Student or Parent (simplified for camp)
+      "birthdate",       // Step 2: Date of birth for age validation (18+ threshold for camp)
+      "guardianName",    // Conditional: shown if under 18 or parent signing up child
+      "guardianEmail",   // Conditional: shown if under 18 or parent signing up child
+      "fullName",        // Participant name
+      "email",           // Participant email
+      "schoolName",      // School name
+      "campPricing",     // Accommodation selection with pricing
+      "consent"          // Consent checkbox
+    ],
+    submitButton: {
+      en: { default: "Register for Camp", loading: "Submitting..." },
+      es: { default: "Registrarse al Campamento", loading: "Enviando..." },
+    },
+    confirmationMessage: {
+      en: "Please proceed to payment to complete your registration.",
+      es: "Por favor proceda al pago para completar su registro.",
     },
     action: "https://submit-form.com/p2kDhINPt",
   },

@@ -19,6 +19,7 @@ interface Props {
   popoverTarget?: string;
   popoverAction?: 'show' | 'hide' | 'toggle';
   buttonId?: string; // For UTM tracking context
+  [key: string]: any; // Allow arbitrary props like data-*
 }
 
 const {
@@ -33,7 +34,8 @@ const {
   fullWidth = false,
   popoverTarget,
   popoverAction = 'show',
-  buttonId
+  buttonId,
+  ...restProps
 } = Astro.props;
 
 const enhancedHref = href;
@@ -61,6 +63,7 @@ const Tag = enhancedHref ? 'a' : 'button';
   popovertargetaction={popoverTarget ? popoverAction : undefined}
   data-component="Button"
   data-button-id={buttonId}
+  {...restProps}
 >
   <div class="btn-animate-chars__bg"></div>
   <span data-button-animate-chars="" class="btn-animate-chars__text">

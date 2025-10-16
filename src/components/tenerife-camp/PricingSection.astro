@@ -36,7 +36,7 @@ const t = useCampTranslations(locale);
       </div>
     </div>
 
-    <a href={tenerifeCampConfig.registrationUrl} class="pricing-book-button">{t.pricing.bookButton}</a>
+    <a href={tenerifeCampConfig.registrationUrl[locale || 'en']} class="pricing-book-button">{t.pricing.bookButton}</a>
 
     <p class="pricing-disclaimer">{t.pricing.disclaimer}</p>
   </div>

@@ -1,4 +1,6 @@
-export type FormFieldType = 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio';
+import { getOptionLabel } from '../data/campPricingConfig';
+
+export type FormFieldType = 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
 
 export interface FormFieldOption {
   value: string;
@@ -119,6 +121,31 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
     }
   },
 
+  campRole: {
+    en: {
+      type: 'select',
+      name: 'role',
+      label: 'I am a...',
+      placeholder: 'Select your role',
+      required: true,
+      options: [
+        { value: 'student', label: 'Student' },
+        { value: 'parent', label: 'Parent' }
+      ]
+    },
+    es: {
+      type: 'select',
+      name: 'role',
+      label: 'Soy...',
+      placeholder: 'Seleccione su rol',
+      required: true,
+      options: [
+        { value: 'student', label: 'Estudiante' },
+        { value: 'parent', label: 'Padre/Madre' }
+      ]
+    }
+  },
+
   consent: {
     en: {
       type: 'checkbox',
@@ -228,6 +255,46 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       label: 'Email del Tutor',
       placeholder: 'Ingrese el email del tutor',
       required: false
+    }
+  },
+
+  birthdate: {
+    en: {
+      type: 'date',
+      name: 'birthdate',
+      label: 'Date of Birth',
+      placeholder: '',
+      required: true
+    },
+    es: {
+      type: 'date',
+      name: 'birthdate',
+      label: 'Fecha de Nacimiento',
+      placeholder: '',
+      required: true
+    }
+  },
+
+  campPricing: {
+    en: {
+      type: 'radio',
+      name: 'campPricing',
+      label: 'Select Accommodation Option',
+      required: true,
+      options: [
+        { value: 'withoutAccommodation', label: getOptionLabel('withoutAccommodation', 'en') },
+        { value: 'withAccommodation', label: getOptionLabel('withAccommodation', 'en') }
+      ]
+    },
+    es: {
+      type: 'radio',
+      name: 'campPricing',
+      label: 'Seleccionar Opción de Alojamiento',
+      required: true,
+      options: [
+        { value: 'withoutAccommodation', label: getOptionLabel('withoutAccommodation', 'es') },
+        { value: 'withAccommodation', label: getOptionLabel('withAccommodation', 'es') }
+      ]
     }
   }
 };

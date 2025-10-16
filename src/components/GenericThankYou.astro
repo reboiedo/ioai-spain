@@ -23,15 +23,18 @@ export interface Props {
 
 const { config, locale } = Astro.props;
 
-// Smart URL handling function
+// Smart URL handling function - keep placeholders as-is, they'll be replaced client-side
 function getButtonProps(button: { url: string; openInNewTab: boolean }) {
-  const isExternalUrl = button.url.startsWith('http://') || button.url.startsWith('https://');
-  const shouldOpenInNewTab = button.openInNewTab ?? isExternalUrl; // explicit or fallback
+  const processedUrl = button.url;
+  const isExternalUrl = processedUrl.startsWith('http://') || processedUrl.startsWith('https://');
+  const shouldOpenInNewTab = button.openInNewTab ?? isExternalUrl;
 
   return {
-    href: button.url,
+    href: processedUrl,
     target: shouldOpenInNewTab ? '_blank' : undefined,
-    rel: shouldOpenInNewTab && isExternalUrl ? 'noopener noreferrer' : undefined
+    rel: shouldOpenInNewTab && isExternalUrl ? 'noopener noreferrer' : undefined,
+    // Add data attribute to identify buttons that need dynamic URL replacement
+    dataDynamic: button.url.includes('{dynamicPaymentUrl}') ? 'payment' : undefined
   };
 }
 
@@ -62,6 +65,7 @@ const secondaryButtonProps = config.buttons.secondary ? getButtonProps(config.bu
             size="medium"
             target={primaryButtonProps.target}
             rel={primaryButtonProps.rel}
+            data-dynamic={primaryButtonProps.dataDynamic}
           >
             {primaryButtonProps.href.includes('drive.google.com') && (
               <svg class="download-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,6 +87,7 @@ const secondaryButtonProps = config.buttons.secondary ? getButtonProps(config.bu
               size="medium"
               target={secondaryButtonProps.target}
               rel={secondaryButtonProps.rel}
+              data-dynamic={secondaryButtonProps.dataDynamic}
             >
               {config.buttons.secondary.text}
             </Button>
@@ -92,6 +97,46 @@ const secondaryButtonProps = config.buttons.secondary ? getButtonProps(config.bu
     </div>
   </div>
 </section>
+
+<script>
+  import { getFlywireUrl } from '../data/campPricingConfig';
+
+  // Handle dynamic payment URL replacement on client side
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('💰 GenericThankYou client script loaded');
+
+    // Get pricing parameter from current URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const pricingParam = urlParams.get('pricing') as 'withAccommodation' | 'withoutAccommodation' | null;
+
+    console.log('💰 Current URL:', window.location.href);
+    console.log('💰 Pricing parameter:', pricingParam);
+
+    // Find all buttons with data-dynamic="payment" attribute
+    const dynamicButtons = document.querySelectorAll('a[data-dynamic="payment"]');
+    console.log('💰 Dynamic payment buttons found:', dynamicButtons.length);
+
+    dynamicButtons.forEach((button) => {
+      const link = button as HTMLAnchorElement;
+      const originalHref = link.getAttribute('href');
+      console.log('💰 Original button href:', originalHref);
+
+      if (originalHref?.includes('{dynamicPaymentUrl}')) {
+        if (pricingParam) {
+          const flywireUrl = getFlywireUrl(pricingParam);
+          link.setAttribute('href', flywireUrl);
+          console.log(`💰 Updated button href to Flywire URL for ${pricingParam}:`, flywireUrl);
+        } else {
+          // Fallback to default pricing
+          console.warn('⚠️ No pricing parameter found, using default pricing (withoutAccommodation)');
+          const flywireUrl = getFlywireUrl('withoutAccommodation');
+          link.setAttribute('href', flywireUrl);
+          console.log('💰 Updated button href to default Flywire URL:', flywireUrl);
+        }
+      }
+    });
+  });
+</script>
 
 <style>
   .thank-you-section {
