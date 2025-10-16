@@ -249,8 +249,18 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
     backgroundColor: string;
   }
 
+  // Extend Window interface for UnicornStudio
+  declare global {
+    interface Window {
+      UnicornStudio?: {
+        init: () => Promise<void>;
+      };
+    }
+  }
+
   // Slide data embedded from Astro
-  const bannerSlides = JSON.parse(document.querySelector('.banner')?.dataset.slides || '[]') as BannerSlide[];
+  const bannerElement = document.querySelector('.banner') as HTMLElement | null;
+  const bannerSlides = JSON.parse(bannerElement?.dataset.slides || '[]') as BannerSlide[];
 
   function initBannerSlider() {
     const banner = document.querySelector('.banner');
@@ -341,7 +351,7 @@ const sortedBanners = t.banners.sort((a, b) => a.order - b.order);
             console.log('Banner slider initialized');
             startAutoRotate();
           })
-          .catch((err) => console.error('Unicorn init error:', err));
+          .catch((err: unknown) => console.error('Unicorn init error:', err));
       } else {
         setTimeout(initUnicorn, 100);
       }

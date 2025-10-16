@@ -197,7 +197,7 @@ const form = resolvedForm;
                   </div>
                 </div>
               ) : field.type === 'date' ? (
-                <!-- Date Field -->
+                <!-- Date Field with enhanced UX -->
                 <>
                   <label for={field.name} class="form-label">
                     {field.label}
@@ -207,8 +207,9 @@ const form = resolvedForm;
                     type="date"
                     id={field.name}
                     name={field.name}
-                    class="form-input"
+                    class="form-input date-input"
                     required={field.required}
+                    placeholder="dd/mm/yyyy"
                   />
                 </>
               ) : (
@@ -364,6 +365,42 @@ const form = resolvedForm;
   .form-textarea {
     resize: vertical;
     min-height: 100px;
+  }
+
+  /* Date Input Enhancements */
+  .date-input {
+    position: relative;
+    cursor: text;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  .date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: 0.5rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    background-color: rgba(0, 102, 204, 0.1);
+    border-radius: 4px;
+  }
+
+  .date-input::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+
+  .date-input::-webkit-datetime-edit-text {
+    padding: 0 0.125rem;
+  }
+
+  .date-input:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
   }
 
   .checkbox-group {
