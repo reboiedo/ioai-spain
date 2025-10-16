@@ -7,7 +7,7 @@ export const tenerifeCampConfig = {
    * Main registration/application URL
    * Used by navigation CTA and other camp CTAs throughout the site
    */
-  registrationUrl: 'https://harbour.space',
+  registrationUrl: 'https://harbour-space.typeform.com/to/iCL5aJnC',
 
   // Add other camp-wide configuration here as needed
   // Examples:
