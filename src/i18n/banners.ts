@@ -30,8 +30,8 @@ export const banners = [
   {
     id: "summer-camp",
     title: createTranslation({
-      en: "Tenerife Summer Camp 2025",
-      es: "Campamento de Verano Tenerife 2025",
+      en: "Tenerife Summer Camp 2026",
+      es: "Campamento de Verano Tenerife 2026",
     }),
     description: createTranslation({
       en: "Join us for an intensive AI and coding summer camp in beautiful Tenerife",
