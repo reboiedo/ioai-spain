@@ -29,14 +29,14 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       type: 'text',
       name: 'fullName',
       label: 'Full Name',
-      placeholder: 'Enter your full name',
+      placeholder: 'Enter student\'s full name',
       required: true
     },
     es: {
       type: 'text',
       name: 'fullName',
       label: 'Nombre Completo',
-      placeholder: 'Ingrese su nombre completo',
+      placeholder: 'Ingrese el nombre completo del estudiante',
       required: true
     }
   },
@@ -46,14 +46,14 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       type: 'email',
       name: 'email',
       label: 'Email',
-      placeholder: 'Enter your email',
+      placeholder: 'Enter student\'s email',
       required: true
     },
     es: {
       type: 'email',
       name: 'email',
       label: 'Correo Electrónico',
-      placeholder: 'Ingrese su correo electrónico',
+      placeholder: 'Ingrese el email del estudiante',
       required: true
     }
   },
@@ -63,14 +63,14 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       type: 'text',
       name: 'schoolName',
       label: 'School Name',
-      placeholder: 'Enter your school name',
+      placeholder: 'Enter student\'s school name',
       required: true
     },
     es: {
       type: 'text',
       name: 'schoolName',
       label: 'Nombre de la Escuela',
-      placeholder: 'Ingrese el nombre de su escuela',
+      placeholder: 'Ingrese el nombre de la escuela del estudiante',
       required: true
     }
   },
@@ -229,7 +229,7 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       type: 'text',
       name: 'guardianName',
       label: 'Guardian Full Name',
-      placeholder: 'Enter guardian full name',
+      placeholder: 'Enter guardian\'s full name',
       required: false
     },
     es: {
@@ -246,7 +246,7 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       type: 'email',
       name: 'guardianEmail',
       label: 'Guardian Email',
-      placeholder: 'Enter guardian email',
+      placeholder: 'Enter guardian\'s email',
       required: false
     },
     es: {
@@ -272,6 +272,66 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       label: 'Fecha de Nacimiento',
       placeholder: '',
       required: true
+    }
+  },
+
+  gender: {
+    en: {
+      type: 'select',
+      name: 'gender',
+      label: 'Gender',
+      placeholder: 'Select gender',
+      required: true,
+      options: [
+        { value: 'female', label: 'Female' },
+        { value: 'male', label: 'Male' },
+        { value: 'non-binary', label: 'Non-binary' }
+      ]
+    },
+    es: {
+      type: 'select',
+      name: 'gender',
+      label: 'Género',
+      placeholder: 'Seleccione género',
+      required: true,
+      options: [
+        { value: 'female', label: 'Femenino' },
+        { value: 'male', label: 'Masculino' },
+        { value: 'non-binary', label: 'No binario' }
+      ]
+    }
+  },
+
+  tshirtSize: {
+    en: {
+      type: 'select',
+      name: 'tshirtSize',
+      label: 'T-Shirt Size',
+      placeholder: 'Select size',
+      required: true,
+      options: [
+        { value: 'xs', label: 'XS' },
+        { value: 's', label: 'S' },
+        { value: 'm', label: 'M' },
+        { value: 'l', label: 'L' },
+        { value: 'xl', label: 'XL' },
+        { value: 'xxl', label: 'XXL' }
+      ]
+    },
+    es: {
+      type: 'select',
+      name: 'tshirtSize',
+      label: 'Talla de Camiseta',
+      placeholder: 'Seleccione talla',
+      required: true,
+      options: [
+        { value: 'xs', label: 'XS' },
+        { value: 's', label: 'S' },
+        { value: 'm', label: 'M' },
+        { value: 'l', label: 'L' },
+        { value: 'xl', label: 'XL' },
+        { value: 'xxl', label: 'XXL' }
+      ]
     }
   },
 

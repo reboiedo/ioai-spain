@@ -43,6 +43,7 @@ export const FORM_TEMPLATES: Record<string, FormTemplate> = {
       "guardianEmail",   // Conditional: shown if under threshold age or parent signing up child
       "fullName",        // Participant name
       "email",           // Participant email
+      "gender",          // Participant gender (for diversity tracking)
       "schoolName",      // School name
       "consent"          // Consent checkbox
     ],
@@ -99,7 +100,9 @@ export const FORM_TEMPLATES: Record<string, FormTemplate> = {
       "guardianEmail",   // Conditional: shown if under 18 or parent signing up child
       "fullName",        // Participant name
       "email",           // Participant email
+      "gender",          // Participant gender (for diversity tracking)
       "schoolName",      // School name
+      "tshirtSize",      // Participant t-shirt size
       "campPricing",     // Accommodation selection with pricing
       "consent"          // Consent checkbox
     ],

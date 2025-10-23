@@ -410,6 +410,11 @@ const form = resolvedForm;
       cursor: text;
     }
 
+    /* Hide custom placeholder on desktop - native input handles it */
+    .date-placeholder {
+      display: none;
+    }
+
     .date-input::-webkit-calendar-picker-indicator {
       cursor: pointer;
       padding: 0.25rem;
@@ -837,44 +842,34 @@ const form = resolvedForm;
       if (birthdateLabel) {
         const labels = {
           en: {
-            student: 'Date of Birth',
-            parentChild: 'Child\'s Date of Birth'
+            studentBirthdate: 'Student\'s Date of Birth'
           },
           es: {
-            student: 'Fecha de Nacimiento',
-            parentChild: 'Fecha de Nacimiento del Hijo/a'
+            studentBirthdate: 'Fecha de Nacimiento del Estudiante'
           }
         };
         const lang = locale || 'en';
-        const labelKey = (role === 'parent' && effectiveSignUpFor === 'my-child') ? 'parentChild' : 'student';
-        birthdateLabel.childNodes[0].textContent = labels[lang][labelKey] + ' ';
+        // Always use "Student's" terminology for consistency
+        birthdateLabel.childNodes[0].textContent = labels[lang].studentBirthdate + ' ';
       }
 
       // Update fullName and email labels
       if (fullNameLabel && emailLabel) {
         const labels = {
           en: {
-            participantName: 'Child\'s Full Name',
-            yourName: 'Your Full Name',
-            participantEmail: 'Child\'s Email',
-            yourEmail: 'Your Email'
+            studentName: 'Student\'s Full Name',
+            studentEmail: 'Student\'s Email'
           },
           es: {
-            participantName: 'Nombre Completo del Hijo/a',
-            yourName: 'Tu Nombre Completo',
-            participantEmail: 'Email del Hijo/a',
-            yourEmail: 'Tu Email'
+            studentName: 'Nombre Completo del Estudiante',
+            studentEmail: 'Email del Estudiante'
           }
         };
         const lang = locale || 'en';
 
-        if (role === 'parent' && effectiveSignUpFor === 'my-child') {
-          fullNameLabel.childNodes[0].textContent = labels[lang].participantName + ' ';
-          emailLabel.childNodes[0].textContent = labels[lang].participantEmail + ' ';
-        } else {
-          fullNameLabel.childNodes[0].textContent = labels[lang].yourName + ' ';
-          emailLabel.childNodes[0].textContent = labels[lang].yourEmail + ' ';
-        }
+        // Always use "Student's" terminology for consistency
+        fullNameLabel.childNodes[0].textContent = labels[lang].studentName + ' ';
+        emailLabel.childNodes[0].textContent = labels[lang].studentEmail + ' ';
       }
 
       // Update guardian field labels
@@ -884,18 +879,58 @@ const form = resolvedForm;
 
         const labels = {
           en: {
-            guardianName: 'Your Full Name (Guardian)',
-            guardianEmail: 'Your Email (Guardian)'
+            guardianName: 'Guardian\'s Name',
+            guardianEmail: 'Guardian\'s Email'
           },
           es: {
-            guardianName: 'Tu Nombre Completo (Tutor)',
-            guardianEmail: 'Tu Email (Tutor)'
+            guardianName: 'Nombre del Tutor',
+            guardianEmail: 'Email del Tutor'
           }
         };
         const lang = locale || 'en';
 
         if (guardianNameLabel) guardianNameLabel.childNodes[0].textContent = labels[lang].guardianName + ' ';
         if (guardianEmailLabel) guardianEmailLabel.childNodes[0].textContent = labels[lang].guardianEmail + ' ';
+      }
+
+      // Update gender field label
+      const genderGroup = getFieldGroup('gender');
+      const genderLabel = genderGroup?.querySelector('label');
+      if (genderLabel) {
+        const labels = {
+          en: {
+            default: 'Gender',
+            student: 'Student\'s Gender'
+          },
+          es: {
+            default: 'Género',
+            student: 'Género del Estudiante'
+          }
+        };
+        const lang = locale || 'en';
+        // Use "Student's" when guardian is involved
+        const labelKey = showGuardian ? 'student' : 'default';
+        genderLabel.childNodes[0].textContent = labels[lang][labelKey] + ' ';
+      }
+
+      // Update t-shirt size field label (camp forms only)
+      const tshirtSizeGroup = getFieldGroup('tshirtSize');
+      const tshirtSizeLabel = tshirtSizeGroup?.querySelector('label');
+      if (tshirtSizeLabel) {
+        const labels = {
+          en: {
+            default: 'T-Shirt Size',
+            student: 'Student\'s T-Shirt Size'
+          },
+          es: {
+            default: 'Talla de Camiseta',
+            student: 'Talla de Camiseta del Estudiante'
+          }
+        };
+        const lang = locale || 'en';
+        // Use "Student's" when guardian is involved
+        const labelKey = showGuardian ? 'student' : 'default';
+        tshirtSizeLabel.childNodes[0].textContent = labels[lang][labelKey] + ' ';
       }
 
       // Rule 5: Update consent checkbox label based on context
