@@ -20,8 +20,8 @@ export const banners = [
       es: "Descargar Folleto",
     }),
     buttonUrl: createTranslation({
-      en: "/form/download/",
-      es: "/es/form/download/",
+      en: "https://drive.google.com/file/d/1mjPIas7ib3Pt_ps2erV9FFxFUWlqAMpp/view?usp=drive_link",
+      es: "https://drive.google.com/file/d/16xmZtRJaj5BqwMmyAIn1FNBU_js5f_9d/view?usp=drive_link",
     }),
     backgroundJson: "/banner.json",
     backgroundColor: "#000000",
