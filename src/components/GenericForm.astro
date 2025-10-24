@@ -488,6 +488,16 @@ const form = resolvedForm;
     line-height: 1.5;
   }
 
+  .checkbox-label .consent-text .privacy-link {
+    color: #0066cc;
+    text-decoration: underline;
+    transition: color 0.2s;
+  }
+
+  .checkbox-label .consent-text .privacy-link:hover {
+    color: #0052a3;
+  }
+
   .radio-group {
     display: flex;
     flex-direction: column;
@@ -686,10 +696,14 @@ const form = resolvedForm;
     });
     console.log('📋 Age threshold:', ageThreshold);
 
-    // Get labels for dynamic updates
+    // Get labels and inputs for dynamic updates
     const birthdateLabel = formElement.querySelector('label[for="birthdate"]');
     const fullNameLabel = formElement.querySelector('label[for="fullName"]');
     const emailLabel = formElement.querySelector('label[for="email"]');
+    const schoolNameLabel = formElement.querySelector('label[for="schoolName"]');
+    const fullNameInput = formElement.querySelector('input[name="fullName"]');
+    const emailInput = formElement.querySelector('input[name="email"]');
+    const schoolNameInput = formElement.querySelector('input[name="schoolName"]');
     const consentLabel = formElement.querySelector('input[name="consent"]')?.closest('.checkbox-label')?.querySelector('.consent-text');
     const guardianNotification = document.getElementById('guardian-notification');
     const notificationTitle = document.getElementById('notification-title');
@@ -853,29 +867,80 @@ const form = resolvedForm;
         birthdateLabel.childNodes[0].textContent = labels[lang].studentBirthdate + ' ';
       }
 
-      // Update fullName and email labels
-      if (fullNameLabel && emailLabel) {
-        const labels = {
+      // Update fullName and email labels and placeholders
+      if (fullNameLabel && emailLabel && fullNameInput && emailInput) {
+        const nameLabels = {
           en: {
-            studentName: 'Student\'s Full Name',
-            studentEmail: 'Student\'s Email'
+            default: 'Full Name',
+            student: 'Student\'s Full Name'
           },
           es: {
-            studentName: 'Nombre Completo del Estudiante',
-            studentEmail: 'Email del Estudiante'
+            default: 'Nombre Completo',
+            student: 'Nombre Completo del Estudiante'
+          }
+        };
+        const emailLabels = {
+          en: {
+            default: 'Email',
+            student: 'Student\'s Email'
+          },
+          es: {
+            default: 'Correo Electrónico',
+            student: 'Email del Estudiante'
+          }
+        };
+        const namePlaceholders = {
+          en: {
+            default: 'Enter your full name',
+            student: 'Enter student\'s full name'
+          },
+          es: {
+            default: 'Ingrese su nombre completo',
+            student: 'Ingrese el nombre completo del estudiante'
+          }
+        };
+        const emailPlaceholders = {
+          en: {
+            default: 'Enter your email',
+            student: 'Enter student\'s email'
+          },
+          es: {
+            default: 'Ingrese su email',
+            student: 'Ingrese el email del estudiante'
           }
         };
         const lang = locale || 'en';
-
-        // Always use "Student's" terminology for consistency
-        fullNameLabel.childNodes[0].textContent = labels[lang].studentName + ' ';
-        emailLabel.childNodes[0].textContent = labels[lang].studentEmail + ' ';
+        // Use "Student's" when guardian is involved
+        const labelKey = showGuardian ? 'student' : 'default';
+        fullNameLabel.childNodes[0].textContent = nameLabels[lang][labelKey] + ' ';
+        emailLabel.childNodes[0].textContent = emailLabels[lang][labelKey] + ' ';
+        fullNameInput.placeholder = namePlaceholders[lang][labelKey];
+        emailInput.placeholder = emailPlaceholders[lang][labelKey];
       }
 
-      // Update guardian field labels
+      // Update schoolName placeholder
+      if (schoolNameLabel && schoolNameInput) {
+        const schoolPlaceholders = {
+          en: {
+            default: 'Enter your school name',
+            student: 'Enter student\'s school name'
+          },
+          es: {
+            default: 'Ingrese el nombre de su escuela',
+            student: 'Ingrese el nombre de la escuela del estudiante'
+          }
+        };
+        const lang = locale || 'en';
+        const labelKey = showGuardian ? 'student' : 'default';
+        schoolNameInput.placeholder = schoolPlaceholders[lang][labelKey];
+      }
+
+      // Update guardian field labels and placeholders
       if (showGuardian) {
         const guardianNameLabel = guardianNameGroup?.querySelector('label');
         const guardianEmailLabel = guardianEmailGroup?.querySelector('label');
+        const guardianNameInput = guardianNameGroup?.querySelector('input[name="guardianName"]');
+        const guardianEmailInput = guardianEmailGroup?.querySelector('input[name="guardianEmail"]');
 
         const labels = {
           en: {
@@ -887,10 +952,22 @@ const form = resolvedForm;
             guardianEmail: 'Email del Tutor'
           }
         };
+        const placeholders = {
+          en: {
+            guardianName: 'Enter guardian\'s full name',
+            guardianEmail: 'Enter guardian\'s email'
+          },
+          es: {
+            guardianName: 'Ingrese el nombre completo del tutor',
+            guardianEmail: 'Ingrese el email del tutor'
+          }
+        };
         const lang = locale || 'en';
 
         if (guardianNameLabel) guardianNameLabel.childNodes[0].textContent = labels[lang].guardianName + ' ';
         if (guardianEmailLabel) guardianEmailLabel.childNodes[0].textContent = labels[lang].guardianEmail + ' ';
+        if (guardianNameInput) guardianNameInput.placeholder = placeholders[lang].guardianName;
+        if (guardianEmailInput) guardianEmailInput.placeholder = placeholders[lang].guardianEmail;
       }
 
       // Update gender field label
@@ -936,29 +1013,28 @@ const form = resolvedForm;
       // Rule 5: Update consent checkbox label based on context
       // Only apply dynamic label if form has conditional fields (signUpFor field exists OR role is parent)
       if (consentLabel && (signUpForGroup || role === 'parent')) {
+        const privacyPolicyPath = locale === 'es' ? '/es/privacy/' : '/privacy/';
+        const privacyPolicyText = locale === 'es' ? 'Política de Privacidad' : 'Privacy Policy';
+
         const consentTexts = {
           en: {
-            default: 'I consent to receiving emails',
-            underThreshold: 'I am the parent/guardian and give consent for my child to participate and receive emails',
-            guardianForSomeone: 'I give consent for my child to participate and receive emails'
+            default: `I agree to receive Olympiad-related emails and to the <a href="${privacyPolicyPath}" target="_blank" rel="noopener noreferrer" class="privacy-link">${privacyPolicyText}</a>`,
+            guardian: `I am the legal guardian and consent to my child's participation and to both of us receiving Olympiad-related emails, as per the <a href="${privacyPolicyPath}" target="_blank" rel="noopener noreferrer" class="privacy-link">${privacyPolicyText}</a>`
           },
           es: {
-            default: 'Acepto recibir correos electrónicos',
-            underThreshold: 'Soy el padre/madre/tutor y doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos',
-            guardianForSomeone: 'Doy mi consentimiento para que mi hijo/a participe y reciba correos electrónicos'
+            default: `Acepto recibir correos electrónicos relacionados con la Olimpiada y la <a href="${privacyPolicyPath}" target="_blank" rel="noopener noreferrer" class="privacy-link">${privacyPolicyText}</a>`,
+            guardian: `Soy el tutor legal y doy mi consentimiento para la participación de mi hijo/a y para que ambos recibamos correos electrónicos relacionados con la Olimpiada, según la <a href="${privacyPolicyPath}" target="_blank" rel="noopener noreferrer" class="privacy-link">${privacyPolicyText}</a>`
           }
         };
         const lang = locale || 'en';
 
         // Determine which consent text to use
         let consentKey = 'default';
-        if (role === 'student' && isUnderThreshold) {
-          consentKey = 'underThreshold';
-        } else if (role === 'parent' && effectiveSignUpFor === 'my-child') {
-          consentKey = 'guardianForSomeone';
+        if ((role === 'student' && isUnderThreshold) || (role === 'parent' && effectiveSignUpFor === 'my-child')) {
+          consentKey = 'guardian';
         }
 
-        consentLabel.textContent = consentTexts[lang][consentKey];
+        consentLabel.innerHTML = consentTexts[lang][consentKey];
       }
     }
 
