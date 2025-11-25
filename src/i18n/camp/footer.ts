@@ -38,8 +38,8 @@ export const footer = {
     es: 'Llámanos'
   }),
   phone: createTranslation({
-    en: '+34 67 498 303',
-    es: '+34 67 498 303'
+    en: '+34671498303',
+    es: '+34671498303'
   }),
   copyright: createTranslation({
     en: '© IOAI Spain',
