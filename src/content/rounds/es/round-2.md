@@ -1,7 +1,7 @@
 ---
 roundNumber: 2
 title: "Ronda 2"
-date: "Comienza el 1 de diciembre de 2025"
+date: "Comienza a inicios de diciembre"
 introSentence: "Mayor dificultad manteniendo la accesibilidad. Enfoque en resolución de problemas, razonamiento y comprensión aplicada de IA."
 phase: "basic"
 ---

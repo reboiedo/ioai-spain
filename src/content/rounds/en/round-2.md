@@ -1,7 +1,7 @@
 ---
 roundNumber: 2
 title: "Round 2"
-date: "Starts December 01, 2025"
+date: "Starts early December"
 introSentence: "Higher difficulty while maintaining accessibility. Focus on problem-solving, reasoning and applied AI understanding."
 phase: "basic"
 ---
