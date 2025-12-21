@@ -20,6 +20,7 @@ export interface Props {
           value: string;
           label: string;
         }>;
+        hint?: string;
       }>;
       submitButton?: {
         default: string;
@@ -51,6 +52,7 @@ type ResolvedForm = {
       value: string;
       label: string;
     }>;
+    hint?: string;
   }>;
   submitButton: {
     default: string;
@@ -231,6 +233,12 @@ const form = resolvedForm;
                     placeholder={field.placeholder}
                     required={field.required}
                   />
+                  {field.hint && (
+                    <div class="field-hint">
+                      <span class="hint-icon">💡</span>
+                      <span class="hint-text">{field.hint}</span>
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -369,6 +377,29 @@ const form = resolvedForm;
   .form-textarea {
     resize: vertical;
     min-height: 100px;
+  }
+
+  .field-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+  }
+
+  .hint-icon {
+    flex-shrink: 0;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .hint-text {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: #92400e;
   }
 
   /* Date Input Enhancements */

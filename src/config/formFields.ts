@@ -14,6 +14,7 @@ export interface FormFieldDefinition {
   placeholder?: string;
   required: boolean;
   options?: FormFieldOption[];
+  hint?: string;
 }
 
 // Localized field definitions
@@ -47,14 +48,16 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       name: 'email',
       label: 'Email',
       placeholder: 'Enter student\'s email',
-      required: true
+      required: true,
+      hint: 'Tip: Personal email addresses (like Gmail) work best—school emails sometimes filter out external messages.'
     },
     es: {
       type: 'email',
       name: 'email',
       label: 'Correo Electrónico',
       placeholder: 'Ingrese el email del estudiante',
-      required: true
+      required: true,
+      hint: 'Consejo: Las direcciones de correo personales (como Gmail) funcionan mejor—los correos escolares a veces filtran mensajes externos.'
     }
   },
 
