@@ -1,7 +1,7 @@
 ---
 roundNumber: 1
 title: "Round 1"
-date: "Oct 27 - Dec 30, 2025"
+date: "Oct 27 - Feb 21"
 introSentence: "Entry point for all students, regardless of previous AI or computing experience. Accessible and inclusive, introduction to foundational AI topics."
 phase: "basic"
 ---
