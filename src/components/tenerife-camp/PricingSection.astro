@@ -38,6 +38,7 @@ const t = useCampTranslations(locale);
 
     <a href={tenerifeCampConfig.registrationUrl[locale || 'en']} class="pricing-book-button">{t.pricing.bookButton}</a>
 
+    <p class="pricing-early-bird-deadline">{t.pricing.earlyBirdDeadline}</p>
     <p class="pricing-disclaimer">{t.pricing.disclaimer}</p>
   </div>
 </section>
@@ -91,13 +92,23 @@ const t = useCampTranslations(locale);
     transform: translateY(-2px);
   }
 
+  .pricing-early-bird-deadline {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 700;
+    line-height: 1.5;
+    color: #EA5938;
+    margin: 24px 0 0;
+    text-align: center;
+  }
+
   .pricing-disclaimer {
     font-family: 'Inter Tight', sans-serif;
     font-size: clamp(14px, 1.5vw, 16px);
     font-weight: 700;
     line-height: 1.5;
     color: #000000;
-    margin: 24px 0 0;
+    margin: 8px 0 0;
     text-align: center;
   }
 

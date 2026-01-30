@@ -109,6 +109,7 @@ export function useCampTranslations(locale: Language | undefined) {
         earlyBird: getTranslation(pricing.withAccommodation.earlyBird, locale)
       },
       bookButton: getTranslation(pricing.bookButton, locale),
+      earlyBirdDeadline: getTranslation(pricing.earlyBirdDeadline, locale),
       disclaimer: getTranslation(pricing.disclaimer, locale)
     },
     faq: {

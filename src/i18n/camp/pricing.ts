@@ -37,6 +37,10 @@ export const pricing = {
     en: 'Book',
     es: 'Reservar'
   }),
+  earlyBirdDeadline: createTranslation({
+    en: '*Early bird pricing available until February 6, 2026',
+    es: '*Precio anticipado disponible hasta el 6 de febrero de 2026'
+  }),
   disclaimer: createTranslation({
     en: '*travel expenses to and from Tenerife are not included',
     es: '*los gastos de viaje hacia y desde Tenerife no están incluidos'
