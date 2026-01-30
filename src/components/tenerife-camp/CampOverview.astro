@@ -12,6 +12,8 @@ import carousel2 from '@/assets/tenerife-camp/about-carousel-2.jpg';
 import carousel3 from '@/assets/tenerife-camp/about-carousel-3.jpg';
 import carousel4 from '@/assets/tenerife-camp/about-carousel-4.jpg';
 import carousel5 from '@/assets/tenerife-camp/about-carousel-5.jpg';
+import harbourSpaceLogo from '@/assets/harbour-space-logo.svg';
+import leaguesLogo from '@/assets/icons/leagues-logo.svg';
 
 export interface Props {
   locale?: Language;
@@ -62,6 +64,17 @@ const carouselImages = [
         <div class="camp-overview__center-text">
           <h2 class="camp-overview__description">{t.hero.description}</h2>
           <p class="camp-overview__paragraph">{t.hero.paragraph}</p>
+        </div>
+        <div class="camp-overview__powered-by">
+          <p class="camp-overview__powered-by-text">{t.hero.poweredBy}</p>
+          <div class="camp-overview__powered-by-logos">
+            <a href="https://harbour.space" target="_blank" rel="noopener noreferrer">
+              <img src={harbourSpaceLogo.src} alt="Harbour.Space" class="camp-overview__powered-by-logo" />
+            </a>
+            <a href="https://leaguesofcode.com" target="_blank" rel="noopener noreferrer">
+              <img src={leaguesLogo.src} alt="Leagues of Code" class="camp-overview__powered-by-logo" />
+            </a>
+          </div>
         </div>
       </div>
 
@@ -241,6 +254,40 @@ const carouselImages = [
     color: rgb(255, 255, 255);
   }
 
+  .camp-overview__powered-by {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 0 20px;
+    margin-top: 32px;
+  }
+
+  .camp-overview__powered-by-text {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(14px, 1.5vw, 16px);
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+  }
+
+  .camp-overview__powered-by-logos {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .camp-overview__column-center .camp-overview__powered-by-logos img {
+    height: 40px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    aspect-ratio: unset;
+    border-radius: 0;
+    filter: brightness(0) invert(1);
+  }
+
   /* Responsive design */
   @media (max-width: 1200px) {
     .camp-overview__three-columns {
@@ -293,6 +340,21 @@ const carouselImages = [
 
     .camp-overview__center-text {
       padding: 0;
+    }
+
+    .camp-overview__powered-by {
+      padding: 0;
+    }
+
+    .camp-overview__powered-by-logos {
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .camp-overview__column-center .camp-overview__powered-by-logos img {
+      height: auto;
+      max-width: 140px;
+      width: 100%;
     }
   }
 

@@ -30,7 +30,8 @@ export function useCampTranslations(locale: Language | undefined) {
       dateSubtitle: getTranslation(hero.dateSubtitle, locale),
       tagline: getTranslation(hero.tagline, locale),
       description: getTranslation(hero.description, locale),
-      paragraph: getTranslation(hero.paragraph, locale)
+      paragraph: getTranslation(hero.paragraph, locale),
+      poweredBy: getTranslation(hero.poweredBy, locale)
     },
     courses: {
       beginnerTitle: getTranslation(courses.beginnerTitle, locale),

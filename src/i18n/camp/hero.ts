@@ -20,5 +20,9 @@ export const hero = {
   paragraph: createTranslation({
     en: 'We\'re thrilled to invite young innovators aged 10 to 20 on the beautiful island of Tenerife. Our camp is designed to inspire and empower the next generation of tech leaders, and we can\'t wait to share our passion for coding with your child.',
     es: 'Estamos encantados de invitar a jóvenes innovadores de 10 a 20 años en la hermosa isla de Tenerife. Nuestro campamento está diseñado para inspirar y empoderar a la próxima generación de líderes tecnológicos, y estamos ansiosos por compartir nuestra pasión por la programación con tu hijo.'
+  }),
+  poweredBy: createTranslation({
+    en: 'Powered and organized by:',
+    es: 'Impulsado y organizado por:'
   })
 } as const;
