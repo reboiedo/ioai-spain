@@ -1,5 +1,6 @@
 ---
 import { resolveFormTemplate, isValidTemplate } from '../config/formTemplates';
+import { TURNSTILE_SITE_KEY } from '../config/turnstile';
 
 export interface Props {
   formData: {
@@ -109,6 +110,9 @@ const form = resolvedForm;
 
           <!-- Formspark redirect URL (will be set by JavaScript) -->
           <input type="hidden" name="_redirect" id={`redirect-${formData.slug}`} value="" />
+
+          <!-- Honeypot (anti-spam, Formspark rejects if filled) -->
+          <input type="text" name="_honeypot" style="display:none" tabindex="-1" autocomplete="off" />
 
           <!-- Guardian Notification (shown dynamically for under-14 students) -->
           <div id="guardian-notification" class="guardian-notification" style="display: none;">
@@ -252,6 +256,9 @@ const form = resolvedForm;
               </p>
             </div>
           )}
+
+          <!-- Cloudflare Turnstile (anti-bot) -->
+          <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="light"></div>
 
           <!-- Submit Button -->
           <div class="form-group">
