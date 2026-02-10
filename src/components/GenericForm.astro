@@ -123,26 +123,9 @@ const form = resolvedForm;
             </div>
           </div>
 
-          {form.fields.map((field) => (
+          {form.fields.filter(f => f.type !== 'checkbox').map((field) => (
             <div class="form-group">
-              {field.type === 'checkbox' ? (
-                <!-- Checkbox Field -->
-                <div class="checkbox-group">
-                  <label class="checkbox-label">
-                    <input
-                      type="checkbox"
-                      id={field.name}
-                      name={field.name}
-                      value="yes"
-                      required={field.required}
-                    />
-                    <span class="consent-text">
-                      {field.label}
-                    </span>
-                    {field.required && <span class="required">*</span>}
-                  </label>
-                </div>
-              ) : field.type === 'select' ? (
+              {field.type === 'select' ? (
                 <!-- Select Field -->
                 <>
                   <label for={field.name} class="form-label">
@@ -248,6 +231,29 @@ const form = resolvedForm;
             </div>
           ))}
 
+          <!-- Cloudflare Turnstile (anti-bot) -->
+          <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="light"></div>
+
+          {form.fields.filter(f => f.type === 'checkbox').map((field) => (
+            <div class="form-group">
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    id={field.name}
+                    name={field.name}
+                    value="yes"
+                    required={field.required}
+                  />
+                  <span class="consent-text">
+                    {field.label}
+                  </span>
+                  {field.required && <span class="required">*</span>}
+                </label>
+              </div>
+            </div>
+          ))}
+
           <!-- Confirmation Message -->
           {form.confirmationMessage && (
             <div class="form-group">
@@ -256,9 +262,6 @@ const form = resolvedForm;
               </p>
             </div>
           )}
-
-          <!-- Cloudflare Turnstile (anti-bot) -->
-          <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="light"></div>
 
           <!-- Submit Button -->
           <div class="form-group">
