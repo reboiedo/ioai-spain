@@ -101,16 +101,13 @@ export function useCampTranslations(locale: Language | undefined) {
       heading: getTranslation(pricing.heading, locale),
       withoutAccommodation: {
         label: getTranslation(pricing.withoutAccommodation.label, locale),
-        price: getTranslation(pricing.withoutAccommodation.price, locale),
-        earlyBird: getTranslation(pricing.withoutAccommodation.earlyBird, locale)
+        price: getTranslation(pricing.withoutAccommodation.price, locale)
       },
       withAccommodation: {
         label: getTranslation(pricing.withAccommodation.label, locale),
-        price: getTranslation(pricing.withAccommodation.price, locale),
-        earlyBird: getTranslation(pricing.withAccommodation.earlyBird, locale)
+        price: getTranslation(pricing.withAccommodation.price, locale)
       },
       bookButton: getTranslation(pricing.bookButton, locale),
-      earlyBirdDeadline: getTranslation(pricing.earlyBirdDeadline, locale),
       disclaimer: getTranslation(pricing.disclaimer, locale)
     },
     faq: {

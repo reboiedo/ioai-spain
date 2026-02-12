@@ -22,7 +22,6 @@ const t = useCampTranslations(locale);
         <h3 class="pricing-option__label" set:html={t.pricing.withoutAccommodation.label.replace('\n', '<br />')}></h3>
         <div class="pricing-option__price">
           <span class="pricing-option__amount">{t.pricing.withoutAccommodation.price}</span>
-          <span class="pricing-option__early-bird">{t.pricing.withoutAccommodation.earlyBird}</span>
         </div>
       </div>
 
@@ -31,14 +30,12 @@ const t = useCampTranslations(locale);
         <h3 class="pricing-option__label" set:html={t.pricing.withAccommodation.label.replace('\n', '<br />')}></h3>
         <div class="pricing-option__price">
           <span class="pricing-option__amount">{t.pricing.withAccommodation.price}</span>
-          <span class="pricing-option__early-bird">{t.pricing.withAccommodation.earlyBird}</span>
         </div>
       </div>
     </div>
 
     <a href={tenerifeCampConfig.registrationUrl[locale || 'en']} class="pricing-book-button">{t.pricing.bookButton}</a>
 
-    <p class="pricing-early-bird-deadline">{t.pricing.earlyBirdDeadline}</p>
     <p class="pricing-disclaimer">{t.pricing.disclaimer}</p>
   </div>
 </section>
@@ -90,16 +87,6 @@ const t = useCampTranslations(locale);
   .pricing-book-button:hover {
     background-color: #d64a2e;
     transform: translateY(-2px);
-  }
-
-  .pricing-early-bird-deadline {
-    font-family: 'Inter Tight', sans-serif;
-    font-size: clamp(14px, 1.5vw, 16px);
-    font-weight: 700;
-    line-height: 1.5;
-    color: #EA5938;
-    margin: 24px 0 0;
-    text-align: center;
   }
 
   .pricing-disclaimer {
@@ -156,14 +143,6 @@ const t = useCampTranslations(locale);
     font-weight: 800;
     line-height: 1;
     color: #000000;
-  }
-
-  .pricing-option__early-bird {
-    font-family: 'Inter Tight', sans-serif;
-    font-size: clamp(16px, 2vw, 20px);
-    font-weight: 700;
-    line-height: 1.3;
-    color: #EA5938;
   }
 
   @media (max-width: 768px) {
