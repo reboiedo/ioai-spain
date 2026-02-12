@@ -5,12 +5,12 @@
 
 export const campPricingConfig = {
   withAccommodation: {
-    original: 2550,
-    discounted: null, // Set to a number (e.g., 2300) to enable early bird discount
+    original: 3000,
+    discounted: null,
   },
   withoutAccommodation: {
-    original: 1530,
-    discounted: null, // Set to a number to enable discount
+    original: 1800,
+    discounted: null,
   },
   currency: 'EUR'
 } as const;
