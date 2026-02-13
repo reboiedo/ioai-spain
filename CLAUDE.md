@@ -150,3 +150,5 @@ import { useTranslations } from '@/i18n';
 2. Type generation from content schemas happens automatically
 3. Forms use native HTML submission (no client-side JS frameworks)
 4. All routes are statically generated at build time
+
+<!-- GitHub-Slack integration test: This comment verifies PRs are reflected in Slack -->
