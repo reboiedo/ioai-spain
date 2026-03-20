@@ -1,7 +1,7 @@
 ---
 roundNumber: 2
 title: "Round 2"
-date: "Open until Feb 21"
+date: "Completed"
 introSentence: "Higher difficulty while maintaining accessibility. Focus on problem-solving, reasoning and applied AI understanding."
 phase: "basic"
 ---
