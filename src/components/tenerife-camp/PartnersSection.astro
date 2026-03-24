@@ -3,7 +3,6 @@ import { Image } from 'astro:assets';
 import { useCampTranslations, type Language } from '@/i18n/camp';
 import partner1 from '@/assets/tenerife-camp/partner-1.png';
 import partner3 from '@/assets/tenerife-camp/partner-3.png';
-import partner4 from '@/assets/tenerife-camp/partner-4.png';
 import partner5 from '@/assets/tenerife-camp/partner-5.png';
 
 export interface Props {
@@ -16,7 +15,6 @@ const t = useCampTranslations(locale);
 const partners = [
   { id: 1, image: partner1, alt: 'Partner 1' },
   { id: 3, image: partner3, alt: 'Partner 3' },
-  { id: 4, image: partner4, alt: 'Partner 4' },
   { id: 5, image: partner5, alt: 'Partner 5' },
 ];
 ---
