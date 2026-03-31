@@ -8,7 +8,7 @@ phase: "team"
 
 ## What to Expect
 
-- Official IOAI Finals in Abu Dhabi
+- Official IOAI Finals in Kazakhstan
 - Team-based international format
 - Real-world AI research challenges
 - All expenses covered

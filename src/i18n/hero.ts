@@ -10,8 +10,8 @@ export const hero = {
     es: "Comienza la Búsqueda de los Futuros Líderes de IA de España"
   }),
   subtitle: createTranslation({
-    en: "Open to all Spanish secondary and high school students who haven't started university yet. Join the national selection for IOAI 2026 and compete in Abu Dhabi.",
-    es: "Abierto a todos los estudiantes españoles de secundaria y bachillerato que aún no hayan comenzado la universidad. Únete a la selección nacional para IOAI 2026 y compite en Abu Dabi."
+    en: "Open to all Spanish secondary and high school students who haven't started university yet. Join the national selection for IOAI 2026.",
+    es: "Abierto a todos los estudiantes españoles de secundaria y bachillerato que aún no hayan comenzado la universidad. Únete a la selección nacional para IOAI 2026."
   }),
   trainingStarts: createTranslation({
     en: "Round 3 is Live!",

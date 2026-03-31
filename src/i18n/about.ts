@@ -19,8 +19,8 @@ export const about = {
       es: "IOAI 2026"
     }),
     date: createTranslation({
-      en: "August 2-8, 2026 in Abu Dhabi",
-      es: "2-8 de agosto de 2026 en Abu Dabi"
+      en: "August 2-8, 2026 in Astana, Republic of Kazakhstan",
+      es: "2-8 de agosto de 2026 en Astaná, República de Kazajistán"
     }),
     description: createTranslation({
       en: "The global competition bringing together the brightest high school minds to tackle cutting-edge AI challenges. IOAI sets the Olympiad standard for young AI talent worldwide.",

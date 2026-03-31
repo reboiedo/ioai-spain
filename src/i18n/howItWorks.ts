@@ -52,8 +52,8 @@ export const howItWorks = {
         es: "Entrenamiento y Competición del Equipo España"
       }),
       intro: createTranslation({
-        en: "Elite program for Spain's representatives. Intensive preparation leading to international competition in Abu Dhabi.",
-        es: "Programa élite para los representantes de España. Preparación intensiva que lleva a la competición internacional en Abu Dhabi."
+        en: "Elite program for Spain's representatives. Intensive preparation leading to international competition in Kazakhstan.",
+        es: "Programa élite para los representantes de España. Preparación intensiva que lleva a la competición internacional en Kazajistán."
       })
     }
   },
