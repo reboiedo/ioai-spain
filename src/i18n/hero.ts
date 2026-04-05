@@ -14,8 +14,8 @@ export const hero = {
     es: "Abierto a todos los estudiantes españoles de secundaria y bachillerato que aún no hayan comenzado la universidad. Únete a la selección nacional para IOAI 2026."
   }),
   trainingStarts: createTranslation({
-    en: "Round 3 is Live!",
-    es: "¡La Ronda 3 está en marcha!"
+    en: "Round 3 Completed!",
+    es: "¡Ronda 3 Completada!"
   }),
   ctaUrl: createTranslation({
     en: "/form/join-training/",
