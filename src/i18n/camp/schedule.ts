@@ -86,7 +86,7 @@ export const schedule = {
         es: 'Actividades'
       }),
       description: createTranslation({
-        en: 'At the camp, children on Menorca can participate in a variety of activities such as swimming, kayaking, hiking and exploring the island\'s unique culture and history, providing them with an exciting and memorable experience.',
+        en: 'At the camp, children on Tenerife can participate in a variety of activities such as swimming, kayaking, hiking and exploring the island\'s unique culture and history, providing them with an exciting and memorable experience.',
         es: 'En el campamento, los niños en Tenerife pueden participar en una variedad de actividades como natación, kayak, senderismo y explorar la cultura e historia única de la isla, brindándoles una experiencia emocionante e inolvidable.'
       })
     },

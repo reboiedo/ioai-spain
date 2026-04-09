@@ -6,7 +6,7 @@ export interface FAQItem {
 export const faqItems: FAQItem[] = [
   {
     question: "What is the camp's focus?",
-    answer: "The camp focuses on teaching coding and computer technology to kids on the summer island of Menorca."
+    answer: "The camp focuses on teaching coding and computer technology to kids on the summer island of Tenerife."
   },
   {
     question: "What is the age range for the camp?",
@@ -45,8 +45,8 @@ export const faqItems: FAQItem[] = [
     answer: "24-hour bilingual monitoring and a summer experience like no other! Our camp activities are led by instructors who know how to bring the fun and make it age-appropriate.\n\nOur energetic and safety-conscious athletic personnel are a combination of coaches, teachers, and college-level players. With their expert skills, your kids will have a blast while developing their abilities.\n\nOur counselors report directly to the Camp Director and Camp Manager, keep a close eye on each camper's hygiene and make sure they have a safe and enjoyable summer. And, to ensure everything runs smoothly, they have daily meetings to review events and address any concerns about the children."
   },
   {
-    question: "How will the transportation within Menorca be?",
-    answer: "Transport from the Airport to Sa Vinyeta - 1st July in Bus. The arrival on the island is organized so that all students will go together in a bus to Sa Vinyeta. Transport from Sa Vinyeta to the Airport- 15th July Flights to Menorca must arrive between 10 am and 6 pm. Pick-ups and drop-offs outside these times will cost €150 each way. To make use of the free airport pick-up and drop-off, travel plans must be submitted to us via the camper information form by June 1. Transport from Sa Vinyeta to the place of the activities"
+    question: "How will the transportation within Tenerife be?",
+    answer: "Transport from the Airport to Sa Vinyeta - 1st July in Bus. The arrival on the island is organized so that all students will go together in a bus to Sa Vinyeta. Transport from Sa Vinyeta to the Airport- 15th July Flights to Tenerife must arrive between 10 am and 6 pm. Pick-ups and drop-offs outside these times will cost €150 each way. To make use of the free airport pick-up and drop-off, travel plans must be submitted to us via the camper information form by June 1. Transport from Sa Vinyeta to the place of the activities"
   },
   {
     question: "What should the kids bring to the camp?",
