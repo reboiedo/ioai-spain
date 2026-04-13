@@ -63,7 +63,7 @@ const carouselImages = [
         />
         <div class="camp-overview__center-text">
           <h2 class="camp-overview__description">{t.hero.description}</h2>
-          <p class="camp-overview__paragraph">{t.hero.paragraph}</p>
+          <div class="camp-overview__paragraph" set:html={t.hero.paragraph.replace(/\n\n/g, '<br><br>')} />
         </div>
         <div class="camp-overview__powered-by">
           <p class="camp-overview__powered-by-text">{t.hero.poweredBy}</p>

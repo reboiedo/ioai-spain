@@ -18,8 +18,8 @@ export const hero = {
     es: 'Un camino hacia el éxito tecnológico para tu hijo con una aventura de programación en nuestra isla'
   }),
   paragraph: createTranslation({
-    en: 'We\'re thrilled to invite young innovators aged 10 to 20 on the beautiful island of Tenerife. Our camp is designed to inspire and empower the next generation of tech leaders, and we can\'t wait to share our passion for coding with your child.',
-    es: 'Estamos encantados de invitar a jóvenes innovadores de 10 a 20 años en la hermosa isla de Tenerife. Nuestro campamento está diseñado para inspirar y empoderar a la próxima generación de líderes tecnológicos, y estamos ansiosos por compartir nuestra pasión por la programación con tu hijo.'
+    en: 'We\'re thrilled to welcome young innovators to our summer camp on the beautiful island of Tenerife. Children aged 10–13, teenagers aged 14–17, and young adults aged 18–20 each follow separate, age-appropriate tracks, so every student benefits from the right mix of challenge, support, and fun.\n\nOur program combines rigorous learning with a vibrant extracurricular experience, so students don\'t have to choose between academic growth and the joy of summer camp.',
+    es: 'Estamos encantados de dar la bienvenida a jóvenes innovadores a nuestro campamento de verano en la hermosa isla de Tenerife. Los niños de 10 a 13 años, los adolescentes de 14 a 17 años y los jóvenes adultos de 18 a 20 años siguen itinerarios separados y adaptados a su edad, para que cada estudiante se beneficie de la combinación adecuada de desafío, apoyo y diversión.\n\nNuestro programa combina un aprendizaje riguroso con una experiencia extracurricular vibrante, para que los estudiantes no tengan que elegir entre crecimiento académico y la alegría del campamento de verano.'
   }),
   poweredBy: createTranslation({
     en: 'Powered and organized by:',
