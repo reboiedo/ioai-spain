@@ -1,0 +1,281 @@
+{
+  "$schema": "https://designsystembuilder.dev/schemas/metadata-v1.json",
+  "version": "1.0.0",
+  "generatedAt": "2026-04-15T10:43:16.445Z",
+  "designSystem": {
+    "name": "Tenerife Camp"
+  },
+  "modes": [
+    "default",
+    "orange",
+    "blue"
+  ],
+  "collections": {
+    "core": {
+      "kind": "regular",
+      "modes": [
+        "default"
+      ],
+      "generators": [
+        {
+          "id": "87c18757-b0ca-42ec-80a3-1850d5e2c063",
+          "type": "typography",
+          "groupPrefix": "type",
+          "generator": {
+            "type": "fluidScale",
+            "viewport": {
+              "minWidth": 0,
+              "maxWidth": 0
+            },
+            "typography": {
+              "steps": [
+                {
+                  "maxPx": 12,
+                  "minPx": 12
+                },
+                {
+                  "maxPx": 14,
+                  "minPx": 14
+                },
+                {
+                  "maxPx": 18,
+                  "minPx": 16
+                },
+                {
+                  "maxPx": 24,
+                  "minPx": 20
+                },
+                {
+                  "maxPx": 32,
+                  "minPx": 24
+                },
+                {
+                  "maxPx": 80,
+                  "minPx": 42
+                },
+                {
+                  "maxPx": 120,
+                  "minPx": 42
+                },
+                {
+                  "maxPx": 48,
+                  "minPx": 32
+                },
+                {
+                  "maxPx": 64,
+                  "minPx": 36
+                }
+              ],
+              "unit": "rem",
+              "prefix": ""
+            }
+          }
+        },
+        {
+          "id": "42c9c8e4-ec28-42a0-af93-5e379be76ffb",
+          "type": "spacing",
+          "groupPrefix": "space",
+          "generator": {
+            "type": "fluidScale",
+            "viewport": {
+              "minWidth": 0,
+              "maxWidth": 0
+            },
+            "spacing": {
+              "baseMin": 16,
+              "baseMax": 24,
+              "steps": [
+                {
+                  "multiplier": 1,
+                  "name": "s"
+                },
+                {
+                  "multiplier": 1.5,
+                  "name": "m"
+                },
+                {
+                  "multiplier": 2,
+                  "name": "l"
+                },
+                {
+                  "multiplier": 2.5,
+                  "name": "xl"
+                },
+                {
+                  "multiplier": 3,
+                  "name": "2xl"
+                },
+                {
+                  "multiplier": 4,
+                  "name": "3xl"
+                },
+                {
+                  "multiplier": 5,
+                  "name": "4xl"
+                },
+                {
+                  "multiplier": 6,
+                  "name": "5xl"
+                },
+                {
+                  "multiplier": 8,
+                  "name": "6xl"
+                },
+                {
+                  "multiplier": 9,
+                  "name": "7xl"
+                }
+              ],
+              "includePairs": true,
+              "customPairs": [],
+              "unit": "rem",
+              "prefix": ""
+            }
+          }
+        },
+        {
+          "id": "6c644bc9-5433-4c11-8f90-5af41fa8cf7d",
+          "type": "color",
+          "groupPrefix": "color",
+          "generator": {
+            "type": "colorScale",
+            "steps": [
+              "50",
+              "100",
+              "200",
+              "300",
+              "400",
+              "500",
+              "600",
+              "700",
+              "800",
+              "900",
+              "950"
+            ],
+            "families": [
+              {
+                "name": "orange",
+                "lightness": {
+                  "start": 0.96,
+                  "end": 0.12,
+                  "curve": "linear",
+                  "overrides": {
+                    "200": 0.8,
+                    "500": 0.6212633306810114
+                  }
+                },
+                "chroma": {
+                  "start": 0.03,
+                  "end": 0.17,
+                  "curve": "linear",
+                  "overrides": {
+                    "500": 0.19399990058247113
+                  }
+                },
+                "hue": {
+                  "start": 51,
+                  "end": 34,
+                  "curve": "linear",
+                  "overrides": {
+                    "500": 33.76060223297341
+                  }
+                }
+              },
+              {
+                "name": "yellow",
+                "lightness": {
+                  "start": 0.98,
+                  "end": 0.16,
+                  "curve": "ease-out",
+                  "overrides": {
+                    "400": 0.8117721889950588
+                  }
+                },
+                "chroma": {
+                  "start": 0.03,
+                  "end": 0.18,
+                  "curve": "ease-in-out",
+                  "overrides": {
+                    "400": 0.13233961876371164
+                  }
+                },
+                "hue": {
+                  "start": 76,
+                  "end": 91,
+                  "curve": "linear",
+                  "overrides": {
+                    "400": 76.19360010756614
+                  }
+                }
+              },
+              {
+                "name": "blue",
+                "lightness": {
+                  "start": 0.96,
+                  "end": 0.08,
+                  "curve": "ease-out",
+                  "overrides": {
+                    "400": 0.6690470948878066,
+                    "800": 0.34106984901653875
+                  }
+                },
+                "chroma": {
+                  "start": 0.01,
+                  "end": 0.21,
+                  "curve": "ease-in-out",
+                  "overrides": {
+                    "400": 0.1836796020020742,
+                    "800": 0.2359760756535737
+                  }
+                },
+                "hue": {
+                  "start": 218,
+                  "end": 257,
+                  "curve": "linear",
+                  "overrides": {
+                    "400": 248.80661243577464,
+                    "800": 264.20616147762985
+                  }
+                }
+              },
+              {
+                "name": "neutrals",
+                "lightness": {
+                  "start": 0.99,
+                  "end": 0.15,
+                  "curve": "linear",
+                  "overrides": {
+                    "300": 0.89
+                  }
+                },
+                "chroma": {
+                  "start": 0.01,
+                  "end": 0.01,
+                  "curve": "ease-in-out"
+                },
+                "hue": {
+                  "start": 320,
+                  "end": 313,
+                  "curve": "linear"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "theme": {
+      "kind": "regular",
+      "modes": [
+        "orange",
+        "blue"
+      ]
+    },
+    "semantic": {
+      "kind": "regular",
+      "modes": [
+        "default"
+      ]
+    }
+  }
+}
