@@ -1,0 +1,136 @@
+---
+/**
+ * SafetySection — the "SAFETY" scene.
+ *
+ * Single split, 100svh tall:
+ *   LEFT  — title pinned to the top, paragraph vertically centred
+ *           below it.
+ *   RIGHT — placeholder asset.
+ *
+ * A thin vertical rule between the halves frames the split. Blue
+ * theme.
+ */
+
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "blue" } = Astro.props;
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section split scene__layer scene__layer--tilt safety"
+    data-theme={theme}
+  >
+    <!-- LEFT — title top, paragraph vertically centred. -->
+    <div class="safety__text">
+      <SectionTitle lines={["SAFETY"]} />
+      <p class="font-body section-copy safety__copy">
+        Your child is looked after at all times. Nineteen dedicated
+        supervisors on the ground plus eight coaches who are always
+        accessible — for help with learning, with activities, or
+        with anything in between. All staff have extensive
+        experience working with children and are trained to be
+        attentive to individual needs and age group. Camp insurance
+        is included in the price.
+      </p>
+    </div>
+
+    <!-- RIGHT — asset placeholder, vertically centred. -->
+    <div class="safety__media-cell">
+      <div class="safety__media" aria-hidden="true">
+        <span class="safety__media-label">Safety</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  /* Tall, breathing scene — one short paragraph against an asset.
+   * Lock to a single viewport (height: 100svh, not min-height) so
+   * the section is exactly one screen tall regardless of content.
+   * Stretch grid items so the right column's left border (the
+   * vertical divider) runs the full height of the row. */
+  .safety {
+    height: 100svh;
+    align-items: stretch;
+  }
+
+  /* LEFT — flex column. Title pinned to the top via the natural
+   * order; paragraph is pushed to the vertical centre with a
+   * `margin-block: auto` (top auto + bottom auto = centred in the
+   * remaining space below the title). */
+  .safety__text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Vertically centred (margin auto on the block axis), and pushed
+   * to the right of the left column (margin-inline-start: auto)
+   * so the paragraph sits next to the centre divider — same
+   * pattern as the Hotel row in the Venue section. */
+  .safety__copy {
+    margin-block: auto;
+    margin-inline-start: auto;
+    margin-inline-end: 0;
+    max-width: 48ch;
+  }
+
+  /* RIGHT — grid so we can centre + constrain the asset along
+   * both axes. `min-height: 0` lets the cell honour the row's
+   * fixed height (otherwise grid items refuse to shrink below
+   * their content's intrinsic size). */
+  .safety__media-cell {
+    display: grid;
+    place-items: center;
+    min-height: 0;
+    /* `overflow: hidden` is a belt-and-braces clip in case the
+     * asset somehow exceeds the cell bounds — keeps the divider
+     * line clean. */
+    overflow: hidden;
+  }
+
+  /* Asset is sized by HEIGHT first (height: 100% of the cell),
+   * with width derived from the 4/5 aspect ratio. `max-width:
+   * 100%` clamps if the derived width is wider than the cell —
+   * `aspect-ratio` then re-derives the height to match. Either
+   * dimension can be the constraint and the asset stays inside
+   * the cell. */
+  .safety__media {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--foreground) 14%, transparent) 0%,
+        color-mix(in oklab, var(--foreground) 6%, transparent) 100%
+      );
+    display: grid;
+    place-items: center;
+    color: color-mix(in oklab, var(--foreground) 60%, transparent);
+  }
+
+  .safety__media-label {
+    font-family: var(--font-headings);
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    letter-spacing: -0.02em;
+  }
+
+  /* Vertical divider between the halves. Sits on the right cell's
+   * left edge with matching padding so the line reads cleanly down
+   * the centreline. Only meaningful when the split is two-column. */
+  @media (min-width: 768px) {
+    .safety__media-cell {
+      border-inline-start: 1px solid var(--border);
+      padding-inline-start: var(--space-2xl);
+    }
+  }
+</style>

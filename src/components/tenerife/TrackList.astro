@@ -1,0 +1,72 @@
+---
+/**
+ * TrackList — a dark "card" that groups a title + a list of
+ * expandable Course drawers. Used inside TracksSection for the
+ * Beginner and Advanced groups.
+ *
+ *   <TrackList title="Beginner tracks" description="…">
+ *     <Course name="Python" … />
+ *     <Course name="Artificial Intelligence" … />
+ *   </TrackList>
+ *
+ * Uses semantic `--card` / `--card-foreground` so each theme paints
+ * the card in its own chrome (black-on-theme across all three).
+ */
+
+export interface Props {
+  title: string;
+  /** Optional short intro above the list. */
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<section class="track-list">
+  <header class="track-list__header">
+    <h3 class="font-h2 track-list__title">{title}</h3>
+    {description && (
+      <p class="font-body track-list__description">{description}</p>
+    )}
+  </header>
+  <div class="track-list__items">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .track-list {
+    background: var(--card);
+    color: var(--card-foreground);
+    border-radius: 16px;
+    padding: var(--space-xl);
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .track-list__header {
+    display: grid;
+    gap: var(--space-s);
+  }
+
+  .track-list__title,
+  .track-list__description {
+    margin: 0;
+  }
+
+  .track-list__description {
+    opacity: 0.85;
+    max-width: 52ch;
+  }
+
+  .track-list__items {
+    display: grid;
+  }
+
+  /* Drop the top border on the first course so the leading row sits
+   * flush against the header. Uses `:global` to reach into Course's
+   * scoped styles. */
+  .track-list__items :global(.course:first-child) {
+    border-block-start: none;
+  }
+</style>

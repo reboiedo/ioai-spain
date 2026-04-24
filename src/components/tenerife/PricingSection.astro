@@ -1,0 +1,318 @@
+---
+/**
+ * PricingSection — the "PRICING" scene.
+ *
+ * Layout: title + intro on the sticky-ish left half, two ticket-
+ * style cards on the right. One card includes accommodation
+ * (Full pass), the other doesn't (Day pass).
+ *
+ * Each card is a "ticket" — corner brackets, dotted spine on the
+ * outer edge, an asset block in the middle, a feature list, and
+ * a CTA button at the bottom.
+ *
+ * Price values are placeholders — replace with the real numbers
+ * once they're confirmed.
+ */
+
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "orange" } = Astro.props;
+
+interface Tier {
+  variant: "primary" | "secondary";
+  /** Headline statement — the first thing read. */
+  headline: string;
+  price: string;
+  features: string[];
+  cta: { text: string; href: string };
+}
+
+const tiers: Tier[] = [
+  {
+    variant: "primary",
+    headline: "With accommodation",
+    price: "€1,800",
+    features: [
+      "Two-week academic programme",
+      "Full extracurricular schedule",
+      "4-star hotel + all meals",
+      "24-hour supervision + insurance",
+    ],
+    cta: { text: "Apply now", href: "#apply" },
+  },
+  {
+    variant: "secondary",
+    headline: "Without accommodation",
+    price: "€1,200",
+    features: [
+      "Two-week academic programme",
+      "Full extracurricular schedule",
+      "Daily lunch on site",
+      "Accommodation arranged separately",
+    ],
+    cta: { text: "Apply now", href: "#apply" },
+  },
+];
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section scene__layer scene__layer--tilt pricing"
+    data-theme={theme}
+  >
+    <div class="split pricing__grid">
+      <!-- Left: title + intro. -->
+      <div class="pricing__intro">
+        <SectionTitle lines={["PICK YOUR PASS"]} />
+        <p class="font-body section-copy pricing__intro-copy">
+          Two ways in. Both include the full academic programme and
+          the afternoon activities; the Full pass adds accommodation,
+          all meals and round-the-clock supervision. Pick the one
+          that fits your travel plans.
+        </p>
+      </div>
+
+      <!-- Right: two pricing tickets. Headline + price at the top,
+           ticket tear with side notches + dashed rule, feature
+           list, CTA. Four small corner dents complete the
+           ticket-stub look. -->
+      <div class="pricing__tiers">
+        {tiers.map((t) => (
+          <article class={`ticket ticket--${t.variant}`}>
+            <!-- Corner dents (4x), punched out of each corner. -->
+            <span class="ticket__corner ticket__corner--tl" aria-hidden="true"></span>
+            <span class="ticket__corner ticket__corner--tr" aria-hidden="true"></span>
+            <span class="ticket__corner ticket__corner--bl" aria-hidden="true"></span>
+            <span class="ticket__corner ticket__corner--br" aria-hidden="true"></span>
+
+            <div class="ticket__head">
+              <h3 class="font-caption ticket__headline">{t.headline}</h3>
+              <p class="font-display ticket__price">{t.price}</p>
+            </div>
+
+            <!-- Ticket tear — side notches and dashed rule. -->
+            <div class="ticket__tear" aria-hidden="true">
+              <span class="ticket__notch ticket__notch--l"></span>
+              <span class="ticket__notch ticket__notch--r"></span>
+            </div>
+
+            <ul class="ticket__features">
+              {t.features.map((f) => (
+                <li class="font-body-s ticket__feature">{f}</li>
+              ))}
+            </ul>
+
+            <a class="ticket__cta" href={t.cta.href}>
+              <span class="ticket__cta-text">{t.cta.text}</span>
+              <span class="ticket__cta-arrow" aria-hidden="true">→</span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  /* Lock the section to one viewport. The content is compact —
+   * title + intro on the left, two small cards on the right —
+   * so it fits comfortably. */
+  .pricing {
+    min-height: 100svh;
+    align-items: center;
+  }
+
+  .pricing__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+  }
+
+  .pricing__intro-copy {
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .pricing__intro {
+      position: sticky;
+      top: var(--sticky-top);
+      align-self: start;
+    }
+  }
+
+  /* Two tickets side-by-side at ≥768px, stacked on narrow. Max-width
+   * matches the courses list container so the two right-hand content
+   * columns line up visually across the page. */
+  .pricing__tiers {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l);
+    max-width: 680px;
+  }
+
+  @media (min-width: 768px) {
+    .pricing__tiers {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* Ticket card. Relative positioning so the four corner-dent
+   * spans and the side-notch spans can sit on the outer edge.
+   * The cutouts are filled with `--background` (the section's
+   * own colour), so they read as the section punching through
+   * the ticket — works on both the dark primary card and the
+   * orange-surface secondary card.
+   *
+   * The CTA pill draws from the theme's semantic palette:
+   *   - primary tier  → `--primary` / `--primary-foreground`
+   *   - secondary tier → `--secondary` / `--secondary-foreground`
+   * Tweaking those tokens (in `tokens/tenerife/tokens.json`) is
+   * how the colour rolls forward to every button on the page. */
+  .ticket {
+    --ticket-fg: var(--foreground);
+    --ticket-bg: var(--surface);
+    --ticket-border: transparent;
+    --ticket-cta-bg: var(--secondary);
+    --ticket-cta-fg: var(--secondary-foreground);
+
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: var(--space-m);
+    padding: var(--space-l);
+    background: var(--ticket-bg);
+    color: var(--ticket-fg);
+    border: 1px solid var(--ticket-border);
+    border-radius: 12px;
+  }
+
+  .ticket--primary {
+    --ticket-fg: var(--card-foreground);
+    --ticket-bg: var(--card);
+    --ticket-border: transparent;
+    /* Both tickets share the same CTA palette — secondary — so the
+     * primary (dark) card reads as the visual anchor and the button
+     * colour doesn't compete with the card background. */
+    --ticket-cta-bg: var(--secondary);
+    --ticket-cta-fg: var(--secondary-foreground);
+  }
+
+  /* Head — small accommodation label on top, big price below. */
+  .ticket__head {
+    display: grid;
+    gap: var(--space-2xs, 6px);
+  }
+
+  .ticket__headline,
+  .ticket__price {
+    margin: 0;
+  }
+
+  .ticket__headline {
+    opacity: 0.7;
+  }
+
+  .ticket__price {
+    /* Tighten line-height on the display font so the big number
+     * doesn't push the card too tall. */
+    line-height: 1;
+  }
+
+  /* Tear line — dashed rule that spans the *full* ticket width
+   * (escapes the card's padding via negative inline margins) so
+   * it runs edge-to-edge into the side notches. Dashes are drawn
+   * in the section background colour so they read as the section
+   * punching through the ticket. */
+  .ticket__tear {
+    position: relative;
+    height: 0;
+    margin-block: var(--space-s);
+    margin-inline: calc(var(--space-l) * -1);
+    border-block-start: 2px dashed var(--background);
+  }
+
+  .ticket__notch {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--background);
+  }
+
+  .ticket__notch--l { left: 0; transform: translate(-50%, -50%); }
+  .ticket__notch--r { right: 0; transform: translate(50%, -50%); }
+
+  /* Corner dents — four circles, same size as the side notches,
+   * filled with the section background so the ticket looks like
+   * it's been punched through at the corners. */
+  .ticket__corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--background);
+  }
+
+  .ticket__corner--tl { top: 0; left: 0; transform: translate(-50%, -50%); }
+  .ticket__corner--tr { top: 0; right: 0; transform: translate(50%, -50%); }
+  .ticket__corner--bl { bottom: 0; left: 0; transform: translate(-50%, 50%); }
+  .ticket__corner--br { bottom: 0; right: 0; transform: translate(50%, 50%); }
+
+  /* Features — bulleted list, tight typography. */
+  .ticket__features {
+    list-style: disc;
+    padding-inline-start: 1.25em;
+    margin: 0;
+    display: grid;
+    gap: var(--space-2xs, 6px);
+  }
+
+  .ticket__feature {
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  /* CTA — pill button, label centred with arrow on the trailing
+   * edge. `white-space: nowrap` keeps "APPLY NOW" on a single
+   * line at any card width. */
+  .ticket__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-s);
+    padding: var(--space-s) var(--space-l);
+    background: var(--ticket-cta-bg);
+    color: var(--ticket-cta-fg);
+    border-radius: 999px;
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    white-space: nowrap;
+    transition: transform 200ms ease;
+  }
+
+  .ticket__cta:hover {
+    transform: translateY(-1px);
+  }
+
+  .ticket__cta-arrow {
+    display: inline-block;
+    line-height: 1;
+    font-size: 1em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticket__cta {
+      transition: none;
+    }
+  }
+</style>

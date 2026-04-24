@@ -1,0 +1,375 @@
+---
+import TenerifeCampV2Layout from '@/layouts/TenerifeCampV2Layout.astro';
+import HeroTitle from '@/components/tenerife/HeroTitle.astro';
+import SectionTitle from '@/components/tenerife/SectionTitle.astro';
+import HoverShaderImage from '@/components/tenerife/HoverShaderImage.astro';
+import FocusSection from '@/components/tenerife/FocusSection.astro';
+import OverviewSection from '@/components/tenerife/OverviewSection.astro';
+import TeamSection from '@/components/tenerife/TeamSection.astro';
+import TracksSection from '@/components/tenerife/TracksSection.astro';
+import ActivitiesSection from '@/components/tenerife/ActivitiesSection.astro';
+import DayInLifeSection from '@/components/tenerife/DayInLifeSection.astro';
+import VenueSection from '@/components/tenerife/VenueSection.astro';
+import SafetySection from '@/components/tenerife/SafetySection.astro';
+import FaqSection from '@/components/tenerife/FaqSection.astro';
+import PricingSection from '@/components/tenerife/PricingSection.astro';
+---
+
+<!-- Inline early to block native scroll restoration BEFORE the browser
+     applies it. If set later (inside a module script), the browser has
+     already restored scroll and our pins/tilts measure against the
+     wrong position. -->
+<script is:inline>
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+</script>
+
+<TenerifeCampV2Layout
+  title="Tenerife Summer Camp - IOAI Spain"
+  description="An educational summer camp in Tenerife combining IT and math, creative activities, and outdoor adventure."
+>
+  <!-- Hero — full-bleed section with a DisplayTitle that fills the
+       viewport width. `.section` pads inward, nothing inside clamps. -->
+  <div class="scene" data-scene>
+    <section class="section scene__layer hero" data-theme="blue">
+      <div class="stack-l">
+        <HeroTitle>TENERIFE CAMP</HeroTitle>
+        <p class="font-body-l hero__lede">
+          Two weeks of maths, code and ocean — the IOAI Spain training camp on the
+          slopes of Mount Teide.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <FocusSection theme="orange" />
+
+  <OverviewSection theme="yellow" />
+
+  <TracksSection theme="blue" />
+
+  <TeamSection theme="orange" />
+
+  <ActivitiesSection theme="blue" />
+
+  <VenueSection theme="yellow" />
+
+  <SafetySection theme="blue" />
+
+  <DayInLifeSection theme="yellow" />
+
+  <PricingSection theme="orange" />
+
+  <FaqSection theme="blue" />
+
+  <!-- Apply — split: hero "JOIN NOW" on the left, supporting copy
+       and CTA on the right. Same `.split` utility used by every
+       other split-headed section, so the columns line up with the
+       rest of the page. -->
+  <div class="scene">
+    <section class="section split scene__layer scene__layer--tilt apply" data-theme="orange">
+      <div class="apply__title">
+        <HeroTitle>JOIN NOW</HeroTitle>
+      </div>
+      <div class="apply__body stack-l">
+        <p class="font-body-l">
+          Applications open with the national qualifier round in February.
+          Shortlisted students are invited to camp; no separate application
+          is needed.
+        </p>
+      </div>
+    </section>
+  </div>
+
+</TenerifeCampV2Layout>
+
+<style>
+  /* Lock the hero to exactly 100svh — the DisplayTitle's extended
+   * SVG viewBox would otherwise push it past a viewport; we want a
+   * crisp single-screen opening shot. */
+  .hero {
+    height: 100svh;
+    min-height: 100svh; /* overrides .scene__layer's min-height */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-block-end: var(--section-block);
+  }
+
+  .hero__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .hero__title,
+  .hero__lede {
+    margin: 0;
+  }
+
+  .hero__lede {
+    max-width: 48ch;
+    opacity: 0.9;
+  }
+
+  /* Apply — keep the right-hand body vertically centred against
+   * the giant hero title on the left so they read as a balanced
+   * pair rather than top-aligned. */
+  @media (min-width: 768px) {
+    .apply {
+      align-items: center;
+    }
+  }
+
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import Lenis from 'lenis';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Scroll restoration is already disabled in an inline head script
+  // (see top of file). Force scroll to top as a belt-and-braces
+  // fallback in case any restoration slipped through.
+  window.scrollTo(0, 0);
+
+  // iOS Safari address-bar show/hide triggers viewport resizes that
+  // cause ScrollTrigger to refresh and visibly jump pins. Suppress
+  // those minor resizes.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
+  let sceneTriggers: ScrollTrigger[] = [];
+  let tiltTweens: gsap.core.Tween[] = [];
+  let displayAssetTweens: gsap.core.Tween[] = [];
+  let lenis: Lenis | null = null;
+
+  function initLenis() {
+    if (lenis) return;
+    lenis = new Lenis({
+      // Default easing with mild lerp — the "buttery" feel without being
+      // so slow that sticky-reveal transitions feel delayed.
+      lerp: 0.1,
+    });
+
+    // Drive ScrollTrigger updates from Lenis's scroll event so pins
+    // and scroll progress stay in sync with smooth-scrolled position.
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // Run Lenis's RAF from GSAP's ticker so both share one animation
+    // loop. Multiplied by 1000 because GSAP ticker is in seconds,
+    // Lenis expects ms.
+    gsap.ticker.add((time) => {
+      lenis?.raf(time * 1000);
+    });
+
+    // Disable GSAP's lag smoothing — it rounds timing in ways that
+    // fight Lenis's interpolation and produce visible stutter.
+    gsap.ticker.lagSmoothing(0);
+  }
+
+  function initSceneStack() {
+    // Kill any stale triggers (Astro view transitions).
+    sceneTriggers.forEach((t) => t.kill());
+    sceneTriggers = [];
+
+    const scenes = gsap.utils.toArray<HTMLElement>('[data-scene]');
+
+    scenes.forEach((scene) => {
+      const trigger = ScrollTrigger.create({
+        trigger: scene,
+        // `bottom bottom` works for both tall and short scenes:
+        //  - tall scene: user scrolls through content first; pin engages
+        //    only once the bottom of the scene reaches viewport bottom.
+        //  - short/viewport scene: equivalent to `top top` (bottom of a
+        //    viewport-sized scene touches vp bottom as its top enters).
+        start: 'bottom bottom',
+        // Hold the pin for one viewport's worth of scroll — enough for
+        // the next scene (natural DOM sibling) to slide up and cover.
+        end: '+=100%',
+        pin: true,
+        // No reserved space below the pin. The next scene stays at its
+        // natural position and paints over the pinned one as scroll
+        // continues. This is what produces the stack-reveal effect
+        // without any negative margins.
+        pinSpacing: false,
+        // Smooths the first-frame of a pin on mobile.
+        anticipatePin: 1,
+        // Recompute start/end when ScrollTrigger refreshes (resize,
+        // content reflow, late-loading fonts, etc).
+        invalidateOnRefresh: true,
+      });
+      sceneTriggers.push(trigger);
+    });
+
+    // Late-loading content (fonts, images) can change scene heights
+    // after triggers were created. Force one refresh to re-measure.
+    ScrollTrigger.refresh();
+  }
+
+  function initTilts() {
+    tiltTweens.forEach((t) => t.scrollTrigger?.kill());
+    tiltTweens.forEach((t) => t.kill());
+    tiltTweens = [];
+
+    const tiltLayers = gsap.utils.toArray<HTMLElement>('.scene__layer--tilt');
+
+    tiltLayers.forEach((layer) => {
+      // Scroll-scrubbed "entry tilt" matching follow.art: each section
+      // arrives at (15°, responsive xPercent) below the fold, and
+      // scrubs to (0°, 0%) as it scrolls up into place. Once flat, it
+      // stays flat — follow.art does NOT re-tilt sections as the next
+      // one covers them (verified by live-scrubbing their DOM).
+      //
+      // Trigger window: `top bottom` (section's top at viewport
+      // bottom — first frame it appears) to `top top` (section's top
+      // at viewport top — pin engages). That's the full entry.
+      //
+      // `xPercent` is a % of the element's own width. follow.art uses
+      // +8.61% on desktop and −12.82% on mobile — different magnitudes
+      // AND opposite signs. The sign flip is deliberate: with origin
+      // `0 0` a 15° rotation swings the bottom-left corner leftward by
+      // ~26% of element height; desktop can afford to pull the section
+      // rightward (+8.61%) to keep the top-right inside viewport,
+      // while mobile's narrower viewport can't — it lets the bottom
+      // corner overflow further left (−12.82%) instead so the
+      // top-right doesn't shoot past the right edge.
+      //
+      // transform-origin is set in CSS (`.scene__layer--tilt`) to
+      // `0 0` — top-left corner pivot.
+      //
+      // `fromTo` + `immediateRender: true` pre-stages every layer at
+      // its 15° starting pose, so sections below the fold sit tilted
+      // waiting to be scrolled into.
+      const tween = gsap.fromTo(
+        layer,
+        {
+          rotation: 15,
+          xPercent: () => (window.innerWidth >= 768 ? 8.61 : -12.82),
+        },
+        {
+          rotation: 0,
+          xPercent: 0,
+          // `power2.out` (quadratic ease-out, `cubic-bezier(0, 0,
+          // 0.58, 1)`). Reverse-engineered from follow.art's live DOM:
+          // at 42% scroll progress the tween is 66% complete, at 94%
+          // scroll it's 99.6% complete — exact quadratic ease-out
+          // match. Feel: section straightens quickly off the bottom,
+          // then decelerates as it lands at the top. `ease: 'none'`
+          // (our previous value) looks mechanical because it's linear
+          // — the final few degrees land on top of the pin instead of
+          // easing into it.
+          ease: 'power2.out',
+          immediateRender: true,
+          scrollTrigger: {
+            trigger: layer,
+            start: 'top bottom',
+            end: 'top top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
+      tiltTweens.push(tween);
+    });
+
+    // One final refresh so newly-created tilt triggers recalculate
+    // their start/end against current document layout (pins may have
+    // shifted things during init).
+    ScrollTrigger.refresh();
+  }
+
+  /**
+   * initDisplayAssets
+   *
+   * For each `[data-display-asset]` element inside a `.display-block`,
+   * create a scroll-scrubbed animation that brings the asset in over
+   * the title as the user scrolls through the block.
+   *
+   * The asset is positioned by CSS (absolute + centred via its
+   * `.display-block__asset-slot` parent). GSAP owns the transform of
+   * the inner element — starts translated down + scaled down +
+   * transparent, ends at natural position + full scale + opaque. Exact
+   * motion is placeholder-level; later this can be replaced with a
+   * Three.js canvas + shader for proper distortion.
+   *
+   * Trigger window: display-block top enters vp bottom → display-block
+   * reaches the middle of the viewport. That gives the animation ~1.5
+   * viewports of scroll to play out, feeling unhurried.
+   */
+  function initDisplayAssets() {
+    displayAssetTweens.forEach((t) => t.scrollTrigger?.kill());
+    displayAssetTweens.forEach((t) => t.kill());
+    displayAssetTweens = [];
+
+    const assets = gsap.utils.toArray<HTMLElement>('[data-display-asset]');
+
+    assets.forEach((asset) => {
+      const block = asset.closest('.display-block');
+      if (!block) return;
+
+      // Parallax-style reveal: the asset passes continuously through
+      // the viewport from bottom to top as the user scrolls through
+      // the display-block. No scale, no opacity fade — just movement.
+      //
+      // The trigger window spans 'top bottom' → 'bottom top' (~200svh
+      // of scroll), and we translate across a range slightly larger
+      // than the natural centring (~±60vh). Net effect: the asset
+      // moves FASTER than the page, so it feels foreground-parallax
+      // rather than landing-in-place.
+      //
+      // `y` values are computed as functions so they re-evaluate on
+      // resize refresh (vh changes → new travel distance).
+      // Asymmetric parallax: asset enters gently from below, exits
+      // aggressively toward the top. The end value is much larger
+      // than the start so the upward motion is visibly faster than
+      // the downward entry. Tune the `1.6` multiplier if you want
+      // even more exit speed.
+      const tween = gsap.fromTo(
+        asset,
+        { y: () => window.innerHeight * 0.6 },
+        {
+          y: () => -window.innerHeight * 1.6,
+          ease: 'none',
+          immediateRender: true,
+          scrollTrigger: {
+            trigger: block,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
+      displayAssetTweens.push(tween);
+    });
+  }
+
+  function cleanup() {
+    sceneTriggers.forEach((t) => t.kill());
+    sceneTriggers = [];
+    tiltTweens.forEach((t) => t.scrollTrigger?.kill());
+    tiltTweens.forEach((t) => t.kill());
+    tiltTweens = [];
+    displayAssetTweens.forEach((t) => t.scrollTrigger?.kill());
+    displayAssetTweens.forEach((t) => t.kill());
+    displayAssetTweens = [];
+    lenis?.destroy();
+    lenis = null;
+  }
+
+  function init() {
+    initLenis();
+    initSceneStack();
+    initTilts();
+    initDisplayAssets();
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
+  document.addEventListener('astro:before-swap', cleanup);
+</script>

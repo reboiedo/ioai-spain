@@ -1,0 +1,139 @@
+---
+/**
+ * OverviewSection — the "OUR APPROACH" scene.
+ *
+ * Layout: split header on top (title left, sentence right — same
+ * pattern as the Coaches section), then a 3-column grid of
+ * approach items below. No more sticky / asset overlay; the scene
+ * is content-driven.
+ */
+
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "yellow" } = Astro.props;
+
+interface ApproachItem {
+  title: string;
+  body: string;
+}
+
+const items: ApproachItem[] = [
+  {
+    title: "The academics and the summer are both real",
+    body: "The learning program and the extracurricular program are built with equal care. Mornings go deep into AI. Afternoons go to Tenerife's beaches, trails, and historic towns. Neither half is filler, and you don't have to sacrifice one to get the other.",
+  },
+  {
+    title: "Two tracks, one community",
+    body: "Foundations and applied ML run in parallel, plus a team research sprint that cuts across both. Mornings you're in your track; afternoons and evenings the whole cohort is together — meals, labs, problem sets, hikes.",
+  },
+  {
+    title: "The highest level is in the room",
+    body: "Students selected from the IOAI Spain qualifier, taught by researchers who publish at NeurIPS and ICML, with industry mentors from Barcelona's AI labs. Ambition is the baseline.",
+  },
+];
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section scene__layer scene__layer--tilt overview"
+    data-theme={theme}
+  >
+    <div class="overview__layout">
+      <!-- Split header — title left, intro sentence right. Mirrors
+           the Coaches section header exactly. -->
+      <div class="split overview__header">
+        <SectionTitle lines={["APPROACH"]} />
+        <p class="font-body-l section-copy overview__header-copy">
+          Three principles shape how the camp is taught, who's in the
+          room, and how everyone spends their afternoons.
+        </p>
+      </div>
+
+      <!-- 3-column grid with 4 explicit rows (number, media, title,
+           body). Each cell is a subgrid child spanning all 4 rows,
+           so the number / media / title / body baselines line up
+           across the row regardless of how long any individual
+           card's copy is. -->
+      <div class="overview__items">
+        {items.map((item, i) => (
+          <article class="approach-item">
+            <span class="approach-item__num font-caption">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div class="approach-item__media" aria-hidden="true"></div>
+            <h3 class="approach-item__title font-h3">{item.title}</h3>
+            <p class="approach-item__body font-body">{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .overview__layout {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .overview__header-copy {
+    margin: 0;
+  }
+
+  /* 3 columns × 4 explicit rows: number / media / title / body.
+   * The media row uses `1fr` to absorb extra vertical space so
+   * the title + body sit at the same baseline across all cells —
+   * regardless of how long each card's copy is. The remaining
+   * tracks size to content. */
+  .overview__items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto 1fr auto auto;
+    border-block: 1px solid var(--border);
+    min-height: 60svh;
+  }
+
+  /* Each cell is a subgrid child — its 4 direct children
+   * (number, media, title, body) snap onto the parent's row
+   * tracks. Padding goes on the cell so the dividers visually
+   * inset; gap controls the rhythm between the four tracks. */
+  .approach-item {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 4;
+    gap: var(--space-l);
+    padding: var(--space-l);
+  }
+
+  /* Vertical divider between cells. `+ .approach-item` skips the
+   * first cell so only the inner gaps get a line. */
+  .approach-item + .approach-item {
+    border-inline-start: 1px solid var(--border);
+  }
+
+  .approach-item__num {
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  /* Media placeholder — stretches into the `1fr` row, so all three
+   * cells reserve the same vertical space for the illustration that
+   * will eventually drop in here. */
+  .approach-item__media {
+    align-self: stretch;
+  }
+
+  .approach-item__title,
+  .approach-item__body {
+    margin: 0;
+  }
+
+  .approach-item__body {
+    opacity: 0.85;
+  }
+</style>

@@ -1,0 +1,456 @@
+---
+/**
+ * HoverShaderImage — Three.js plane + ShaderMaterial with a
+ * mouse-proximity "bubble" vertex displacement (follow.art pattern,
+ * Landing2GetSeenWebGl). Image is rendered as a subdivided
+ * PlaneGeometry; vertices closer to the cursor get pushed toward the
+ * camera for a smooth, liquid hover effect.
+ *
+ *   <HoverShaderImage src="/path/to.jpg" alt="..." />
+ *
+ * Degrades to an <img> when WebGL is unavailable or JS is disabled.
+ * Disabled on narrow viewports (hover-free touch devices).
+ */
+
+interface Props {
+  src: string;
+  alt?: string;
+  class?: string;
+  aspectRatio?: string;
+  /** CSS selector for the scroll trigger element that drives the
+   *  reveal warp (bend on entry, slide-up on exit). If omitted, the
+   *  image's own wrapper is used. Set to an explicit selector when
+   *  the image lives inside a rotated or otherwise transformed
+   *  ancestor whose bounding rect would give ScrollTrigger unstable
+   *  measurements. Pass `"off"` to disable the warp entirely. */
+  scrollTrigger?: string;
+}
+
+const {
+  src,
+  alt = "",
+  class: className = "",
+  aspectRatio = "3/4",
+  scrollTrigger = "",
+} = Astro.props;
+---
+
+<div
+  class:list={["hover-shader-image", className]}
+  data-hover-shader-src={src}
+  data-hover-shader-trigger={scrollTrigger}
+  style={`aspect-ratio: ${aspectRatio};`}
+>
+  <img src={src} alt={alt} class="hover-shader-image__fallback" />
+  <canvas class="hover-shader-image__canvas" aria-hidden="true"></canvas>
+</div>
+
+<style>
+  /* `:where()` keeps these at zero specificity so consumer classes
+   * (e.g. `.overview__asset` with `position: absolute; width: 60%`)
+   * can override them without needing `!important`. */
+  :where(.hover-shader-image) {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .hover-shader-image__fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hover-shader-image__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  /* When the shader is initialised, hide the fallback <img>. JS adds
+   * `data-hover-shader-ready`. Without JS or WebGL the img stays
+   * visible and the canvas is just an empty transparent layer. */
+  .hover-shader-image[data-hover-shader-ready] .hover-shader-image__fallback {
+    visibility: hidden;
+  }
+</style>
+
+<script>
+  import * as THREE from "three";
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  type Instance = {
+    renderer: THREE.WebGLRenderer;
+    scene: THREE.Scene;
+    camera: THREE.PerspectiveCamera;
+    mesh: THREE.Mesh;
+    mat: THREE.ShaderMaterial;
+    target: THREE.Vector2;
+    lerped: THREE.Vector2;
+    el: HTMLElement;
+    raf: number;
+    ro: ResizeObserver;
+    onMouseMove: (e: MouseEvent) => void;
+    onEnter: () => void;
+    onLeave: () => void;
+    revealTweens: gsap.core.Tween[];
+  };
+
+  const instances = new Map<HTMLElement, Instance>();
+
+  // ── Shaders ──────────────────────────────────────────────────────
+  //
+  // Vertex: two effects stacked.
+  //
+  // 1. REVEAL WARP (bend) — scroll-driven. At ps=0 the plane is
+  //    curled 90° around its horizontal axis (invisible edge-on),
+  //    pushed back by `uRadius` on Z, shifted up by 0.25 world units.
+  //    As ps scrubs to 1, the plane unfurls from bottom to top and
+  //    settles flat + centered. `pe` drives the exit slide (up to
+  //    2.25 units up off-screen).
+  //
+  // 2. MOUSE BUBBLE — hover-driven. Each vertex's NDC distance to
+  //    `uMouse` is smoothstep-falled-off and pushes `pos.z` toward
+  //    the camera. `uStrength` fades the effect in on mouseenter.
+  //
+  // The bend is applied first in local space, then the bubble is
+  // applied after view projection so it reads in screen-space
+  // regardless of how the plane has been warped. This matches
+  // follow.art's ordering.
+  //
+  // `scaleValue` / per-vertex progress stagger is copied verbatim
+  // from follow.art's Landing2GetSeenWebGl — it makes the bottom of
+  // the plane uncurl first.
+  const vertexShader = /* glsl */ `
+    #define PI 3.14159265358979
+    uniform vec2 uMouse;
+    uniform float uStrength;
+    uniform float uProgressStart;
+    uniform float uProgressEnd;
+    uniform float uRadius;
+    varying vec2 vUv;
+
+    float scaleValue(float value, float vMin, float vMax, float tMin, float tMax) {
+      return clamp(
+        tMin + (value - vMin) / (vMax - vMin) * (tMax - tMin),
+        min(tMin, tMax),
+        max(tMin, tMax)
+      );
+    }
+
+    vec4 bend(vec4 coords, float ps, float pe) {
+      float yAnimationOffset = 0.25;
+      float adjustedProgress = ps + (1.0 - coords.y) * yAnimationOffset;
+      if (ps > 0.5) {
+        float endProgressStart = scaleValue(ps, 0.5, 1.0, 0.0, 1.0);
+        adjustedProgress = ps * endProgressStart + adjustedProgress * (1.0 - endProgressStart);
+      }
+      float angle = (1.0 - adjustedProgress) * PI * 0.5;
+      float zOffset = uRadius * (1.0 - cos(angle));
+      float yOffset = (1.0 - ps) * 0.25 + pe * 2.25;
+      vec4 bent = coords;
+      bent.y = bent.y * cos(angle) + yOffset;
+      bent.z = bent.z * sin(angle) - zOffset;
+      return bent;
+    }
+
+    void main() {
+      vUv = uv;
+
+      // 1. Reveal warp in local space
+      vec4 bent = bend(vec4(position, 1.0), uProgressStart, uProgressEnd);
+
+      // 2. World → view → clip for the bubble's screen-space math
+      vec4 world = modelMatrix * bent;
+      vec4 view  = viewMatrix  * world;
+      vec4 clip  = projectionMatrix * view;
+      vec2 ndc   = clip.xy / clip.w;
+
+      float d = length(uMouse - ndc);
+      float bubble = (1.0 - smoothstep(0.0, 0.9, d)) * 0.2 * uStrength;
+      view.z -= bubble;
+
+      gl_Position = projectionMatrix * view;
+    }
+  `;
+
+  // Fragment: textured plane with `object-fit: cover` built in. The
+  // `uCover` vec2 is the UV scale factor that crops the texture to
+  // fit the container aspect without distortion (recomputed on
+  // resize). Without this, landscape images stretched into a
+  // portrait plane would look squeezed.
+  const fragmentShader = /* glsl */ `
+    uniform sampler2D uMap;
+    uniform vec2 uCover;
+    varying vec2 vUv;
+
+    void main() {
+      vec2 uv = (vUv - 0.5) * uCover + 0.5;
+      gl_FragColor = texture2D(uMap, uv);
+    }
+  `;
+
+  // ── Per-element init ─────────────────────────────────────────────
+  function init(el: HTMLElement) {
+    if (instances.has(el)) return;
+    const src = el.dataset.hoverShaderSrc;
+    if (!src) return;
+    const canvas = el.querySelector<HTMLCanvasElement>(
+      ".hover-shader-image__canvas",
+    );
+    if (!canvas) return;
+
+    // Bail on WebGL failure — the <img> fallback stays visible.
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+        premultipliedAlpha: false,
+      });
+    } catch {
+      return;
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    // Perspective camera is required — the vertex displacement only
+    // reads visually because of perspective projection (an ortho
+    // camera would ignore pos.z changes).
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+    camera.position.z = 3;
+
+    // Plane is sized so that at z=0 it exactly fills the camera
+    // frustum (computed from fov and camera distance). `mesh.scale`
+    // stretches to the live aspect ratio on resize.
+    const fovRad = (camera.fov * Math.PI) / 180;
+    const baseHeight = 2 * Math.tan(fovRad / 2) * camera.position.z;
+    const baseWidth = baseHeight;
+
+    // 64×64 subdivisions — dense enough for smooth bubble falloff,
+    // cheap enough to stay at 60fps on an integrated GPU.
+    const geom = new THREE.PlaneGeometry(baseWidth, baseHeight, 64, 64);
+
+    const mat = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        uMap: { value: null },
+        uMouse: { value: new THREE.Vector2(0, 0) },
+        uStrength: { value: 0 },
+        uCover: { value: new THREE.Vector2(1, 1) },
+        // Reveal-warp uniforms. uProgressStart starts at 0 (fully
+        // curled / invisible) and lands at 1 (flat, at rest).
+        // uProgressEnd stays 0 until the section scrolls out, then
+        // ramps to 1 for the exit slide. uRadius = world-space curl
+        // radius; ~1.0 is a natural match for our plane size
+        // (baseHeight ≈ 1.6 in the current camera setup).
+        uProgressStart: { value: 0 },
+        uProgressEnd: { value: 0 },
+        uRadius: { value: 1.0 },
+      },
+      transparent: true,
+    });
+
+    const mesh = new THREE.Mesh(geom, mat);
+    scene.add(mesh);
+
+    // Load texture async. `sRGBColorSpace` matches what the DOM
+    // expects for standard web images — otherwise colours look washed
+    // out relative to the surrounding CSS.
+    const loader = new THREE.TextureLoader();
+    loader.load(src, (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.needsUpdate = true;
+      mat.uniforms.uMap.value = tex;
+      el.setAttribute("data-hover-shader-ready", "");
+      updateCover();
+    });
+
+    const target = new THREE.Vector2(0, 0);
+    const lerped = new THREE.Vector2(0, 0);
+
+    // Recompute: canvas size, camera aspect, plane scale, and the
+    // object-fit-cover UV factor.
+    function updateCover() {
+      const tex = mat.uniforms.uMap.value as THREE.Texture | null;
+      if (!tex || !tex.image) return;
+      const img = tex.image as HTMLImageElement;
+      const containerAspect = camera.aspect;
+      const textureAspect = img.width / img.height;
+      const cover = mat.uniforms.uCover.value as THREE.Vector2;
+      if (textureAspect > containerAspect) {
+        cover.set(containerAspect / textureAspect, 1);
+      } else {
+        cover.set(1, textureAspect / containerAspect);
+      }
+    }
+
+    function resize() {
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      renderer.setSize(rect.width, rect.height, false);
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
+      const visibleHeight =
+        2 * Math.tan(fovRad / 2) * camera.position.z;
+      const visibleWidth = visibleHeight * camera.aspect;
+      mesh.scale.set(visibleWidth / baseWidth, visibleHeight / baseHeight, 1);
+      updateCover();
+    }
+
+    function onMouseMove(e: MouseEvent) {
+      const rect = el.getBoundingClientRect();
+      // Normalise to -1..1 across the container, flip Y (DOM→GL).
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+      target.set(x, y);
+    }
+
+    // Simple rAF tween for the strength fade. Avoids a gsap dep for
+    // one animation; matches the ~400ms feel of follow.art's fade.
+    function animateStrength(to: number, duration = 400) {
+      const start = mat.uniforms.uStrength.value as number;
+      const t0 = performance.now();
+      const step = () => {
+        const t = Math.min(1, (performance.now() - t0) / duration);
+        // Ease-out cubic — gentle landing at the target value.
+        const eased = 1 - Math.pow(1 - t, 3);
+        mat.uniforms.uStrength.value = start + (to - start) * eased;
+        if (t < 1) requestAnimationFrame(step);
+      };
+      step();
+    }
+    const onEnter = () => animateStrength(1);
+    const onLeave = () => animateStrength(0);
+
+    el.addEventListener("mousemove", onMouseMove);
+    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("mouseleave", onLeave);
+
+    // ── Reveal-warp scroll triggers ──────────────────────────────
+    //
+    // Two scrubbed tweens: one drives uProgressStart over the entry
+    // window (section top bottom → top top), the other drives
+    // uProgressEnd over the exit window (bottom bottom → bottom
+    // top). Trigger element is the `scrollTrigger` selector if
+    // provided, else the image wrapper itself.
+    //
+    // Opt-out: pass `scrollTrigger="off"` to skip this entirely.
+    const revealTweens: gsap.core.Tween[] = [];
+    const triggerSel = el.dataset.hoverShaderTrigger ?? "";
+    if (triggerSel !== "off") {
+      const triggerEl =
+        (triggerSel && document.querySelector<HTMLElement>(triggerSel)) ||
+        el;
+      revealTweens.push(
+        gsap.fromTo(
+          mat.uniforms.uProgressStart,
+          { value: 0 },
+          {
+            value: 1,
+            ease: "none",
+            immediateRender: true,
+            scrollTrigger: {
+              trigger: triggerEl,
+              start: "top bottom",
+              end: "top top",
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        ),
+      );
+      revealTweens.push(
+        gsap.fromTo(
+          mat.uniforms.uProgressEnd,
+          { value: 0 },
+          {
+            value: 1,
+            ease: "none",
+            immediateRender: true,
+            scrollTrigger: {
+              trigger: triggerEl,
+              start: "bottom bottom",
+              end: "bottom top",
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        ),
+      );
+    }
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(el);
+    resize();
+
+    // Render loop. `lerped.lerp(target, 0.2)` is the "follow.art
+    // floaty mouse" — a small fraction of the gap closed per frame
+    // gives the liquid lag instead of a hard 1:1 follow.
+    let raf = 0;
+    const render = () => {
+      lerped.lerp(target, 0.2);
+      (mat.uniforms.uMouse.value as THREE.Vector2).copy(lerped);
+      renderer.render(scene, camera);
+      raf = requestAnimationFrame(render);
+    };
+    render();
+
+    instances.set(el, {
+      renderer,
+      scene,
+      camera,
+      mesh,
+      mat,
+      target,
+      lerped,
+      el,
+      raf,
+      ro,
+      onMouseMove,
+      onEnter,
+      onLeave,
+      revealTweens,
+    });
+  }
+
+  function destroy(el: HTMLElement) {
+    const inst = instances.get(el);
+    if (!inst) return;
+    cancelAnimationFrame(inst.raf);
+    inst.ro.disconnect();
+    inst.el.removeEventListener("mousemove", inst.onMouseMove);
+    inst.el.removeEventListener("mouseenter", inst.onEnter);
+    inst.el.removeEventListener("mouseleave", inst.onLeave);
+    inst.revealTweens.forEach((t) => {
+      t.scrollTrigger?.kill();
+      t.kill();
+    });
+    (inst.mat.uniforms.uMap.value as THREE.Texture | null)?.dispose();
+    inst.mesh.geometry.dispose();
+    inst.mat.dispose();
+    inst.renderer.dispose();
+    inst.el.removeAttribute("data-hover-shader-ready");
+    instances.delete(el);
+  }
+
+  function initAll() {
+    document
+      .querySelectorAll<HTMLElement>(".hover-shader-image")
+      .forEach(init);
+  }
+  function destroyAll() {
+    [...instances.keys()].forEach(destroy);
+  }
+
+  initAll();
+  document.addEventListener("astro:page-load", initAll);
+  document.addEventListener("astro:before-swap", destroyAll);
+</script>

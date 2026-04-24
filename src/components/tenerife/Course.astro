@@ -1,0 +1,244 @@
+---
+/**
+ * Course — a single course drawer row. Renders as a native
+ * `<details>` so it works without JS and stays accessible.
+ *
+ * Used inside `TrackList.astro` (Beginner / Advanced cards in
+ * TracksSection). The parent list is responsible for the card
+ * chrome (background, padding, rounded corners); Course only owns
+ * the row itself — a name summary with an expand icon, and an
+ * expandable body with description + outcomes.
+ *
+ *   <Course
+ *     name="Python"
+ *     description="No experience needed — …"
+ *     outcomes="A working Python program, …"
+ *   />
+ */
+
+export interface Props {
+  name: string;
+  description: string;
+  outcomes: string;
+  /** Small label above the outcomes paragraph. Defaults to "You'll leave with". */
+  outcomesLabel?: string;
+  /**
+   * Exclusive-accordion group. When multiple Courses share the same
+   * `group`, opening one closes the others — native browser behavior
+   * via the `<details name>` attribute (Chromium 120+, Safari 17.2+,
+   * Firefox 129+). Defaults to "tracks" so every Course on the
+   * Tenerife page participates in one group out of the box.
+   */
+  group?: string;
+}
+
+const {
+  name,
+  description,
+  outcomes,
+  outcomesLabel = "You'll leave with",
+  group = "tracks",
+} = Astro.props;
+---
+
+<details class="course" name={group}>
+  <summary class="course__summary">
+    <span class="font-h4 course__name">{name}</span>
+    <span class="course__icon" aria-hidden="true"></span>
+  </summary>
+  <div class="course__body-wrap">
+    <div class="course__body">
+      <p class="font-body-s course__description">{description}</p>
+      <p class="font-caption course__outcomes-label">{outcomesLabel}</p>
+      <p class="font-body-s course__outcomes">{outcomes}</p>
+    </div>
+  </div>
+</details>
+
+<style>
+  .course {
+    /* Border on top so adjacent courses read as a list. Parent drops
+     * the border on `:first-child` so the first row sits flush. */
+    border-block-start: 1px solid
+      color-mix(in oklab, var(--card-foreground) 20%, transparent);
+  }
+
+  .course__summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding-block: var(--space-m);
+    /* Keep the native marker out — we draw our own `+` / `×`. */
+  }
+
+  .course__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .course__name {
+    /* font-h4 comes from the class, but reset margin in case the
+     * surrounding flow ever wraps this in an <h…> element. */
+    margin: 0;
+  }
+
+  .course__icon {
+    position: relative;
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Two-line plus, rotated to × when open. A single pseudo-element
+   * for each line so the transition is clean (transforms only). */
+  .course__icon::before,
+  .course__icon::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1.5px;
+    background: currentColor;
+    transform-origin: center;
+    transition: transform 0.2s ease;
+  }
+
+  .course__icon::after {
+    transform: rotate(90deg);
+  }
+
+  .course[open] .course__icon::before {
+    transform: rotate(45deg);
+  }
+
+  .course[open] .course__icon::after {
+    transform: rotate(-45deg);
+  }
+
+  /* Body wrapper.
+   *
+   * The UA stylesheet hides non-summary children of a closed
+   * <details> — we override that so the wrapper stays in flow
+   * and the `grid-template-rows: 0fr → 1fr` height animation can
+   * actually run. Plain CSS transition; no JS needed for the
+   * open/close motion (Flip was producing weird "text flying in
+   * from the corner" artefacts because it interpolates layout
+   * positions and the body's natural pre-open position is
+   * collapsed at 0 height).
+   *
+   * Native `<details name="tracks">` still drives the exclusive
+   * accordion behaviour — opening one closes the others. */
+  .course:not([open]) .course__body-wrap,
+  .course__body-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+
+  .course[open] .course__body-wrap {
+    grid-template-rows: 1fr;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .course:not([open]) .course__body-wrap,
+    .course__body-wrap {
+      transition: none;
+    }
+  }
+
+  .course__body {
+    overflow: hidden;
+    min-height: 0;
+    display: grid;
+    gap: var(--space-xs);
+    padding-block: 0 var(--space-l);
+    /* Indent the body slightly so it visually hangs off the name
+     * rather than the card edge. */
+    padding-inline-end: var(--space-l);
+  }
+
+  .course__description,
+  .course__outcomes-label,
+  .course__outcomes {
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  .course__description {
+    opacity: 0.9;
+  }
+
+  .course__outcomes-label {
+    margin-top: var(--space-xs);
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .course__outcomes {
+    opacity: 0.9;
+  }
+</style>
+
+<!--
+  Scroll-reserve.
+
+  Each scene gets a 1-viewport pin (see `initSceneStack` in the
+  page). When a Course drawer opens, the scene grows past that pin
+  and the next scene clips into the open body. We can't call
+  `ScrollTrigger.refresh()` on toggle — it destabilises every
+  prior pin/tilt — so instead we reserve trailing scroll room
+  *up front*, equal to the tallest possible drawer body. The
+  scene's measured height is then stable from mount, ScrollTrigger
+  measures it once correctly, and any drawer can open without
+  clipping.
+
+  Cost: a bit of empty space below the closed list. Acceptable
+  trade vs the tilt-breaking refresh, and unnoticeable next to
+  the scene's own padding.
+-->
+<script>
+  const DEBOUNCE_MS = 150;
+
+  function applyReserve() {
+    const bodies = document.querySelectorAll<HTMLElement>('.course .course__body');
+    let max = 0;
+    bodies.forEach((b) => {
+      if (b.scrollHeight > max) max = b.scrollHeight;
+    });
+    document.querySelectorAll<HTMLElement>('.tracks__lists').forEach((list) => {
+      list.style.setProperty('--tracks-extra', `${max}px`);
+    });
+  }
+
+  function install() {
+    if ((window as any).__coursesHooked) return;
+    (window as any).__coursesHooked = true;
+
+    applyReserve();
+
+    // Text reflows at different widths, so the tallest body might
+    // be a different course at mobile vs desktop. Debounced resize
+    // listener re-computes the reserve.
+    let resizeTimer: number | null = null;
+    window.addEventListener('resize', () => {
+      if (resizeTimer !== null) clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        resizeTimer = null;
+        applyReserve();
+      }, DEBOUNCE_MS);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', install, { once: true });
+  } else {
+    install();
+  }
+  document.addEventListener('astro:page-load', () => {
+    (window as any).__coursesHooked = false;
+    install();
+  });
+</script>
+

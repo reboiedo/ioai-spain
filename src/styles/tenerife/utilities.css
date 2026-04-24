@@ -1,0 +1,258 @@
+/* Tenerife camp — layout utilities
+ *
+ * Hand-authored primitives that consume generated tokens. Typography
+ * utilities (.font-*) are generated from semantic.font.* composites
+ * — see tokens.css.
+ *
+ * ── The section model ──────────────────────────────────────────────
+ *
+ * Sections are **edge-to-edge** — horizontal padding comes from the
+ * `--section-inline` token, no inner max-width container clamps the
+ * content.
+ *
+ * Two composition patterns:
+ *
+ * A) Full-width display title on top, split content below.
+ *    The DisplayTitle scales to fill the section's inner width.
+ *
+ *    <section class="section">
+ *      <DisplayTitle>EXTRACURRICULARS</DisplayTitle>
+ *      <div class="split">
+ *        <div>…left half…</div>
+ *        <div>…right half…</div>
+ *      </div>
+ *    </section>
+ *
+ * B) Split-only, fixed-size titles inside each half.
+ *    Use `.font-display-l` (or `.font-display`) for the titles —
+ *    they don't auto-scale.
+ *
+ *    <section class="section split">
+ *      <div>
+ *        <h2 class="font-display-l">Meet the team</h2>
+ *        <p>…</p>
+ *      </div>
+ *      <div>…right half…</div>
+ *    </section>
+ *
+ * Rule of thumb: use `<DisplayTitle>` for hero-style moments where the
+ * title dominates the viewport. Use `.font-display-l` for section
+ * headings inside split halves or other contained areas.
+ */
+
+/* Shared layout constants.
+ *   `--nav-height`  — the fixed v2 nav bar is 80px tall. All section
+ *                    paddings and sticky offsets reference this so any
+ *                    future change to the nav height propagates cleanly.
+ *   `--sticky-top`  — canonical top offset for `position: sticky` content
+ *                    across sections (titles, columns). Keeps the sticky
+ *                    element clear of the nav, with a consistent gap. */
+:root {
+  --nav-height: 80px;
+  --sticky-top: calc(var(--nav-height) + var(--space-m));
+}
+
+.section {
+  /* Extra top padding to account for the fixed nav — titles landing at
+   * viewport top otherwise end up clipped behind it. */
+  padding-block-start: calc(var(--section-block) + var(--nav-height));
+  padding-block-end: var(--section-block);
+  padding-inline: var(--section-inline);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Two-column split utility. Apply to a section (or any container) to
+ * divide it into halves. Direct children become the halves — no wrapper
+ * needed. Collapses to a single column on narrow viewports. */
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .split {
+    /* minmax(0, 1fr) — keep tracks shrinkable so nowrap content
+     * doesn't force the section wider than the viewport. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+}
+
+/* Legacy container classes — kept as no-op aliases so existing markup
+ * still works while we migrate. They do not clamp width any more. */
+.container,
+.container-narrow,
+.container-full {
+  width: 100%;
+}
+
+/* ── Section copy ─────────────────────────────────────────────────
+ *
+ * Shared paragraph utility for the supporting copy that sits beside
+ * a SectionTitle (usually in the left half of a `.split`). Caps
+ * measure at 600px so long runs of body text don't stretch into
+ * unreadable wide lines. Apply directly to a <p> — no wrapper:
+ *
+ *   <div class="stack-m">
+ *     <SectionTitle lines={["COACHES"]} />
+ *     <p class="font-body section-copy">Every track is led by…</p>
+ *   </div>
+ *
+ * Opacity is pulled back slightly so the paragraph sits visually
+ * below the title without competing with it.
+ */
+.section-copy {
+  max-width: 600px;
+  opacity: 0.85;
+}
+
+/* ── Display-block: a "title moment" inside a section ─────────────
+ *
+ * A block that hosts the eyebrow + <DisplayTitle> at the top of a
+ * section, with optional overlaid animated asset. Content-sized; the
+ * block's own height is just what the title needs. Bottom padding
+ * gives breathing room before whatever follows (usually a `.split`).
+ *
+ *   <section class="section">
+ *     <div class="display-block">
+ *       <div class="stack-m">
+ *         <p class="font-caption">Venue</p>
+ *         <DisplayTitle>NORTH COAST</DisplayTitle>
+ *       </div>
+ *       <div class="display-block__asset-slot">
+ *         <div class="display-block__asset" data-display-asset>
+ *           <div class="asset-frame">…</div>
+ *         </div>
+ *       </div>
+ *     </div>
+ *     <div class="split">…</div>
+ *   </section>
+ *
+ * The `[data-display-asset]` element is picked up by JS (see
+ * `initDisplayAssets` in tenerife-camp.astro) and scroll-scrubbed via
+ * a parallax translate. Three.js can later replace the asset's inner
+ * content for shader-driven distortion. */
+.display-block {
+  position: relative; /* containing block for the absolute asset */
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start; /* title anchors to the top */
+  gap: var(--space-2xl);
+  padding-block-end: var(--space-4xl);
+}
+
+/* Overlaid asset — pinned to the centre of the display-block, does
+ * not participate in the grid flow. Two-layer structure so CSS
+ * handles the static centring and GSAP owns the scroll-linked
+ * transforms on the inner element without conflicting. */
+.display-block__asset-slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(60vw, 760px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.display-block__asset {
+  /* Inner element — GSAP writes transform + opacity here. */
+  will-change: transform, opacity;
+}
+
+/* Asset frame — a placeholder for images / embeds. Swap the inner
+ * contents for an <img>, <video>, or WebGL canvas when content
+ * lands. */
+.asset-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--foreground) 12%, transparent) 0%,
+      color-mix(in oklab, var(--foreground) 4%, transparent) 100%);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+}
+
+.asset-frame__caption {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  opacity: 0.5;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Common content-flow helpers.
+ *
+ * `grid-template-columns: minmax(0, 1fr)` is the crucial bit. Default
+ * grid track sizing resolves to min-content, which for a `white-space:
+ * nowrap` child is the full text width — that would blow up the stack's
+ * width when DisplayTitle is rendered at its fallback font-size before
+ * JS has fitted it. `minmax(0, 1fr)` forces the track to be shrinkable
+ * so children can't force the parent wider than the intended column. */
+
+.stack-s  { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-s); }
+.stack-m  { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-m); }
+.stack-l  { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-l); }
+.stack-xl { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
+
+/* ──────────────────────────────────────────────────────────────────
+ * Stacked section reveal — GSAP ScrollTrigger driven.
+ *
+ * Scenes opting into the stack-reveal via `[data-scene]` are pinned by
+ * JS with `pinSpacing: false`, so subsequent scenes naturally paint
+ * over them during the reveal window. No negative margins, no spacer
+ * pseudo-elements, no sticky positioning — content of any height
+ * scrolls through naturally first, then pins for the reveal.
+ *
+ * Without JS, the page degrades to a plain stack of sections — fully
+ * readable, just without the overlay effect.
+ *
+ *   <div class="scene" data-scene>
+ *     <section class="section scene__layer" data-theme="blue">…</section>
+ *   </div>
+ *
+ * The last scene should omit `data-scene` — nothing needs to reveal
+ * over it.
+ * ────────────────────────────────────────────────────────────────── */
+
+.scene {
+  position: relative;
+}
+
+/* Every scene layer is at least viewport-tall. This is a hard requirement
+ * of the pin-and-reveal pattern: when a short scene is pinned, its bottom
+ * must be at the viewport bottom, which means pin engages with the scene
+ * occupying only the lower portion of the viewport — a split-screen effect
+ * with the previous pinned scene still visible above. Enforcing 100svh
+ * min-height means every pin lands with `top: 0`, filling the viewport,
+ * and the next scene covers cleanly on scroll. Tall content is unaffected
+ * — min-height is a floor, not a ceiling. */
+.scene__layer {
+  min-height: 100svh;
+}
+
+/* Tilt/warp opt-in marker.
+ *
+ * The rotation + translateX are scroll-linked by JS (see `initTilts()`
+ * in tenerife-camp.astro). GSAP scrubs from (15°, responsive translateX)
+ * → (0°, 0) between the scene entering the viewport (`top bottom`) and
+ * reaching the viewport top (`top top`). The section is leaning while
+ * below, lands flat at the top.
+ *
+ * `transform-origin: 0 0` — top-left corner pivot. Clockwise rotation
+ * about this point swings the section's bottom-left arc out to the
+ * left and the top-right down into the viewport (the scroll-driven
+ * translateX compensates so the rotated box stays framed at each
+ * breakpoint). Values and origin reverse-engineered from follow.art. */
+.scene__layer--tilt {
+  transform-origin: 0 0;
+}

@@ -1,0 +1,176 @@
+---
+/**
+ * TeamSection — the "COACHES" scene.
+ *
+ * Layout: title + intro on top, two rows of 4 coach cards below.
+ * As the user scrolls vertically past the section, the two rows
+ * translate in opposite Y directions — row 1 drifts upward, row 2
+ * drifts downward — producing a subtle counter-parallax reveal.
+ *
+ * Participates in the scene stack (`data-scene`) and tilt entry
+ * (`scene__layer--tilt`) like every other scene on the page.
+ */
+
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import TeamCard from "@/components/tenerife/TeamCard.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "orange" } = Astro.props;
+
+interface Member {
+  initials: string;
+  name: string;
+  role?: string;
+  bio: string;
+}
+
+const members: Member[] = [
+  {
+    initials: "VA",
+    name: "Vladimir Arkhipov",
+    role: "10+ ML competitions won",
+    bio: "Vladimir has won over 10 machine learning competitions and hackathons, and helped design the final round of the national AI olympiad. He spent time as an ML Engineer at PIK Digital before moving into teaching, where he's been helping students crack AI for over two years.",
+  },
+  {
+    initials: "AL",
+    name: "Alberto Leyva Guerra",
+    role: "3× IOI finalist",
+    bio: "Alberto represented his country at the International Olympiad in Informatics (IOI) — the world championship of competitive programming — three years in a row. He earned medals at the Ibero-American computing competition across all three years, and holds Candidate Master rank on Codeforces, a global platform where only the top few percent of competitive programmers reach that level.",
+  },
+  {
+    initials: "AS",
+    name: "Artem Seleznev",
+    role: "2025 IOAI team mentor",
+    bio: "Artem is a research engineer at AIRI, one of the top AI research institutes in the field. He's won the National Technology AI Olympiad and the AI Challenge twice (2023 and 2024), and was chosen to mentor the national-level team at the 2025 International Olympiad in Artificial Intelligence — the global championship for AI students. He's also spoken at major tech events including Skolkovo.",
+  },
+  {
+    initials: "AP",
+    name: "Artem Plotkin",
+    role: "PhD, Computational Maths",
+    bio: "Artem is a software engineer and mathematician with industry experience at Yandex, currently completing a PhD in Computational Mathematics. He coaches competitive programming teams at ICPC and IOI level — two of the most prestigious competitions in the field — and teaches algorithms and nonlinear programming. His own competitive record speaks for itself: 1st place at the 2018 International Data Analysis Olympiad and 5th place at the 2024 CodeRun Backend Championship.",
+  },
+  {
+    initials: "IZ",
+    name: "Ivan Zagorulko",
+    role: "3× AI Challenge winner",
+    bio: "Ivan is a research engineer at AIRI and a three-time winner of the AI Challenge (2022, 2023, 2024). He mentored the national-level team at the 2025 International Olympiad in AI, and recently published a research paper accepted at AAAI — one of the most prestigious conferences in the field.",
+  },
+  {
+    initials: "IM",
+    name: "Ilia Mogilev",
+    role: "10,000+ CS teachers trained",
+    bio: "Ilia has spent 8+ years designing education programs at scale. He's built over 50 learning products, trained more than 10,000 CS teachers nationwide, developed curriculum content for Yandex, and created materials for Hour of Code Kazakhstan that reached 20,000+ students. He also ran a nationwide AI hackathon for 8,000 schoolchildren.",
+  },
+  {
+    initials: "OM",
+    name: "Ogabek Masharipov",
+    role: "Algorithms lecturer",
+    bio: "Ogabek has taught Computer Science and Robotics at both school and university level across Europe. He's a lecturer in Algorithms and Data Structures at a leading state university, and has taught the IB Computer Science curriculum at a top international gymnasium. His focus is on building structured, efficient lessons that actually stick.",
+  },
+  {
+    initials: "AV",
+    name: "Anier Velasco Sotomayor",
+    role: "Contributor, Cohere Aya",
+    bio: "Anier is a researcher and educator specialising in the theory behind machine learning. He studied Computer Science and Data Science at Harbour.Space University, won a gold medal at the National Olympiad in Informatics, and has contributed to Aya — an open-source multilingual AI project backed by Cohere for AI, involving researchers from over 100 countries.",
+  },
+];
+
+// Split the members 4/4 into two rows. Keeping the halves symmetrical
+// makes the opposing-Y parallax read as a balanced pair rather than a
+// lopsided drift.
+const rowA = members.slice(0, 4);
+const rowB = members.slice(4, 8);
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section scene__layer scene__layer--tilt team"
+    data-theme={theme}
+  >
+    <div class="team__layout">
+      <!-- Title left, intro paragraph right. Uses the shared
+           `.split` utility so the 50/50 alignment matches every
+           other split-headed section on the page. -->
+      <div class="split team__header">
+        <SectionTitle lines={["COACHES"]} />
+        <p class="font-body section-copy team__header-copy">
+          Every track is led by someone who works in the field, not just
+          teaches it. The team includes research engineers from leading
+          AI institutes, competitive programming coaches, olympiad
+          winners, PhD researchers, and industry professionals with
+          experience at major tech companies. Several instructors have
+          coached or competed at international level themselves.
+        </p>
+      </div>
+
+      <!-- Two rows, four cards each. Each row is its own grid with
+           4 columns × 4 subgrid rows (portrait, name, role, bio), so
+           every card in a row shares its baselines with its siblings. -->
+      <div class="team__rows">
+        <div class="team__row">
+          {rowA.map((m) => (
+            <TeamCard
+              initials={m.initials}
+              name={m.name}
+              role={m.role}
+              bio={m.bio}
+            />
+          ))}
+        </div>
+        <div class="team__row">
+          {rowB.map((m) => (
+            <TeamCard
+              initials={m.initials}
+              name={m.name}
+              role={m.role}
+              bio={m.bio}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .team__layout {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .team__header-copy {
+    margin: 0;
+  }
+
+  /* Two stacked rows. */
+  .team__rows {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  /* Each row is a 4-column grid. Cards keep their own internal
+   * layout (see TeamCard). Alignment across cards is handled by
+   * deterministic `min-height` on the name (2lh) and role (1lh)
+   * tracks, which keeps siblings lined up without subgrid — and
+   * crucially lets one card hide its portrait in the expanded
+   * state without leaving a hole where a subgrid track would be. */
+  .team__row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--space-l);
+    row-gap: var(--space-l);
+    align-items: start;
+  }
+
+  /* Under 768px, 4-up is too cramped. Drop to 2 columns. */
+  @media (max-width: 767.98px) {
+    .team__row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
+

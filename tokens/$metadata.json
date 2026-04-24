@@ -130,7 +130,7 @@
               {
                 "chroma": {
                   "curve": "linear",
-                  "end": 0.14,
+                  "end": 0.17,
                   "overrides": {
                     "500": 0.19399990058247113
                   },
@@ -158,25 +158,25 @@
               {
                 "chroma": {
                   "curve": "ease-in-out",
-                  "end": 0.15,
+                  "end": 0.18,
                   "overrides": {
-                    "400": 0.14
+                    "400": 0.13233961876371164
                   },
                   "start": 0.03
                 },
                 "hue": {
                   "curve": "linear",
-                  "end": 77,
+                  "end": 91,
                   "overrides": {
-                    "400": 77
+                    "400": 76.19360010756614
                   },
-                  "start": 85
+                  "start": 76
                 },
                 "lightness": {
                   "curve": "ease-out",
-                  "end": 0.18,
+                  "end": 0.16,
                   "overrides": {
-                    "400": 0.81
+                    "400": 0.8117721889950588
                   },
                   "start": 0.98
                 },
@@ -270,19 +270,19 @@
       "modes": [
         "orange",
         "blue",
-        "yellow"
+        "neutral"
       ]
     }
   },
   "designSystem": {
     "name": "Tenerife Camp"
   },
-  "generatedAt": "2026-04-24T13:14:43.870Z",
+  "generatedAt": "2026-04-17T12:09:25.751Z",
   "modes": [
     "default",
     "orange",
     "blue",
-    "yellow"
+    "neutral"
   ],
   "version": "1.0.0"
 }

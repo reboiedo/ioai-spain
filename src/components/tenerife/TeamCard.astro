@@ -1,0 +1,276 @@
+---
+/**
+ * TeamCard — a coach cell whose picture area doubles as a bio panel.
+ *
+ *   - collapsed: square portrait at the top, name (always 2 lines),
+ *     role (always 1 line). No bio visible — the card stays short.
+ *   - expanded: the same square area swaps the portrait for the bio
+ *     text. Name and role stay put. Nothing else on the card moves.
+ *
+ * Only the square face animates between states (portrait → bio).
+ * Card outer dimensions are identical in both states, so every
+ * sibling card holds its position on click.
+ *
+ *   <TeamCard initials="VA" name="Vladimir Arkhipov" bio="…" />
+ */
+
+export interface Props {
+  initials: string;
+  name: string;
+  role?: string;
+  bio: string;
+}
+
+const { initials, name, role, bio } = Astro.props;
+
+/*
+ * Split the name into the first token and the remainder so the
+ * display always hard-wraps after the first name. That gives every
+ * card a two-line name regardless of column width — no reliance on
+ * natural wrap, no risk of "Ivan Zagorulko" sitting on one line
+ * while "Alberto Leyva Guerra" sits on three.
+ */
+const spaceIndex = name.indexOf(" ");
+const nameFirst = spaceIndex === -1 ? name : name.slice(0, spaceIndex);
+const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
+---
+
+<button class="team-card" type="button" aria-expanded="false" data-team-card>
+  <!-- The square face — both portrait and bio layer here, absolutely
+       positioned, swapped on click. The container owns the 1:1 box.
+       The corner signifier (plus/x) lives on top of both layers so
+       it's always visible. -->
+  <div class="team-card__face">
+    <div class="team-card__portrait" data-initials={initials} data-team-portrait></div>
+    <div class="team-card__bio" data-team-bio>
+      <p class="font-body-s team-card__bio-text">{bio}</p>
+    </div>
+    <span class="team-card__cue" aria-hidden="true"></span>
+  </div>
+
+  <h3 class="font-h3 team-card__name">
+    <span class="team-card__name-line">{nameFirst}</span>
+    <span class="team-card__name-line">{nameRest || "\u00A0"}</span>
+  </h3>
+  <p class="font-caption team-card__role">{role ?? ""}</p>
+</button>
+
+<style>
+  .team-card {
+    /* Button reset so the whole cell is one click target without
+     * the default UA chrome. */
+    appearance: none;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+
+    display: grid;
+    gap: var(--space-s);
+  }
+
+  .team-card:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 4px;
+  }
+
+  /* Square face — the swapping surface. Portrait and bio stack
+   * inside via `position: absolute`, so toggling which one is
+   * visible can't change the card's height. */
+  .team-card__face {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 4px;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--foreground) 10%, transparent);
+  }
+
+  .team-card__portrait,
+  .team-card__bio {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Portrait layer. Initials are placeholder content until real
+   * photography lands. */
+  .team-card__portrait {
+    display: grid;
+    place-items: center;
+  }
+
+  .team-card__portrait::after {
+    content: attr(data-initials);
+    font-family: var(--font-headings);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    letter-spacing: -0.02em;
+    color: color-mix(in oklab, var(--foreground) 55%, transparent);
+  }
+
+  /* Bio layer. Long bios are allowed to scroll inside the square
+   * so the card never grows. `overscroll-behavior: contain` keeps
+   * that scroll from bubbling to the page when we're reading a
+   * card's full bio. */
+  .team-card__bio {
+    padding: var(--space-m);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .team-card__bio-text {
+    margin: 0;
+  }
+
+  /* Corner signifier — a two-line plus that rotates into an × when
+   * the card is expanded. Lives above both layers so it's always
+   * visible. Purely decorative; the whole card is the hit target. */
+  .team-card__cue {
+    position: absolute;
+    top: var(--space-s);
+    right: var(--space-s);
+    width: 1.25rem;
+    height: 1.25rem;
+    pointer-events: none;
+    color: color-mix(in oklab, var(--foreground) 75%, transparent);
+  }
+
+  .team-card__cue::before,
+  .team-card__cue::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1.5px;
+    background: currentColor;
+    transform-origin: center;
+    transition: transform 220ms ease;
+  }
+
+  .team-card__cue::after {
+    transform: rotate(90deg);
+  }
+
+  .team-card[aria-expanded="true"] .team-card__cue::before {
+    transform: rotate(45deg);
+  }
+
+  .team-card[aria-expanded="true"] .team-card__cue::after {
+    transform: rotate(-45deg);
+  }
+
+  /* Cue colour flips to card-foreground contrast when the bio
+   * layer is showing (bio panel uses the card's background tint). */
+  .team-card[aria-expanded="true"] .team-card__cue {
+    color: var(--foreground);
+  }
+
+  /* Expanded state — swap the two layers' visibility. The actual
+   * crossfade is driven by GSAP in the <script> below so we can
+   * control the timing / easing centrally; these rules are the
+   * resting end-states for each side. */
+  .team-card[aria-expanded="true"] .team-card__portrait {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .team-card[aria-expanded="true"] .team-card__bio {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Name — always two lines. Each `.team-card__name-line` is a
+   * block-level span, and the template hard-splits the string at
+   * the first space so `Ivan` / `Zagorulko` stacks reliably no
+   * matter how wide the column is. If a card has only a single-
+   * word name the second span renders a non-breaking space so the
+   * 2-line height is still reserved. */
+  .team-card__name {
+    margin: 0;
+  }
+
+  .team-card__name-line {
+    display: block;
+  }
+
+  /* Role — always 1 line of reserved space, even when absent. */
+  .team-card__role {
+    margin: 0;
+    opacity: 0.7;
+    min-height: 1lh;
+  }
+</style>
+
+<script>
+  /**
+   * Crossfade the square face between portrait and bio on click.
+   *
+   * The card's outer dimensions never change, so no Flip is
+   * needed — a simple opacity + subtle scale tween on the two
+   * absolutely-positioned layers. One delegated listener covers
+   * every card and survives Astro view transitions.
+   */
+  import { gsap } from 'gsap';
+
+  function install() {
+    if ((window as any).__teamCardHooked) return;
+    (window as any).__teamCardHooked = true;
+
+    document.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement | null)?.closest<HTMLButtonElement>(
+        '[data-team-card]',
+      );
+      if (!card) return;
+
+      const portrait = card.querySelector<HTMLElement>('[data-team-portrait]');
+      const bio = card.querySelector<HTMLElement>('[data-team-bio]');
+      if (!portrait || !bio) return;
+
+      const isOpen = card.getAttribute('aria-expanded') === 'true';
+      const willOpen = !isOpen;
+      card.setAttribute('aria-expanded', String(willOpen));
+
+      const [entering, leaving] = willOpen ? [bio, portrait] : [portrait, bio];
+
+      // Kill any in-flight tween on the same layers so rapid clicks
+      // don't stack animations.
+      gsap.killTweensOf([entering, leaving]);
+
+      gsap
+        .timeline()
+        .to(leaving, {
+          opacity: 0,
+          scale: 0.96,
+          duration: 0.25,
+          ease: 'power2.in',
+        })
+        .fromTo(
+          entering,
+          { opacity: 0, scale: 1.04 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.3,
+            ease: 'power2.out',
+            clearProps: 'scale',
+          },
+          '-=0.1',
+        );
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', install, { once: true });
+  } else {
+    install();
+  }
+  document.addEventListener('astro:page-load', () => {
+    (window as any).__teamCardHooked = false;
+    install();
+  });
+</script>

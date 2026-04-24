@@ -1,0 +1,605 @@
+---
+/**
+ * ActivitiesSection — the "ACTIVITIES" scene.
+ *
+ * Layout: split column.
+ *   LEFT (sticky): SectionTitle on top, image below. The image is
+ *     swapped as the user scrolls past the right-hand list — the
+ *     activity row currently centered in the viewport drives which
+ *     image is shown.
+ *   RIGHT: vertical list of activity rows, separated by horizontal
+ *     borders. Each row: day number, title, description.
+ *
+ * Content sourced from the Tenerife Content Notion page's
+ * activities database (15 days). Move to a content collection when
+ * copy goes bilingual.
+ */
+
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "blue" } = Astro.props;
+
+interface Activity {
+  day: number;
+  title: string;
+  description: string;
+}
+
+const activities: Activity[] = [
+  {
+    day: 1,
+    title: "Welcome & getting to know each other",
+    description:
+      "The camp kicks off with a walk along the seafront of Puerto de la Cruz, finishing at the historic Plaza del Charco. Along the way, campers take part in a simple but effective icebreaker — sharing their name, something they love, and their plans for the future. By the end of the evening, the group already feels like a group.",
+  },
+  {
+    day: 2,
+    title: "Historic Puerto de la Cruz",
+    description:
+      "Campers explore the old town on a guided cultural walk that brings local history to life. Highlights include the 17th-century Church of Nuestra Señora de la Peña de Francia, the town's historic fishing pier — once used to export Malvasia wine — Playa Jardín designed by celebrated Canarian artist César Manrique, and the Castle of San Felipe, a coastal fortress built to defend against pirates. The walk ends back at the iconic Lago Martiánez pool complex.",
+  },
+  {
+    day: 3,
+    title: "Beach sports",
+    description:
+      "A full afternoon at Playa Jardín with volleyball, football, tennis and frisbee. Campers rotate through activities in small groups, keeping it social, competitive and fun.",
+  },
+  {
+    day: 4,
+    title: "Yoga workshop & beach",
+    description:
+      "A more mindful afternoon. While some campers enjoy the beach, others take part in a yoga workshop designed to balance the physical intensity of the week with self-care and reflection. Every camper gets their session.",
+  },
+  {
+    day: 5,
+    title: "Rambla de Castro coastal trail",
+    description:
+      "A scenic coastal hike through one of Tenerife's most beautiful natural routes. The group passes black-sand coves, a historic 1903 steam-engine pumping station, a wooden bridge over a ravine, an 18th-century coastal fort, and arrives at Mirador de San Pedro — a clifftop viewpoint with sweeping ocean views.",
+  },
+  {
+    day: 6,
+    title: "Traditional Canarian games",
+    description:
+      "Back at Playa Jardín for an afternoon of traditional games from the Canary Islands: crab races, tug-of-war and the handkerchief game. Loud, fun, and a genuine window into local culture.",
+  },
+  {
+    day: 7,
+    title: "Zip-line park at Forestal Park",
+    description:
+      "A special day at Forestal Park Tenerife, a high-altitude adventure park in the forests of Monte de La Esperanza. Before heading in, the group takes part in a short session on emotions — naming them, noticing them, and letting go of the negative ones through a dreamcatcher activity afterward. Lunch is a picnic in the forest.",
+  },
+  {
+    day: 8,
+    title: "Teide National Park & Observatory",
+    description:
+      "A full-day excursion to the top of Tenerife. One group visits the Teide Observatory, home to leading European solar telescopes. The other explores the El Portillo Visitor Centre, with exhibitions on volcanic geology, a botanical garden of native species and a simulated volcanic tube. Both groups then meet at Roques de García for lunch and a breathing and nature connection activity, surrounded by one of the most dramatic landscapes in Europe.",
+  },
+  {
+    day: 9,
+    title: "La Orotava cultural walk",
+    description:
+      "A guided tour through the beautifully preserved historic town of La Orotava. Campers visit a neo-Gothic chapel, a 19th-century French garden with panoramic views, the iconic Casa de los Balcones with its carved wooden architecture, and a traditional gofio mill — a staple of Canarian food culture.",
+  },
+  {
+    day: 10,
+    title: "Surfing at Playa Martiánez",
+    description:
+      "Just five minutes from the hotel, campers try surfing for the first time (or build on what they know) in small groups with professional instructors. While half surf, the other half enjoy the beach or the hotel pool.",
+  },
+  {
+    day: 11,
+    title: "Painting workshop & beach",
+    description:
+      "An afternoon combining creativity with sunshine. Campers take a guided painting workshop on the beach, turning their impressions of the trip into their own artwork. A quieter, more reflective counterpoint to the more active days.",
+  },
+  {
+    day: 12,
+    title: "Surfing, round two",
+    description:
+      "Another session in the water, with extended surf classes for all participants. More time in the sea, more time to progress.",
+  },
+  {
+    day: 13,
+    title: "Farewell beach games",
+    description:
+      "The last beach afternoon: handball, beach paddles, gymkhana obstacle courses and relay races. Before leaving, the whole group gathers in a circle to share their favourite memory of Tenerife.",
+  },
+  {
+    day: 14,
+    title: "Loro Parque",
+    description:
+      "The final special-day excursion takes campers to Loro Parque, one of Europe's most celebrated wildlife parks. The visit is designed not just as a fun day out, but as a meaningful encounter with animal welfare and biodiversity conservation — themes that connect to the broader values of the camp.",
+  },
+  {
+    day: 15,
+    title: "Farewell & the jar of messages",
+    description:
+      "The last day brings the group together for a final activity: the jar of messages. Each camper writes a note — a reflection, an encouragement, a memory — folds it up and adds it to a shared jar. It's a simple, powerful way to close two weeks of shared experience. The day ends with a collective farewell discussion and the kind of goodbyes that usually involve promises to stay in touch.",
+  },
+];
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section split scene__layer scene__layer--tilt activities"
+    data-theme={theme}
+  >
+    <!-- LEFT: sticky title + image. The image swaps as the user
+         scrolls past activity rows on the right (driven by the
+         IntersectionObserver in the <script> below). -->
+    <div class="activities__left">
+      <SectionTitle lines={["ACTIVITIES"]} />
+      <div class="activities__stack" data-activities-stack>
+        <!-- Inner wrapper exists so the mouse-driven rotateX/Y can
+             be applied as a group transform without disturbing the
+             outer aspect-ratio sizing. -->
+        <div class="activities__stack-inner">
+          <!-- A polaroid per activity. They stack inside this box: as
+               the user scrolls down, each new "current" activity
+               reveals its polaroid on top of the previous ones with a
+               small random tilt/offset, building a casual pile by the
+               end. Scroll back up and the most recent ones drop off.
+
+               Placeholder solid colour for the photo area for now —
+               swap `<div class="polaroid__photo">` for an `<img>` when
+               real photography lands. -->
+          {activities.map((a, i) => {
+          // Deterministic per-card rotation + offset so the same
+          // polaroid always lands in the same spot on every render.
+          // Uses a tiny PRNG seeded by index so the values look
+          // random but are stable.
+          const seed = (i + 1) * 9301 + 49297;
+          const rand = ((seed % 233280) / 233280);
+          const rand2 = (((seed * 7) % 233280) / 233280);
+          const rand3 = (((seed * 13) % 233280) / 233280);
+          const rotate = (rand - 0.5) * 14; // -7° to +7°
+          const offsetX = (rand2 - 0.5) * 12; // -6% to +6%
+          const offsetY = (rand - 0.5) * 8; // -4% to +4%
+          // Mouse-shift multiplier: each card responds to the
+          // cursor with a slightly different magnitude so the
+          // pile "loosens" instead of moving as a single block.
+          // Range 0.4 → 1.6 keeps the differential subtle.
+          const mouseMult = 0.4 + rand3 * 1.2;
+          return (
+            <figure
+              class="polaroid"
+              data-activities-polaroid={String(i)}
+              data-active={i === 0 ? "true" : undefined}
+              style={`--polaroid-rotate: ${rotate}deg; --polaroid-x: ${offsetX}%; --polaroid-y: ${offsetY}%; --polaroid-z: ${i}; --polaroid-mouse-mult: ${mouseMult.toFixed(2)};`}
+              aria-hidden="true"
+            >
+              <div class="polaroid__photo">
+                <span class="font-caption-script polaroid__day">Day {a.day}</span>
+              </div>
+              <figcaption class="font-caption-script polaroid__caption">{a.title}</figcaption>
+            </figure>
+          );
+        })}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: intro paragraph + list of activity rows. The intro
+         scrolls with the list (not sticky), uses body-l, and
+         doesn't participate in the active-row IntersectionObserver.
+         Top border per row; first row drops its border so the list
+         starts flush. -->
+    <div class="activities__column">
+      <p class="font-body-l activities__intro">
+        Outside of study hours, campers have a full schedule of
+        activities across Tenerife — beaches, national parks,
+        historic towns, and cultural workshops. Two weeks of
+        afternoons and evenings, planned but never crammed. Here's
+        the day-by-day.
+      </p>
+
+      <ol class="activities__list">
+        {activities.map((a, i) => (
+          <li
+            class="activity-row"
+            data-activity-index={String(i)}
+            data-active={i === 0 ? "true" : undefined}
+          >
+            <p class="font-caption activity-row__day">Day {String(a.day).padStart(2, "0")}</p>
+            <h3 class="font-h3 activity-row__title">{a.title}</h3>
+            <p class="font-body activity-row__description">{a.description}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</div>
+
+<style>
+  .activities {
+    align-items: start;
+  }
+
+  /* LEFT — sticky title + image.
+   *
+   * `max-height` is sized so the column's bottom reaches the viewport
+   * bottom when stuck. This makes sticky release at exactly the same
+   * scroll position where the scene-stack pin engages (both keyed off
+   * "section bottom hits viewport bottom"). Any slack here would show
+   * as the left column scrolling off before the pin takes over. */
+  .activities__left {
+    position: sticky;
+    top: var(--sticky-top);
+    align-self: start;
+    display: grid;
+    gap: var(--space-l);
+    max-height: calc(100svh - var(--sticky-top));
+  }
+
+  /* Polaroid stack frame.
+   *
+   * Sized by whichever constraint hits first:
+   *   - 800px   — visual cap on very wide viewports
+   *   - 100%    — column width (sticky left column on desktop)
+   *   - available column height × 4/5 — so the polaroid never
+   *     overflows the sticky column on short viewports (16" laptop,
+   *     landscape iPad, etc).
+   *
+   * `--activities-title-h` is a rough reservation for the
+   * SectionTitle above the stack — display-l line height + gap.
+   * Tuning by feel; doesn't need to be exact since the `min()`
+   * picks the smallest of three guesses anyway. */
+  .activities__stack {
+    --activities-title-h: 8rem;
+    position: relative;
+    width: min(
+      800px,
+      100%,
+      calc(
+        (100svh - var(--sticky-top) - var(--activities-title-h) - var(--space-2xl))
+          * 4 / 5
+      )
+    );
+    aspect-ratio: 4 / 5;
+    margin-inline: auto;
+  }
+
+  /* Inner wrapper holds the polaroids and the mouse CSS vars. The
+   * vars (--mouse-dx / --mouse-dy) cascade down to each polaroid,
+   * which uses them in its transform multiplied by its own
+   * `--polaroid-mouse-mult`. Defaults to 0 so SSR / no-JS shows a
+   * flat stack. */
+  .activities__stack-inner {
+    position: absolute;
+    inset: 0;
+    --mouse-dx: 0px;
+    --mouse-dy: 0px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .activities__stack-inner {
+      --mouse-dx: 0px !important;
+      --mouse-dy: 0px !important;
+    }
+  }
+
+  /* Each polaroid is absolutely positioned, all inside the stack
+   * box. Rotation, offset and z-index come from inline custom
+   * properties set in the template (deterministic per index, so
+   * the pile looks random but stays stable across renders). */
+  .polaroid {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 78%;
+    /* Polaroid card aspect: image area is square, plus a thicker
+     * bottom strip for the caption. Roughly 4 : 5 overall. */
+    aspect-ratio: 4 / 5;
+    background: #f4efe7;
+    color: #1a1a1a;
+    /* Even inline padding top/left/right; the bottom strip is
+     * sized by the grid row below so the caption has room to
+     * actually centre inside the white area. */
+    padding: 6% 6% 0;
+    border-radius: 2px;
+    /* Soft single-layer drop. Light enough that a stack of 15
+     * doesn't read as muddy, dark enough to lift each card off
+     * the theme background. */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+    /* Two rows: the photo area sized by its own square aspect
+     * ratio, then a fixed-proportion white strip for the caption.
+     * `18%` of the card height gives the classic polaroid feel —
+     * a meaningful white band, not a thin sliver. */
+    display: grid;
+    grid-template-rows: 1fr 18%;
+    z-index: var(--polaroid-z, 0);
+    /* Hidden + slightly down/scaled by default; snaps into the
+     * pile when `[data-active]` is set. Snappy back-out easing so
+     * each card lands with a tiny overshoot — feels like it's
+     * being tossed onto the table. */
+    opacity: 0;
+    transform:
+      translate(0%, -4%)
+      rotate(0deg)
+      scale(0.92);
+    transition:
+      opacity 180ms ease-out,
+      transform 320ms cubic-bezier(0.34, 1.4, 0.64, 1);
+    pointer-events: none;
+  }
+
+  .polaroid[data-active="true"] {
+    opacity: 1;
+    /* Two stacked translates: the resting offset (in %, deterministic
+     * per index) and the mouse-driven nudge (in px, scaled by this
+     * card's own `--polaroid-mouse-mult` so each card shifts a
+     * different amount — the pile loosens like papers on a desk). */
+    transform:
+      translate(var(--polaroid-x, 0%), var(--polaroid-y, 0%))
+      translate(
+        calc(var(--mouse-dx, 0px) * var(--polaroid-mouse-mult, 1)),
+        calc(var(--mouse-dy, 0px) * var(--polaroid-mouse-mult, 1))
+      )
+      rotate(var(--polaroid-rotate, 0deg))
+      scale(1);
+  }
+
+  /* Photo area — solid placeholder until images land. Square so the
+   * card reads as a classic instant-photo. */
+  .polaroid__photo {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--accent, #999) 70%, white) 0%,
+        color-mix(in oklab, var(--accent, #999) 90%, black) 100%
+      );
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  /* Typography comes from `.font-caption-script` on both the day
+   * badge and the caption strip — that utility wires Rock Salt via
+   * `--font-script`. These rules only carry per-element tweaks
+   * (color, sizing to fit the polaroid, centering). */
+  .polaroid__day {
+    color: rgba(255, 255, 255, 0.9);
+    /* Scale down from the token default so it fits the photo area
+     * at small polaroid widths. */
+    font-size: clamp(1rem, 1.6vw, 1.5rem);
+  }
+
+  .polaroid__caption {
+    margin: 0;
+    /* Fill the white strip and centre the caption both ways. */
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding-inline: 6%;
+    font-size: clamp(0.8rem, 1vw, 1rem);
+    /* Rock Salt is tall — default caption-script `leading-none`
+     * leaves no room between wrapped lines. Nudge it up a bit. */
+    line-height: 1.25;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .polaroid {
+      transition: opacity 200ms ease;
+      transform:
+        translate(var(--polaroid-x, 0%), var(--polaroid-y, 0%))
+        rotate(var(--polaroid-rotate, 0deg));
+    }
+  }
+
+  /* RIGHT — intro paragraph + activity list. */
+  .activities__column {
+    display: grid;
+  }
+
+  /* Intro paragraph — body-l, max measure, scrolls with the
+   * column. Sits up top with generous padding below so the first
+   * activity row lands comfortably. */
+  .activities__intro {
+    margin: 0;
+    max-width: 52ch;
+    padding-block-end: 25vh;
+  }
+
+  .activities__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+
+  .activity-row {
+    display: grid;
+    gap: var(--space-s);
+    padding-block: var(--space-l);
+    border-block-start: 1px solid var(--border);
+    /* Dim everything that isn't the currently-focused row. The
+     * centred row gets bumped back to full opacity (rule below).
+     * Smooth so the dim/undim happens gradually as the user
+     * scrolls between activities. */
+    opacity: 0.5;
+    transition: opacity 360ms ease;
+  }
+
+  .activity-row[data-active="true"] {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .activity-row {
+      transition: none;
+    }
+  }
+
+  /* First row keeps its top border now that the intro paragraph
+   * provides the breathing room from the section start. */
+  .activity-row:first-child {
+    padding-block-start: var(--space-l);
+  }
+
+  .activity-row:last-child {
+    padding-block-end: var(--space-l);
+  }
+
+  .activity-row__day {
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  .activity-row__title,
+  .activity-row__description {
+    margin: 0;
+  }
+
+  .activity-row__description {
+    opacity: 0.85;
+    max-width: 60ch;
+  }
+</style>
+
+<script>
+  /**
+   * IntersectionObserver picks the activity row currently in the
+   * centre band of the viewport. Polaroids 0..currentIndex are
+   * shown (active), so the stack grows as the user scrolls down
+   * and shrinks as they scroll back up. Single observer per page;
+   * re-installs on Astro view transitions.
+   */
+  function install() {
+    if ((window as any).__activitiesHooked) return;
+    (window as any).__activitiesHooked = true;
+
+    const rows = document.querySelectorAll<HTMLElement>('[data-activity-index]');
+    const polaroids = document.querySelectorAll<HTMLElement>(
+      '[data-activities-polaroid]',
+    );
+    if (rows.length === 0 || polaroids.length === 0) return;
+
+    const ratios = new Map<number, number>();
+    let currentIndex = 0;
+
+    function setStackTo(i: number) {
+      if (i === currentIndex) return;
+      currentIndex = i;
+      polaroids.forEach((poly) => {
+        const idx = Number(poly.dataset.activitiesPolaroid);
+        poly.setAttribute('data-active', idx <= i ? 'true' : 'false');
+      });
+      // Single active row — the one currently centred. CSS dims
+      // every other row to 0.7 with a smooth opacity transition.
+      rows.forEach((row) => {
+        const idx = Number(row.dataset.activityIndex);
+        row.setAttribute('data-active', idx === i ? 'true' : 'false');
+      });
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const idx = Number((entry.target as HTMLElement).dataset.activityIndex);
+          ratios.set(idx, entry.intersectionRatio);
+        }
+        // Pick the index with the highest current ratio in the
+        // centre band — that's the activity the user is "on".
+        let bestIdx = -1;
+        let bestRatio = -1;
+        ratios.forEach((r, i) => {
+          if (r > bestRatio) {
+            bestRatio = r;
+            bestIdx = i;
+          }
+        });
+        if (bestIdx >= 0 && bestRatio > 0) setStackTo(bestIdx);
+      },
+      {
+        // Activation zone: from 40% below the viewport top down to
+        // 5% above the bottom. Loose bottom so the last row
+        // activates even when its trailing room is small.
+        rootMargin: '-40% 0px -5% 0px',
+        threshold: [0, 0.5, 1],
+      },
+    );
+
+    rows.forEach((row) => io.observe(row));
+
+    /**
+     * Mouse-driven shift — cursor position nudges each polaroid by
+     * a small offset, scaled by that card's own multiplier so the
+     * pile loosens (papers on a desk being grazed by a hand) rather
+     * than tilting in 3D. Listens on window so the effect tracks
+     * even when the cursor is over the activity list.
+     *
+     * Skipped under reduced-motion preference.
+     */
+    const stack = document.querySelector<HTMLElement>('[data-activities-stack]');
+    const inner = stack?.querySelector<HTMLElement>('.activities__stack-inner');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (stack && inner && !reduced) {
+      const MAX_PX = 18; // peak shift magnitude per axis
+      const LERP = 0.12; // how quickly current position chases target
+
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+      let raf = 0;
+
+      // Continuous rAF that eases the displayed position toward
+      // the cursor target. Idles itself when close enough to the
+      // target so we're not burning frames at rest.
+      const loop = () => {
+        currentX += (targetX - currentX) * LERP;
+        currentY += (targetY - currentY) * LERP;
+        inner.style.setProperty('--mouse-dx', `${currentX.toFixed(2)}px`);
+        inner.style.setProperty('--mouse-dy', `${currentY.toFixed(2)}px`);
+        const settled =
+          Math.abs(targetX - currentX) < 0.05 &&
+          Math.abs(targetY - currentY) < 0.05;
+        raf = settled ? 0 : requestAnimationFrame(loop);
+      };
+
+      const start = () => {
+        if (!raf) raf = requestAnimationFrame(loop);
+      };
+
+      window.addEventListener('mousemove', (e) => {
+        // Centre of the stack as the reference point so the shift
+        // is symmetric around the polaroid no matter where it
+        // sits in layout.
+        const rect = stack.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        // Normalise to -1..1 over a generous range so the effect
+        // is felt across the whole viewport, not just on hover.
+        const range = Math.max(window.innerWidth, window.innerHeight) / 2;
+        const nx = Math.max(-1, Math.min(1, (e.clientX - cx) / range));
+        const ny = Math.max(-1, Math.min(1, (e.clientY - cy) / range));
+        targetX = nx * MAX_PX;
+        targetY = ny * MAX_PX;
+        start();
+      });
+
+      window.addEventListener('mouseleave', () => {
+        targetX = 0;
+        targetY = 0;
+        start();
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', install, { once: true });
+  } else {
+    install();
+  }
+  document.addEventListener('astro:page-load', () => {
+    (window as any).__activitiesHooked = false;
+    install();
+  });
+</script>

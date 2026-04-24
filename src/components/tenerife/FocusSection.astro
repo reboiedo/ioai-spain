@@ -1,0 +1,379 @@
+---
+/**
+ * FocusSection — the "FOCUS" scene (second on the tenerife camp
+ * page): why Tenerife, climate, logistics.
+ *
+ * Structural pattern:
+ *   <div class="scene" data-scene>             ← stack-reveal opt-in
+ *     <section class="section scene__layer     ← theme + tilt target
+ *              scene__layer--tilt split">
+ *       <div class="stack-m">…title…</div>     ← left half
+ *       <div class="stack-m">…body…</div>      ← right half
+ *     </section>
+ *   </div>
+ *
+ * No props — content is hardcoded here. When the page goes bilingual
+ * or the copy needs to live in a content collection, this is where
+ * to hook it up (either by accepting props or reading from the
+ * collection directly).
+ */
+
+import { Image } from "astro:assets";
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import harbourLogo from "@/assets/harbour-space-logo.svg";
+import leaguesLogo from "@/assets/icons/leagues-logo.svg";
+import carousel1 from "@/assets/tenerife-camp/experience-carousel1.jpg";
+import carousel2 from "@/assets/tenerife-camp/experience-carousel2.jpg";
+import carousel3 from "@/assets/tenerife-camp/experience-carousel3.jpg";
+import carousel4 from "@/assets/tenerife-camp/experience-carousel4.jpg";
+import carousel5 from "@/assets/tenerife-camp/experience-carousel5.jpg";
+import carousel6 from "@/assets/tenerife-camp/experience-carousel6.jpg";
+import about1 from "@/assets/tenerife-camp/about-carousel-1.jpg";
+import about2 from "@/assets/tenerife-camp/about-carousel-2.jpg";
+import about3 from "@/assets/tenerife-camp/about-carousel-3.jpg";
+
+/**
+ * Marquee image set. Ten tiles feels varied without killing the page
+ * weight; the animation duplicates them at render so the loop is
+ * visually seamless. Swap / reorder freely — the marquee doesn't care
+ * about count.
+ */
+const marqueeImages = [
+  { src: carousel1, alt: "Camp life — coastline" },
+  { src: carousel2, alt: "Camp life — coding session" },
+  { src: carousel3, alt: "Camp life — classroom" },
+  { src: carousel4, alt: "Camp life — workshop" },
+  { src: carousel5, alt: "Camp life — outdoors" },
+  { src: carousel6, alt: "Camp life — group activity" },
+  { src: about1, alt: "Tenerife — environment" },
+  { src: about2, alt: "Tenerife — environment" },
+  { src: about3, alt: "Tenerife — environment" },
+];
+// Rendered twice back-to-back so the translateX -50% wrap is invisible.
+const marqueeTrack = [...marqueeImages, ...marqueeImages];
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "orange" } = Astro.props;
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section scene__layer scene__layer--tilt focus"
+    data-theme={theme}
+  >
+    <div class="split focus__top">
+    <div class="stack-xl focus__left">
+      <SectionTitle lines={["The Camp"]} />
+
+      <!-- Sponsors — sits under the section title in the left column,
+           below the SectionTitle's mass so the title still dominates.
+           Logos inverted to white so they read on any themed bg. -->
+      <div class="stack-s focus__sponsors">
+        <p class="font-caption focus__sponsors-label">Powered and sponsored by</p>
+        <div class="focus__sponsors-logos">
+          <Image
+            src={harbourLogo}
+            alt="Harbour.Space"
+            class="focus__sponsors-logo focus__sponsors-logo--harbour"
+          />
+          <Image
+            src={leaguesLogo}
+            alt="Leagues of Code"
+            class="focus__sponsors-logo focus__sponsors-logo--leagues"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-m focus__body">
+      <p class="font-body-l">
+        A path to computer tech success for your child with an
+        island-coding adventure at our summer camp.
+      </p>
+      <p class="font-body">
+        We're thrilled to welcome young innovators to our summer camp
+        on the beautiful island of Tenerife. Children aged 10–13,
+        teenagers aged 14–17, and young adults aged 18–20 each follow
+        separate, age-appropriate tracks, so every student benefits
+        from the right mix of challenge, support, and fun.
+      </p>
+      <p class="font-body">
+        Our program combines rigorous learning with a vibrant
+        extracurricular experience, so students don't have to choose
+        between academic growth and the joy of summer camp.
+      </p>
+    </div>
+    </div>
+
+    <!-- Marquee — full-bleed infinite strip of square tiles. Breaks
+         out of the section's inline padding via negative margins so the
+         row touches both edges. Edge-to-edge separator above. The
+         track is rendered twice so the `translateX(-50%)` loop is
+         seamless. JS-driven so we can support drag + inertia. -->
+    <div class="focus__footer">
+    <hr class="focus__marquee-rule" />
+    <div class="focus__marquee" data-marquee aria-hidden="true">
+      <div class="focus__marquee-track" data-marquee-track>
+        {marqueeTrack.map((img) => (
+          <div class="focus__marquee-tile">
+            <Image
+              src={img.src}
+              alt={img.alt}
+              widths={[320, 480, 640]}
+              sizes="(min-width: 768px) 25vw, 50vw"
+              class="focus__marquee-image"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .focus__sponsors-label {
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    opacity: 0.7;
+  }
+
+  .focus__sponsors-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-l);
+  }
+
+  .focus__sponsors-logo {
+    width: auto;
+    object-fit: contain;
+    object-position: left center;
+    /* Native SVG fills (e.g. Harbour.Space purple) won't sit cleanly on
+     * every theme. Flatten to white so both marks share visual weight
+     * and read on any coloured background. */
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+  }
+
+  .focus__sponsors-logo--harbour { height: 28px; }
+  .focus__sponsors-logo--leagues { height: 34px; }
+
+  /* Cap body measure so long runs of text don't stretch into
+   * unreadably wide lines on big viewports. */
+  .focus__body {
+    max-width: 56ch;
+  }
+
+  /* Stack the section vertically: split up top, marquee footer pinned
+   * to the bottom of the scene-tall section. One spacing token drives
+   * the whole rhythm — `--focus-gap` is used for the gap above the
+   * rule, the gap between the rule and the tiles, AND the breathing
+   * room below the tiles. We override the section's much larger
+   * default `--section-block` bottom padding to keep the marquee close
+   * to the bottom. */
+  .focus {
+    --focus-gap: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+    /* Trim the section's bottom padding so the marquee hugs the
+     * bottom — we apply our own consistent `--focus-gap` instead. */
+    padding-block-end: var(--focus-gap);
+  }
+
+  .focus__footer {
+    margin-block-start: auto; /* push to the bottom of the section */
+    display: flex;
+    flex-direction: column;
+    gap: var(--focus-gap);
+    padding-block-start: var(--focus-gap);
+  }
+
+  /* ── Marquee ───────────────────────────────────────────────────────
+   *
+   * Full-bleed: negative inline margins cancel the section's
+   * `--section-inline` padding so the row reaches the viewport edges.
+   * Track is rendered with its tiles duplicated and is JS-translated
+   * with a wrap at -halfWidth, giving a seamless loop while letting us
+   * layer in pointer drag + inertia. */
+  .focus__marquee-rule {
+    margin: 0 calc(var(--section-inline) * -1);
+    border: 0;
+    border-top: 1px solid color-mix(in oklab, var(--foreground) 25%, transparent);
+  }
+
+  .focus__marquee {
+    margin-inline: calc(var(--section-inline) * -1);
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .focus__marquee.is-dragging {
+    cursor: grabbing;
+  }
+
+  .focus__marquee-track {
+    display: flex;
+    gap: var(--space-m);
+    width: max-content;
+    padding-inline: var(--space-m);
+    will-change: transform;
+  }
+
+  .focus__marquee-tile {
+    flex: 0 0 auto;
+    width: 180px;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--foreground) 8%, transparent);
+    -webkit-user-drag: none;
+  }
+
+  .focus__marquee-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+</style>
+
+<script>
+  /**
+   * Marquee driver — auto-scrolls the track at a constant base speed
+   * and overlays pointer drag + inertia on top.
+   *
+   * State machine:
+   *   - At rest: velocity ≈ baseSpeed, position drifts left each frame.
+   *   - Dragging: position is set directly from pointer delta. Recent
+   *     pointer samples are kept so we can compute release velocity.
+   *   - Released: velocity = release velocity, decays back toward
+   *     baseSpeed via exponential lerp. Net effect: a flick keeps
+   *     spinning fast then settles back into the auto-drift.
+   *
+   * Position wraps at -halfTrackWidth (track is rendered as two copies
+   * of the same tile set, so the seam is invisible).
+   */
+  (() => {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((root) => {
+      const track = root.querySelector<HTMLElement>('[data-marquee-track]');
+      if (!track) return;
+
+      // Base auto-scroll speed in px/s. Negative = leftward drift.
+      const BASE_VELOCITY = -22;
+      // How quickly post-flick velocity decays back to baseline. Higher
+      // = snappier return; lower = longer coast. Time constant in
+      // seconds — at 1/decay seconds the residual is ~37%.
+      const DECAY = 1.8;
+
+      let position = 0;
+      let velocity = reduced ? 0 : BASE_VELOCITY;
+      let halfWidth = track.scrollWidth / 2;
+      let lastT = performance.now();
+      let dragging = false;
+      let pointerStartX = 0;
+      let positionStart = 0;
+      // Recent samples for release-velocity calc: [{ t, x }, ...].
+      let samples: Array<{ t: number; x: number }> = [];
+
+      const measure = () => {
+        halfWidth = track.scrollWidth / 2;
+      };
+      // Recompute on resize and after images decode (their layout
+      // contribution can change track width).
+      const ro = new ResizeObserver(measure);
+      ro.observe(track);
+      window.addEventListener('load', measure);
+
+      const wrap = () => {
+        if (halfWidth <= 0) return;
+        // Keep position in (-halfWidth, 0] so the track is always
+        // covering the visible area with no gap.
+        while (position <= -halfWidth) position += halfWidth;
+        while (position > 0) position -= halfWidth;
+      };
+
+      const apply = () => {
+        track.style.transform = `translate3d(${position}px, 0, 0)`;
+      };
+
+      const tick = (now: number) => {
+        const dt = Math.min(0.05, (now - lastT) / 1000); // clamp to 50ms to avoid jumps after tab-switch
+        lastT = now;
+
+        if (!dragging) {
+          // Exponential approach back to BASE_VELOCITY.
+          const k = 1 - Math.exp(-DECAY * dt);
+          velocity += (BASE_VELOCITY - velocity) * k;
+          position += velocity * dt;
+          wrap();
+          apply();
+        }
+
+        requestAnimationFrame(tick);
+      };
+
+      const onPointerDown = (e: PointerEvent) => {
+        dragging = true;
+        root.classList.add('is-dragging');
+        root.setPointerCapture(e.pointerId);
+        pointerStartX = e.clientX;
+        positionStart = position;
+        samples = [{ t: performance.now(), x: e.clientX }];
+        velocity = 0;
+      };
+
+      const onPointerMove = (e: PointerEvent) => {
+        if (!dragging) return;
+        position = positionStart + (e.clientX - pointerStartX);
+        wrap();
+        apply();
+
+        const now = performance.now();
+        samples.push({ t: now, x: e.clientX });
+        // Trim to ~80ms of history for a tight, responsive flick read.
+        while (samples.length > 2 && now - samples[0].t > 80) samples.shift();
+      };
+
+      const onPointerUp = (e: PointerEvent) => {
+        if (!dragging) return;
+        dragging = false;
+        root.classList.remove('is-dragging');
+        try { root.releasePointerCapture(e.pointerId); } catch {}
+
+        // Velocity from the recent samples: dx/dt over the window.
+        if (samples.length >= 2) {
+          const first = samples[0];
+          const last = samples[samples.length - 1];
+          const dt = (last.t - first.t) / 1000;
+          if (dt > 0) {
+            // Cap initial velocity so monster flicks don't rocket off.
+            const v = (last.x - first.x) / dt;
+            velocity = Math.max(-6000, Math.min(6000, v));
+          }
+        }
+        samples = [];
+      };
+
+      root.addEventListener('pointerdown', onPointerDown);
+      root.addEventListener('pointermove', onPointerMove);
+      root.addEventListener('pointerup', onPointerUp);
+      root.addEventListener('pointercancel', onPointerUp);
+
+      // Kick off.
+      lastT = performance.now();
+      requestAnimationFrame(tick);
+    });
+  })();
+</script>

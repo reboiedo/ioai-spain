@@ -1,0 +1,379 @@
+---
+import { Font } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import '@/styles/tenerife-camp-v2.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  showNavigation?: boolean;
+  hideNavItems?: boolean;
+  ctaUrlOverride?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  canonical?: string;
+}
+
+const {
+  title,
+  description,
+  showNavigation = true,
+  hideNavItems = true,
+  ctaUrlOverride,
+  ogImage,
+  ogType,
+  canonical
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  showNavigation={showNavigation}
+  hideNavItems={hideNavItems}
+  ctaUrlOverride={ctaUrlOverride}
+  navTheme="transparent"
+  ogImage={ogImage}
+  ogType={ogType}
+  canonical={canonical}
+>
+  <Fragment slot="head">
+    <Font cssVariable="--font-inter-tight" preload />
+    <!-- Rock Salt — handwritten script used by `.font-caption-script`
+         (e.g. polaroid captions in the Activities scene). -->
+    <Font cssVariable="--font-rock-salt" preload />
+    <!-- PP Neue Corp Condensed Ultrabold — self-hosted display font
+         used by DisplayTitle / SectionTitle. Preloaded to eliminate
+         the FOUT between CSS load and the display titles rendering. -->
+    <link
+      rel="preload"
+      href="/fonts/PPNeueCorp-CondensedUltrabold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <!-- Manual scroll restoration. The browser's default is to restore
+         scroll BEFORE ScrollTrigger has measured positions, so pinned /
+         scrubbed scenes paint against stale coordinates and jump. We
+         take the wheel: switch to manual, cache scrollY on unload, and
+         let the companion module script below restore it after
+         ScrollTrigger.refresh() has run. Inline + head-placed so the
+         `manual` flag is set before the browser attempts any restore. -->
+    <script is:inline>
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      try {
+        const stored = sessionStorage.getItem('tenerifeScrollY');
+        window.__tenerifeSavedScrollY = stored ? Number(stored) : 0;
+      } catch (_) {
+        window.__tenerifeSavedScrollY = 0;
+      }
+      addEventListener('beforeunload', () => {
+        try {
+          sessionStorage.setItem('tenerifeScrollY', String(window.scrollY));
+        } catch (_) {}
+      });
+    </script>
+  </Fragment>
+  <div class="tenerife-camp-v2">
+    <slot />
+  </div>
+</BaseLayout>
+
+<!--
+  Scroll-position restorer. Runs once per real page load (not on Astro
+  view transitions). Waits for `window.load` so every ScrollTrigger-using
+  component has had a chance to register its triggers during its own
+  DOMContentLoaded / immediate render path. Then:
+    1. Calls `ScrollTrigger.refresh()` so all triggers re-measure against
+       the document's final layout (important — positions computed at
+       scrollY=0 are the ones we want).
+    2. Seeks the window to the saved scroll position. ScrollTrigger's
+       scroll listener catches the jump and paints pinned / scrubbed
+       scenes at the correct progress for that scrollY.
+  We deliberately skip astro:page-load — that fires on soft navigations
+  where we want to land at scrollY 0.
+-->
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  declare global {
+    interface Window {
+      __tenerifeSavedScrollY?: number;
+      __tenerifeScrollRestored?: boolean;
+    }
+  }
+
+  function isReload() {
+    const entries = performance.getEntriesByType('navigation');
+    const nav = entries[0] as PerformanceNavigationTiming | undefined;
+    return nav?.type === 'reload' || nav?.type === 'back_forward';
+  }
+
+  function restoreScroll() {
+    if (window.__tenerifeScrollRestored) return;
+    const y = window.__tenerifeSavedScrollY ?? 0;
+    if (y <= 0 || !isReload()) {
+      window.__tenerifeScrollRestored = true;
+      return;
+    }
+    // rAF gives ScrollTrigger one frame to settle its internal state
+    // after refresh() before we seek — without this, we've seen the
+    // first pin snap to its end state for one frame.
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+      window.scrollTo(0, y);
+      window.__tenerifeScrollRestored = true;
+    });
+  }
+
+  if (document.readyState === 'complete') {
+    restoreScroll();
+  } else {
+    window.addEventListener('load', restoreScroll, { once: true });
+  }
+
+  /*
+   * Width-change refresh.
+   *
+   * ScrollTrigger auto-refreshes on `resize`, but the mobile URL bar
+   * collapse / expand fires resize on every scroll and triggers
+   * unnecessary recalculations — worse, while a pin is active that
+   * recalc can cause the pinned scene to jump. We only care about
+   * WIDTH changes (container queries, layout breakpoints, asset
+   * sizing), so we listen ourselves, filter by width delta, and
+   * debounce.
+   *
+   * Debounce is trailing-only so the refresh lands after the user
+   * stops dragging the window edge, not mid-drag (which would
+   * interrupt scrubbed scenes).
+   */
+  let lastWidth = window.innerWidth;
+  let resizeTimer: number | null = null;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
+    if (resizeTimer !== null) clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      resizeTimer = null;
+      ScrollTrigger.refresh();
+    }, 150);
+  });
+
+  /*
+   * Scroll-tied nav-bg driver (follow.art pattern, refined).
+   *
+   * Two layers in the nav:
+   *   1. Nav's own background: the colour of the section currently
+   *      *approaching* the top (next to cross). When that section's
+   *      top is fully past viewport top, this is the section's
+   *      colour — once stable, this is just "current section".
+   *   2. An injected absolute overlay (`.tenerife-nav-prev-bg`)
+   *      that holds the colour of the section currently *under* the
+   *      nav (previous). Its `translateY` is mapped directly to the
+   *      approaching section's `top`:
+   *        - approaching.top = nav-height → translateY(0)   (fully
+   *          covering the nav with the old colour)
+   *        - approaching.top = 0           → translateY(-100%)
+   *          (overlay fully slid up; new colour revealed)
+   *      Linear interpolation in between, so the reveal is exactly
+   *      tied to scroll velocity — no fixed 500ms timer.
+   */
+  function installNavBg() {
+    const nav = document.querySelector<HTMLElement>('nav');
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>('.tenerife-camp-v2 .section'),
+    );
+    if (!nav || sections.length === 0) return;
+
+    let prevBg = nav.querySelector<HTMLElement>('.tenerife-nav-prev-bg');
+    if (!prevBg) {
+      prevBg = document.createElement('div');
+      prevBg.className = 'tenerife-nav-prev-bg';
+      prevBg.setAttribute('aria-hidden', 'true');
+      nav.insertBefore(prevBg, nav.firstChild);
+    }
+
+    const navHeight = parseInt(
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--nav-height') || '80',
+      10,
+    );
+
+    function bgOf(el: HTMLElement | null) {
+      if (!el) return '';
+      return getComputedStyle(el).getPropertyValue('--background').trim();
+    }
+
+    function update() {
+      // Walk DOM-ordered sections and find the deepest one whose
+      // top is at or above viewport top. That's "current".
+      let currentIdx = -1;
+      for (let i = 0; i < sections.length; i++) {
+        if (sections[i].getBoundingClientRect().top <= 0) {
+          currentIdx = i;
+        }
+      }
+      const current = currentIdx >= 0 ? sections[currentIdx] : null;
+      const next = sections[currentIdx + 1] || null;
+
+      const currentBg = bgOf(current);
+      const nextBg = bgOf(next);
+
+      if (next) {
+        const nextTop = next.getBoundingClientRect().top;
+        if (nextTop <= navHeight) {
+          // Transition zone: scroll progress in [0, 1].
+          const progress = Math.max(0, Math.min(1, 1 - nextTop / navHeight));
+          // Nav's own bg is the *new* colour underneath.
+          if (nextBg) nav!.style.setProperty('--tenerife-nav-bg', nextBg);
+          // Overlay is the *previous* (current) colour, sliding up.
+          prevBg!.style.background = currentBg || 'transparent';
+          prevBg!.style.transform = `translateY(${-progress * 100}%)`;
+          return;
+        }
+      }
+
+      // Stable state: no approaching section in the nav strip.
+      // Nav bg is just the current section's colour; overlay
+      // hidden (transparent + reset position).
+      if (currentBg) {
+        nav!.style.setProperty('--tenerife-nav-bg', currentBg);
+      } else {
+        nav!.style.removeProperty('--tenerife-nav-bg');
+      }
+      prevBg!.style.background = 'transparent';
+      prevBg!.style.transform = 'translateY(0)';
+    }
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installNavBg, { once: true });
+  } else {
+    installNavBg();
+  }
+  document.addEventListener('astro:page-load', installNavBg);
+</script>
+
+<style>
+  .tenerife-camp-v2 {
+    min-height: 100vh;
+    background: var(--background);
+    color: var(--foreground);
+    /* Scenes with `scene__layer--tilt` rotate up to 12° on entry,
+     * which extends their bounding box diagonally beyond the viewport
+     * width and creates horizontal scroll. `overflow-x: clip` clips
+     * the same way as `hidden` but — crucially — does NOT establish
+     * a scroll container, so `position: sticky` descendants still
+     * work relative to the viewport. Using `hidden` would break our
+     * sticky overview columns. */
+    overflow-x: clip;
+  }
+
+</style>
+
+<!--
+  Nav override for v2 pages.
+    - `position: fixed` + high z-index so the nav rides above every
+      pinned / tilted scene on scroll.
+    - `padding-top: 0` on main removes the implicit BaseLayout
+      spacer so the hero can start at scroll 0.
+    - Transparent background + thin bottom border so the nav reads
+      as a hairline divider over each scene's theme colour rather
+      than its own opaque chrome. Text colour inherits from the
+      scene currently under the nav via `currentColor` on the
+      brand/links (set via `color: var(--foreground)`), so it
+      stays legible against orange / blue / yellow backgrounds.
+-->
+<style is:global>
+  body:has(.tenerife-camp-v2) nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    /* Opaque nav background — colour matches whichever section is
+     * currently under the nav (driven by the JS below). Fallback
+     * to `transparent` for the hero region where no section has
+     * been crossed yet. Snaps instantly when a section crosses;
+     * the slide-up overlay below provides the smooth visual. */
+    background: var(--tenerife-nav-bg, transparent);
+    border-block-end: 1px solid rgba(255, 255, 255, 0.25);
+    color: var(--foreground);
+    /* Override BaseLayout's nav box-shadow / opaque bg, if any. */
+    box-shadow: none;
+    /* Clip the slide-up overlay so it doesn't paint above the nav
+     * once it animates past `top: 0`. */
+    overflow: hidden;
+  }
+
+  /* Slide-up overlay (follow.art's `__previous-bg` pattern). Lives
+   * as the first child of the nav, holds the PREVIOUS section's
+   * colour, and is animated upward by JS to reveal the new colour
+   * underneath from the bottom up. */
+  body:has(.tenerife-camp-v2) nav .tenerife-nav-prev-bg {
+    position: absolute;
+    inset: 0;
+    transform: translateY(0);
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* Without this, the absolute overlay above paints in front of
+   * the static nav children (logo + buttons) — they'd vanish
+   * behind the slide-up colour. Promoting `nav-container` to
+   * `position: relative` puts both in the same positioned
+   * context; DOM order then settles painting (overlay first,
+   * nav-container after, so links and brand stay on top). */
+  body:has(.tenerife-camp-v2) nav .nav-container {
+    position: relative;
+  }
+  /* Drop the inner container's max-width on the v2 page so the
+   * brand sits flush against the section gutter (matching the
+   * rest of the page's full-bleed sections). The horizontal
+   * padding lives on `nav` itself via `--section-inline`. */
+  body:has(.tenerife-camp-v2) nav .nav-container {
+    max-width: none;
+  }
+
+
+  /* Nav button colours pulled from the Tenerife semantic palette
+   * (`--primary` / `--secondary`) so they roll forward when the
+   * theme tokens change.
+   *
+   * `!important` is used because Astro adds per-component
+   * `data-astro-cid-*` attributes to scoped selectors, which gives
+   * Button.astro's own rules an extra layer of specificity that
+   * a plain global selector can't beat. */
+  body:has(.tenerife-camp-v2) nav .btn-animate-chars--primary {
+    color: var(--primary-foreground) !important;
+  }
+  body:has(.tenerife-camp-v2) nav .btn-animate-chars--primary .btn-animate-chars__bg {
+    background-color: var(--primary) !important;
+  }
+  body:has(.tenerife-camp-v2) nav .btn-animate-chars--secondary {
+    color: var(--secondary-foreground) !important;
+  }
+  body:has(.tenerife-camp-v2) nav .btn-animate-chars--secondary .btn-animate-chars__bg {
+    background-color: var(--secondary) !important;
+  }
+  /* Text-variant nav links inherit the layout foreground so they
+   * stay legible against each scene's theme colour. */
+  body:has(.tenerife-camp-v2) nav .btn-animate-chars--text {
+    color: var(--foreground) !important;
+  }
+  body:has(.tenerife-camp-v2) nav .btn-animate-chars--text::after {
+    background-color: var(--foreground) !important;
+  }
+  body:has(.tenerife-camp-v2) main {
+    padding-top: 0;
+  }
+</style>

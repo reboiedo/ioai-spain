@@ -1,0 +1,525 @@
+---
+/**
+ * DayInLifeSection — "A DAY AT TENERIFE CAMP" scene.
+ *
+ * Same shape as ActivitiesSection but the left visual is an
+ * animated clock instead of a polaroid pile. As the user scrolls
+ * through the timeslot rows on the right, the clock's hour and
+ * minute hands rotate to the active slot's start time.
+ *
+ * Schedule data is sourced from `src/i18n/camp/schedule.ts`
+ * (8 slots from 07:00 → 22:00). Hand angles are pre-computed
+ * server-side from each slot's start time so the SSR render
+ * shows the right initial state for slot 0.
+ */
+
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "yellow" } = Astro.props;
+
+interface Slot {
+  time: string;
+  title: string;
+  description: string;
+  startHour: number;
+  startMinute: number;
+  endHour: number;
+  endMinute: number;
+}
+
+/**
+ * Parse a single "7:00am" / "1:30pm" segment into 24-hour
+ * { hour, minute }.
+ */
+function parseSegment(seg: string): { hour: number; minute: number } {
+  const m = seg.trim().toLowerCase().match(/(\d{1,2}):(\d{2})\s*(am|pm)?/);
+  if (!m) return { hour: 0, minute: 0 };
+  let hour = parseInt(m[1], 10);
+  const minute = parseInt(m[2], 10);
+  const meridiem = m[3];
+  if (meridiem === "pm" && hour < 12) hour += 12;
+  if (meridiem === "am" && hour === 12) hour = 0;
+  return { hour, minute };
+}
+
+/**
+ * Split a time range string ("7:00am – 9:00am") into start + end.
+ * Accepts both ASCII hyphen and en-dash separators.
+ */
+function parseRange(range: string) {
+  const parts = range.split(/[-–—]/);
+  const start = parseSegment(parts[0] ?? "");
+  const end = parseSegment(parts[1] ?? "");
+  return { start, end };
+}
+
+/**
+ * Map a time on the analog (12-hour) face to its angle in
+ * degrees, where 0° = 12 o'clock and the dial advances
+ * clockwise. Each hour is 30°; minutes add 0.5°.
+ */
+function angleAt(hour: number, minute: number) {
+  return ((hour % 12) * 30) + (minute * 0.5);
+}
+
+const rawSlots: Array<{ time: string; title: string; description: string }> = [
+  {
+    time: "7:00am – 9:00am",
+    title: "Early rise",
+    description:
+      "The day starts with a morning workout, a quick clean-up, and the day's announcements. Then a generous breakfast to power through the first lecture block.",
+  },
+  {
+    time: "9:30am – 11:00am",
+    title: "1st period",
+    description:
+      "Students pick up the day's coding skills through a mix of lectures, hands-on practice, and short quizzes that keep the room awake and accountable.",
+  },
+  {
+    time: "11:00am – 11:30am",
+    title: "Snack time",
+    description:
+      "A short break to recharge with something nutritious. Energy back up, attention reset, ready for the next block.",
+  },
+  {
+    time: "11:30am – 1:00pm",
+    title: "2nd period",
+    description:
+      "The second teaching block leans into individual practice — the instructor circulates while students build their own small projects from the morning's material.",
+  },
+  {
+    time: "1:30pm – 4:00pm",
+    title: "Lunch",
+    description:
+      "A long, well-balanced lunch on site. Time to eat, talk, and rest before the afternoon programme picks up.",
+  },
+  {
+    time: "4:00pm – 7:00pm",
+    title: "Activities",
+    description:
+      "The full afternoon goes to the extracurricular programme — beach sports, hikes, cultural walks, surfing, the workshops, the day trips. See the previous section for the day-by-day plan.",
+  },
+  {
+    time: "7:00pm – 8:00pm",
+    title: "Dinner",
+    description:
+      "Dinner together as a cohort — fresh seafood, Mediterranean staples, and locally-sourced produce on a rotating menu.",
+  },
+  {
+    time: "8:00pm – 10:00pm",
+    title: "Wind down",
+    description:
+      "The last hours of the day are deliberately unstructured — chill time, an optional movie, occasional quizzes or stargazing on the terrace, then lights out for an early start.",
+  },
+];
+
+const slots: Slot[] = rawSlots.map((s) => {
+  const { start, end } = parseRange(s.time);
+  return {
+    ...s,
+    startHour: start.hour,
+    startMinute: start.minute,
+    endHour: end.hour,
+    endMinute: end.minute,
+  };
+});
+
+/** SSR initial values for slot 0's arc, so the first paint is correct. */
+function arcVars(slot: Slot) {
+  const start = angleAt(slot.startHour, slot.startMinute);
+  let end = angleAt(slot.endHour, slot.endMinute);
+  // Wrap if the range crosses 12 (e.g. 11pm → 1am).
+  if (end < start) end += 360;
+  return { start, extent: end - start };
+}
+
+const initial = arcVars(slots[0]);
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section split scene__layer scene__layer--tilt day-in-life"
+    data-theme={theme}
+  >
+    <!-- LEFT: sticky title + animated clock. -->
+    <div class="day__left">
+      <SectionTitle lines={["A DAY AT TENERIFE"]} />
+
+      <!-- Clock — pure SVG. The active timeslot is shown as a
+           single arc swept on the dial; JS lerps the start angle
+           and arc length toward the active slot's range. -->
+      <div class="day__clock" data-day-clock>
+        <svg
+          class="day__clock-svg"
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <!-- Face outline. -->
+          <circle
+            class="day__clock-face"
+            cx="50"
+            cy="50"
+            r="46"
+            fill="none"
+          />
+          <!-- 12 hour ticks. Quarter ticks (12, 3, 6, 9) are
+               longer + bolder. -->
+          {Array.from({ length: 12 }).map((_, i) => {
+            const angle = (i * 30) - 90; // start at top, step 30°
+            const rad = (angle * Math.PI) / 180;
+            const isQuarter = i % 3 === 0;
+            const inner = isQuarter ? 38 : 41;
+            const outer = 46;
+            const x1 = 50 + Math.cos(rad) * inner;
+            const y1 = 50 + Math.sin(rad) * inner;
+            const x2 = 50 + Math.cos(rad) * outer;
+            const y2 = 50 + Math.sin(rad) * outer;
+            return (
+              <line
+                class="day__clock-tick"
+                data-quarter={isQuarter ? "true" : undefined}
+                x1={x1.toFixed(2)}
+                y1={y1.toFixed(2)}
+                x2={x2.toFixed(2)}
+                y2={y2.toFixed(2)}
+              />
+            );
+          })}
+          <!-- Active range arc.
+               * `pathLength="360"` rescales the path length to
+                 360 units, so dasharray/offset values are simple
+                 degrees.
+               * The group is rotated -90° so 0° = 12 o'clock
+                 (SVG circles default to starting at 3 o'clock).
+               * Initial inline styles from SSR cover the no-JS /
+                 first-paint case for slot 0; JS overrides on
+                 scroll. -->
+          <g class="day__clock-arc-group">
+            <circle
+              class="day__clock-arc"
+              cx="50"
+              cy="50"
+              r="44"
+              fill="none"
+              pathLength="360"
+              style={`stroke-dasharray: ${initial.extent.toFixed(2)} ${(360 - initial.extent).toFixed(2)}; stroke-dashoffset: ${(-initial.start).toFixed(2)};`}
+            />
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- RIGHT: intro paragraph + list of timeslot rows. The intro
+         scrolls with the column (not sticky) and stays out of the
+         IntersectionObserver's pool so it doesn't trigger the clock. -->
+    <div class="day__column">
+      <p class="font-body-l day__intro">
+        Every day at the camp follows the same rhythm — morning
+        learning blocks, an unhurried lunch, the afternoon programme
+        on the island, dinner together, and a deliberately quiet
+        evening before the next early start. Here's how a typical
+        day breaks down.
+      </p>
+
+      <ol class="day__list">
+        {slots.map((s, i) => (
+          <li
+            class="day-row"
+            data-day-index={String(i)}
+            data-active={i === 0 ? "true" : undefined}
+            data-start-hour={String(s.startHour)}
+            data-start-minute={String(s.startMinute)}
+            data-end-hour={String(s.endHour)}
+            data-end-minute={String(s.endMinute)}
+          >
+            <p class="font-caption day-row__time">{s.time}</p>
+            <h3 class="font-h3 day-row__title">{s.title}</h3>
+            <p class="font-body day-row__description">{s.description}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</div>
+
+<style>
+  .day-in-life {
+    align-items: start;
+  }
+
+  /* LEFT — sticky title + clock. */
+  .day__left {
+    position: sticky;
+    top: var(--sticky-top);
+    align-self: start;
+    display: grid;
+    gap: var(--space-l);
+    max-height: calc(100svh - var(--sticky-top) - var(--space-xl));
+  }
+
+  /* Clock container. Sized by min() so it fits both width and the
+   * remaining vertical space inside the sticky column on short
+   * viewports. */
+  .day__clock {
+    --day-title-h: 8rem;
+    width: min(
+      560px,
+      100%,
+      calc(100svh - var(--sticky-top) - var(--day-title-h) - var(--space-2xl))
+    );
+    aspect-ratio: 1 / 1;
+    margin-inline: auto;
+  }
+
+  .day__clock-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .day__clock-face {
+    stroke: var(--foreground);
+    stroke-width: 0.6;
+    opacity: 0.4;
+  }
+
+  .day__clock-tick {
+    stroke: var(--foreground);
+    stroke-width: 0.5;
+    opacity: 0.4;
+  }
+
+  .day__clock-tick[data-quarter="true"] {
+    stroke-width: 1.2;
+    opacity: 0.85;
+  }
+
+  /* Active-range arc.
+   *
+   * Drawn as a `<circle>` with `pathLength="360"` so its dasharray /
+   * dashoffset are addressable in degrees. The wrapping group is
+   * rotated -90° so 0° = 12 o'clock (matching the tick layout).
+   * `stroke-dasharray` and `stroke-dashoffset` are written by JS
+   * inline on the circle (animated via rAF lerp — see <script>),
+   * so no CSS transition is needed here. */
+  .day__clock-arc-group {
+    transform: rotate(-90deg);
+    transform-origin: 50px 50px;
+  }
+
+  .day__clock-arc {
+    stroke: var(--foreground);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  /* RIGHT — intro paragraph + timeslot list. */
+  .day__column {
+    display: grid;
+  }
+
+  /* Intro paragraph — body-l, max measure, scrolls with the
+   * column. Sits up top with generous padding below so the first
+   * timeslot row lands comfortably. */
+  .day__intro {
+    margin: 0;
+    max-width: 52ch;
+    padding-block-end: 25vh;
+  }
+
+  /* Timeslot list. Same pattern as the activities list:
+   * dim non-active rows; centre row gets full opacity. */
+  .day__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+
+  .day-row {
+    display: grid;
+    gap: var(--space-s);
+    padding-block: var(--space-l);
+    border-block-start: 1px solid var(--border);
+    opacity: 0.5;
+    transition: opacity 360ms ease;
+  }
+
+  .day-row[data-active="true"] {
+    opacity: 1;
+  }
+
+  .day-row:first-child {
+    padding-block-start: var(--space-l);
+  }
+
+  .day-row:last-child {
+    padding-block-end: 30vh;
+  }
+
+  .day-row__time {
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  .day-row__title,
+  .day-row__description {
+    margin: 0;
+  }
+
+  .day-row__description {
+    opacity: 0.85;
+    max-width: 60ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .day-row {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * IO picks the active timeslot row; the arc on the clock face
+   * is animated to span that slot's [start, end] range.
+   *
+   * The arc is two values:
+   *   - startDeg: where the arc begins on the dial (0° = 12 o'clock,
+   *     advancing clockwise). 0..360, can wrap.
+   *   - extentDeg: how many degrees of arc to draw. 0..360.
+   *
+   * Both are JS-lerped toward their targets in a single rAF loop,
+   * so movement is smooth and no CSS transition is needed (CSS
+   * doesn't interpolate `stroke-dasharray` reliably between values
+   * with different magnitudes). The startDeg accumulates forward
+   * so the arc sweeps clockwise across the day rather than
+   * unwinding back to morning when scrolling up.
+   */
+  function install() {
+    if ((window as any).__dayInLifeHooked) return;
+    (window as any).__dayInLifeHooked = true;
+
+    const rows = document.querySelectorAll<HTMLElement>('[data-day-index]');
+    const arc = document.querySelector<SVGCircleElement>('.day__clock-arc');
+    if (rows.length === 0 || !arc) return;
+
+    function angleAt(hour: number, minute: number) {
+      return ((hour % 12) * 30) + (minute * 0.5);
+    }
+
+    function rangeFor(row: HTMLElement) {
+      const sH = Number(row.dataset.startHour);
+      const sM = Number(row.dataset.startMinute);
+      const eH = Number(row.dataset.endHour);
+      const eM = Number(row.dataset.endMinute);
+      const start = angleAt(sH, sM);
+      let end = angleAt(eH, eM);
+      if (end < start) end += 360; // crosses 12 o'clock
+      return { start, extent: end - start };
+    }
+
+    const ratios = new Map<number, number>();
+    let currentIndex = -1;
+
+    // Initial state from row 0 so SSR / first paint and the JS
+    // animator agree on the starting arc.
+    const first = rangeFor(rows[0]);
+    let accStart = first.start; // accumulated, forward-only
+    let lastStartMod = first.start; // last target mod 360
+    let targetStart = first.start;
+    let targetExtent = first.extent;
+    let renderStart = first.start;
+    let renderExtent = first.extent;
+    let raf = 0;
+
+    const LERP = 0.14;
+
+    function applyArc(start: number, extent: number) {
+      arc.style.strokeDasharray = `${extent.toFixed(2)} ${(360 - extent).toFixed(2)}`;
+      arc.style.strokeDashoffset = `${(-start).toFixed(2)}`;
+    }
+
+    function loop() {
+      renderStart += (targetStart - renderStart) * LERP;
+      renderExtent += (targetExtent - renderExtent) * LERP;
+      applyArc(renderStart, renderExtent);
+      const settled =
+        Math.abs(targetStart - renderStart) < 0.05 &&
+        Math.abs(targetExtent - renderExtent) < 0.05;
+      raf = settled ? 0 : requestAnimationFrame(loop);
+    }
+
+    function start() {
+      if (!raf) raf = requestAnimationFrame(loop);
+    }
+
+    function setActive(i: number) {
+      if (i === currentIndex) return;
+      currentIndex = i;
+      rows.forEach((row) => {
+        const idx = Number(row.dataset.dayIndex);
+        row.setAttribute('data-active', idx === i ? 'true' : 'false');
+      });
+
+      const row = rows[i];
+      if (!row) return;
+      const next = rangeFor(row);
+
+      // Take the SHORTEST path between the last and next start
+      // angles — clockwise when scrolling forward through the day,
+      // anti-clockwise when scrolling back. Normalising the delta
+      // to (-180, +180] picks whichever direction is shorter, so
+      // a small backward scroll doesn't trigger a full revolution.
+      let delta = next.start - lastStartMod;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      accStart += delta;
+      lastStartMod = next.start;
+
+      targetStart = accStart;
+      targetExtent = next.extent;
+      start();
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const idx = Number((entry.target as HTMLElement).dataset.dayIndex);
+          ratios.set(idx, entry.intersectionRatio);
+        }
+        let bestIdx = -1;
+        let bestRatio = -1;
+        ratios.forEach((r, i) => {
+          if (r > bestRatio) {
+            bestRatio = r;
+            bestIdx = i;
+          }
+        });
+        if (bestIdx >= 0 && bestRatio > 0) setActive(bestIdx);
+      },
+      {
+        rootMargin: '-40% 0px -20% 0px',
+        threshold: [0, 0.5, 1],
+      },
+    );
+
+    rows.forEach((row) => io.observe(row));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', install, { once: true });
+  } else {
+    install();
+  }
+  document.addEventListener('astro:page-load', () => {
+    (window as any).__dayInLifeHooked = false;
+    install();
+  });
+</script>

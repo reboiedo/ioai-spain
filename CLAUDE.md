@@ -108,6 +108,33 @@ import { useTranslations } from '@/i18n';
 - Scoped component styles with media queries for responsive design
 - GSAP animations used selectively (e.g., button interactions)
 
+### Design tokens (Tenerife Camp v2)
+
+Tokens for the **Tenerife Camp v2** page live in the external `design-system-builder` app (design system: "Tenerife Camp"). Authoritative source in this repo:
+
+- `tokens/tenerife/tokens.json` — DTCG-format tokens (core primitives, semantic layer, per-mode theme blocks)
+- `tokens/tenerife/$metadata.json` — token set metadata
+
+These files are the **input** to Style Dictionary. Generated output:
+
+- `src/styles/tenerife/tokens.css` — primitives + flat semantic vars on `:root`, `.font-*` typography utility classes, per-mode blocks (`:root, [data-theme="orange"]`, `[data-theme="blue"]`, `[data-theme="neutral"]`)
+- `src/styles/tenerife/utilities.css` — hand-authored layout utilities (`.section`, `.container`, `.container-narrow`, `.container-full`, `.stack-*`) that consume the generated vars
+
+Build is wired via the **`tenerifeTokens()` Astro integration** (`src/integrations/tokens.mjs`): runs SD on every `astro dev` / `astro build`, and hot-rebuilds + triggers a full browser reload when any `tokens/**/*.json` file changes during dev. Manual build: `npm run tokens:build`.
+
+**Consumption rule (user memory — do not violate):** On Tenerife Camp v2 pages, use the generated `.font-*` utility classes directly (e.g. `<h1 class="font-display-l">`). Do **not** recompose typography from primitive `--type-*`/`--weight-*`/`--font-*` vars.
+
+**Editing tokens — use the `design-system-builder` MCP** (configured per-project in `~/.claude.json`). Conventions:
+
+- Name grouping uses `.` (e.g. `color.blue.500`), **not** `/` — the MCP's `create_token` tool description says `/` but that is stale.
+- Typography tokens are DTCG composites. `update_token` only accepts primitives; for composite edits use the Convex HTTP API directly:
+  ```
+  PATCH https://tacit-vole-969.convex.site/api/tokens/update?key=<DSB_API_KEY>&id=<tokenId>
+  body: { "values": { "default": { "type": "composite", "value": {...} } } }
+  ```
+- Aliases reference `tokenId`, not the dotted path. Dotted paths only appear in the generated DTCG output.
+- After editing, changes sync into `tokens/tenerife/tokens.json`; the Astro integration rebuilds `tokens.css` automatically.
+
 ## Important Patterns
 
 ### Adding New Forms

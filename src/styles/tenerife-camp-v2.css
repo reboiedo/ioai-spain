@@ -1,0 +1,39 @@
+/* Tenerife Camp v2 — custom styles */
+/* Fonts (Unbounded, Inter Tight) are loaded via Astro's Fonts API in
+   astro.config.mjs and injected by TenerifeCampV2Layout — do not add
+   @import url() here. */
+
+/* CSS spec: @import MUST come before any other rules (except
+ * @charset / @layer). Keep them first. */
+@import './tenerife/tokens.css';
+@import './tenerife/utilities.css';
+
+/* PP Neue Corp Condensed Ultrabold — self-hosted local font.
+ *
+ * The primitive `--font-neue-corp` below is referenced by the
+ * semantic `core.font.headings` token, so every `.font-*` utility
+ * that resolves through `var(--font-headings)` picks up Neue Corp
+ * automatically. No per-component font-family overrides needed.
+ *
+ * Why defined here (not via Astro's Fonts API): it's a one-off
+ * local font with a single weight and style, so the @font-face +
+ * primitive-var pair is simpler than wiring a local provider. */
+@font-face {
+  font-family: 'PP Neue Corp Condensed';
+  src: url('/fonts/PPNeueCorp-CondensedUltrabold.woff2') format('woff2'),
+       url('/fonts/PPNeueCorp-CondensedUltrabold.woff')  format('woff');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Primitive font stack: `'PP Neue Corp Condensed'` (our @font-face
+   * family above), with Inter Tight as the fallback so the temporary
+   * FOUT swap stays within the "2 families" rule (Neue Corp for
+   * display, Inter Tight for everything else). Referenced by
+   * `tokens/tenerife/tokens.json` → `core.font.neue-corp` →
+   * `--font-neue-corp` → consumed by `.font-display` / `.font-display-l`. */
+  --font-neue-corp: 'PP Neue Corp Condensed', var(--font-inter-tight), sans-serif;
+}
+

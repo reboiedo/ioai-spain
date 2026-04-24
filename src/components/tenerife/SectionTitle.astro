@@ -1,0 +1,143 @@
+---
+/**
+ * SectionTitle — stacked display heading sized by `.font-display-l`.
+ * Each line is its own block so we can scale-Y it independently on
+ * scroll, anchored to its top edge.
+ *
+ *   <SectionTitle lines={["OUR", "APPROACH"]} />
+ *   <SectionTitle lines={["OUR APPROACH"]} mobileLines={["OUR", "APPROACH"]} />
+ *   <SectionTitle lines={["Apply"]} as="h3" />
+ *
+ * `mobileLines` is optional — when omitted, `lines` is used at every
+ * viewport. When present, a second variant is rendered in the DOM and
+ * swapped via `@media (max-width: 767.98px)`. Breakpoint mirrors
+ * `.split` in `src/styles/tenerife/utilities.css`.
+ */
+
+export interface Props {
+  as?: 'h1' | 'h2' | 'h3' | 'div';
+  class?: string;
+  /** Desktop (≥768px) lines. Also used on mobile if `mobileLines` omitted. */
+  lines: string[];
+  /** Optional mobile (<768px) line breakdown. */
+  mobileLines?: string[];
+  /** Optional max-width for the title (any CSS length, e.g. "20ch", "40rem"). */
+  width?: string;
+}
+
+const {
+  as: Tag = 'h2',
+  class: extraClass = '',
+  lines = [],
+  mobileLines,
+  width,
+} = Astro.props as Props;
+
+const mobile: string[] | null =
+  Array.isArray(mobileLines) && mobileLines.length > 0 ? mobileLines : null;
+---
+
+<Tag
+  class:list={['section-title', 'font-display-l', extraClass]}
+  style={width ? `max-width: ${width}` : undefined}
+>
+  <span
+    class="section-title__lines section-title__lines--desktop"
+    aria-hidden={mobile ? 'true' : undefined}
+    data-stl
+  >
+    {lines.map((line) => (
+      <span class="section-title__line">{line}</span>
+    ))}
+  </span>
+  {mobile && (
+    <span class="section-title__lines section-title__lines--mobile" data-stl>
+      {mobile.map((line) => (
+        <span class="section-title__line">{line}</span>
+      ))}
+    </span>
+  )}
+</Tag>
+
+<style>
+  @property --scroll-sy {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 1;
+  }
+
+  .section-title {
+    margin: 0;
+  }
+
+  .section-title__lines {
+    display: block;
+    transform-origin: 0 0;
+    transform: scaleY(var(--scroll-sy, 1));
+    will-change: transform;
+  }
+
+  .section-title__line {
+    display: block;
+  }
+
+  .section-title__lines--mobile {
+    display: none;
+  }
+
+  @media (max-width: 767.98px) {
+    .section-title:has(.section-title__lines--mobile) .section-title__lines--desktop {
+      display: none;
+    }
+    .section-title:has(.section-title__lines--mobile) .section-title__lines--mobile {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  let tweens: gsap.core.Tween[] = [];
+
+  function renderAll() {
+    tweens.forEach((t) => t.scrollTrigger?.kill());
+    tweens.forEach((t) => t.kill());
+    tweens = [];
+
+    const lines = document.querySelectorAll<HTMLElement>('[data-stl]');
+    lines.forEach((line) => {
+      tweens.push(
+        gsap.fromTo(
+          line,
+          { '--scroll-sy': 0.6 },
+          {
+            '--scroll-sy': 1,
+            ease: 'none',
+            immediateRender: true,
+            scrollTrigger: {
+              trigger: line,
+              start: 'top bottom',
+              end: 'center center',
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        ),
+      );
+    });
+
+    ScrollTrigger.refresh();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAll, { once: true });
+  } else {
+    renderAll();
+  }
+
+  document.addEventListener('astro:page-load', renderAll);
+</script>

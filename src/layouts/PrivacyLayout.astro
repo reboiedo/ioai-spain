@@ -12,28 +12,12 @@ export interface Props {
 }
 
 const { title, description, privacyEntry, locale = 'en' } = Astro.props;
-const { Content } = await render(privacyEntry);
+const { Content, headings: rawHeadings } = await render(privacyEntry);
 const lastUpdated = privacyEntry.data.lastUpdated;
 
-// Parse markdown content to extract headings for navigation
-function parseMarkdownHeadings(markdown: string) {
-  const headingRegex = /^## (.+)$/gm;
-  const headings: { id: string; title: string }[] = [];
-  let match;
-
-  while ((match = headingRegex.exec(markdown)) !== null) {
-    const headingTitle = match[1];
-    const id = headingTitle
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '')
-      .replace(/\s+/g, '-');
-    headings.push({ id, title: headingTitle });
-  }
-
-  return headings;
-}
-
-const headings = parseMarkdownHeadings(privacyEntry.body || '');
+const headings = rawHeadings
+  .filter(h => h.depth === 2)
+  .map(h => ({ id: h.slug, title: h.text }));
 
 // Translations for the interface
 const translations = {

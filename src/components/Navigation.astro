@@ -6,13 +6,21 @@ import Button from '@/components/ui/Button.astro';
 import Dropdown from '@/components/ui/Dropdown.astro';
 import { Image } from 'astro:assets';
 import logoSvg from '@/assets/icons/ioai-spain.svg';
+import logoWhiteSvg from '@/assets/ioai-logo-white.svg';
 
 export interface Props {
   hideNavItems?: boolean;
   ctaUrlOverride?: string;
+  /**
+   * Visual theme for the nav. `'default'` is the standard light
+   * nav. `'transparent'` swaps in the white wordmark for use on
+   * dark / coloured backgrounds (e.g. the Tenerife camp v2 page).
+   */
+  theme?: 'default' | 'transparent';
 }
 
-const { hideNavItems = false, ctaUrlOverride } = Astro.props;
+const { hideNavItems = false, ctaUrlOverride, theme = 'default' } = Astro.props;
+const logoSrc = theme === 'transparent' ? logoWhiteSvg : logoSvg;
 
 // Get current locale from Astro's i18n
 const currentLocale = (Astro.currentLocale || 'en') as Language;
@@ -47,7 +55,7 @@ const navItems = [
     <div class="nav-brand">
       <a href={getRelativeLocaleUrl(currentLocale, '')}>
         <Image
-          src={logoSvg}
+          src={logoSrc}
           alt="IOAI Spain"
           class="logo"
           width={120}
