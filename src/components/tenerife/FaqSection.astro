@@ -128,16 +128,13 @@ const faqs: Faq[] = [
     }
   }
 
-  /* Right column — stack of drawer rows.
-   *
-   * `--faq-extra` is set once on mount (see <script> below) to
-   * the tallest answer's measured height, then reserved as
-   * `padding-block-end`. The scene's pin sees a stable, worst-
-   * case scene height from the start, so opening any drawer
-   * doesn't clip into the next scene. */
+  /* Right column — stack of drawer rows. The scene-stack pin
+   * adapts to height changes via a ResizeObserver in
+   * `initSceneStack` (see `src/pages/tenerife-camp.astro`), so
+   * opening a drawer just lets the section grow and the pin
+   * re-anchors at the new bottom. No reserve padding required. */
   .faq__list {
     display: grid;
-    padding-block-end: var(--faq-extra, 0px);
   }
 
   .faq-item {
@@ -234,55 +231,3 @@ const faqs: Faq[] = [
     }
   }
 </style>
-
-<!--
-  Scroll-reserve. Same idea as Course: this scene gets the
-  scene-stack 1-viewport pin, so when an answer expands the
-  bottom of the stack would otherwise clip into the next scene.
-  Reserve trailing room equal to the tallest answer's measured
-  height, set once on mount, so ScrollTrigger sees a stable
-  worst-case scene height and any drawer can open without the
-  next section overlapping.
--->
-<script>
-  const DEBOUNCE_MS = 150;
-
-  function applyReserve() {
-    const bodies = document.querySelectorAll<HTMLElement>(
-      '.faq-item .faq-item__body',
-    );
-    let max = 0;
-    bodies.forEach((b) => {
-      if (b.scrollHeight > max) max = b.scrollHeight;
-    });
-    document.querySelectorAll<HTMLElement>('.faq__list').forEach((list) => {
-      list.style.setProperty('--faq-extra', `${max}px`);
-    });
-  }
-
-  function install() {
-    if ((window as any).__faqHooked) return;
-    (window as any).__faqHooked = true;
-
-    applyReserve();
-
-    let resizeTimer: number | null = null;
-    window.addEventListener('resize', () => {
-      if (resizeTimer !== null) clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => {
-        resizeTimer = null;
-        applyReserve();
-      }, DEBOUNCE_MS);
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', install, { once: true });
-  } else {
-    install();
-  }
-  document.addEventListener('astro:page-load', () => {
-    (window as any).__faqHooked = false;
-    install();
-  });
-</script>

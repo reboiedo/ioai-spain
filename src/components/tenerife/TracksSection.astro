@@ -155,19 +155,14 @@ const advancedTracks: Track[] = [
 
   /* Right column — two dark cards stacked vertically. Larger gap
    * than the inner card padding so the cards read as distinct
-   * objects rather than a single long panel.
-   *
-   * `--tracks-extra` is set once (on mount) by Course.astro to the
-   * tallest drawer body's scrollHeight — reserved trailing room so
-   * the scene's pin (at `bottom bottom`) engages only after the
-   * worst-case drawer has had space to scroll into view. Set once
-   * so ScrollTrigger can measure the scene stably; no per-toggle
-   * refresh is needed (which would otherwise destabilise upstream
-   * tilts). */
+   * objects rather than a single long panel. The scene-stack pin
+   * adapts to height changes via the ResizeObserver in
+   * `initSceneStack` (see `src/pages/tenerife-camp.astro`), so
+   * opening a course drawer just lets the section grow and the pin
+   * re-anchors at the new bottom — no reserve padding required. */
   .tracks__lists {
     display: grid;
     gap: var(--space-2xl);
-    padding-block-end: var(--tracks-extra, 0px);
     max-width: 680px;
   }
 </style>

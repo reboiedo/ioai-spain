@@ -144,6 +144,7 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
   ScrollTrigger.config({ ignoreMobileResize: true });
 
   let sceneTriggers: ScrollTrigger[] = [];
+  let sceneObservers: ResizeObserver[] = [];
   let tiltTweens: gsap.core.Tween[] = [];
   let displayAssetTweens: gsap.core.Tween[] = [];
   let lenis: Lenis | null = null;
@@ -173,9 +174,11 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
   }
 
   function initSceneStack() {
-    // Kill any stale triggers (Astro view transitions).
+    // Kill any stale triggers / observers (Astro view transitions).
     sceneTriggers.forEach((t) => t.kill());
     sceneTriggers = [];
+    sceneObservers.forEach((o) => o.disconnect());
+    sceneObservers = [];
 
     const scenes = gsap.utils.toArray<HTMLElement>('[data-scene]');
 
@@ -204,6 +207,30 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
         invalidateOnRefresh: true,
       });
       sceneTriggers.push(trigger);
+
+      // Per-scene ResizeObserver. Sections that contain disclosure
+      // widgets (FAQ, Tracks) grow when the user opens an accordion;
+      // images and late-loading fonts can also shift heights. Refresh
+      // ONLY this scene's pin trigger so:
+      //  - the new `bottom bottom` is measured against the new height,
+      //  - the pin releases / re-engages cleanly at the right scroll,
+      //  - tilt scrub triggers on other scenes are NOT re-measured
+      //    (a global ScrollTrigger.refresh() destabilises them).
+      // Debounced so the refresh fires once at the end of the open/
+      // close transition rather than on every animation frame.
+      let lastH = scene.offsetHeight;
+      let timer: number | undefined;
+      const ro = new ResizeObserver(() => {
+        const h = scene.offsetHeight;
+        if (h === lastH) return;
+        lastH = h;
+        if (timer !== undefined) window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          trigger.refresh();
+        }, 120);
+      });
+      ro.observe(scene);
+      sceneObservers.push(ro);
     });
 
     // Late-loading content (fonts, images) can change scene heights
@@ -352,6 +379,8 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
   function cleanup() {
     sceneTriggers.forEach((t) => t.kill());
     sceneTriggers = [];
+    sceneObservers.forEach((o) => o.disconnect());
+    sceneObservers = [];
     tiltTweens.forEach((t) => t.scrollTrigger?.kill());
     tiltTweens.forEach((t) => t.kill());
     tiltTweens = [];

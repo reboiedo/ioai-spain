@@ -347,8 +347,11 @@ const initial = arcVars(slots[0]);
     gap: var(--space-s);
     padding-block: var(--space-l);
     border-block-start: 1px solid var(--border);
-    opacity: 0.5;
-    transition: opacity 360ms ease;
+    /* Match the activity-row dim treatment: deeper inactive opacity
+     * (0.2) and a long ease-out-expo curve so focus shifts read as
+     * a slow cross-fade rather than a snap. */
+    opacity: 0.2;
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .day-row[data-active="true"] {
