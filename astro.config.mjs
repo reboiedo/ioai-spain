@@ -9,6 +9,11 @@ import tenerifeTokens from "./src/integrations/tokens.mjs";
 
 // https://astro.build/config
 export default defineConfig({
+  // Hide Astro's floating dev toolbar (the icon at the bottom of the
+  // viewport during `astro dev`). astro-tunnel is unaffected — this
+  // only disables the in-page toolbar overlay.
+  devToolbar: { enabled: false },
+
   i18n: {
     defaultLocale: "en",
     locales: ["en", "es"],

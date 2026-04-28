@@ -68,6 +68,10 @@ const mobile: string[] | null =
 
   .section-title {
     margin: 0;
+    /* Inherit the section's foreground colour. Each theme's
+     * `--foreground` resolves per `data-theme` so the title reads
+     * cleanly against the section's background. */
+    color: var(--foreground);
   }
 
   .section-title__lines {

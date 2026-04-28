@@ -50,13 +50,39 @@
 :root {
   --nav-height: 80px;
   --sticky-top: calc(var(--nav-height) + var(--space-m));
+  /* StickyJoinCta margin from the viewport edges (matches the
+   * `--cta-inset` value used in StickyJoinCta.astro). Both sites
+   * read this var so changing it propagates everywhere. */
+  --cta-inset: clamp(0.75rem, 3vw, 1.25rem);
+  /* Reserved bottom-of-section padding so the sticky Join CTA
+   * doesn't overlap section content. ZERO on desktop — the CTA is
+   * a small bottom-right corner pill there and the extra padding
+   * was inflating every section unnecessarily. The mobile media
+   * query below sets a non-zero value because the mobile CTA is a
+   * wide bar that would crowd any bottom-anchored content. */
+  --cta-clearance: 0px;
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    /* Just-enough clearance for the mobile sticky CTA:
+     *   2 × bottom margin (= `--cta-inset` on each side, top + bottom
+     *   of the button) + button intrinsic height (~3rem = label
+     *   line-height + vertical padding).
+     * Result lands ~80px tall on most phones — content stays clear
+     * of the button without inflating every section by 144px. */
+    --cta-clearance: calc(var(--cta-inset) * 2 + 3rem);
+  }
 }
 
 .section {
   /* Extra top padding to account for the fixed nav — titles landing at
    * viewport top otherwise end up clipped behind it. */
   padding-block-start: calc(var(--section-block) + var(--nav-height));
-  padding-block-end: var(--section-block);
+  /* Bottom padding includes `--cta-clearance` so the floating /
+   * sticky Join CTA never overlaps any bottom-anchored content
+   * (ledes, section CTAs, contact lines, etc.) on any breakpoint. */
+  padding-block-end: calc(var(--section-block) + var(--cta-clearance));
   padding-inline: var(--section-inline);
   background: var(--background);
   color: var(--foreground);
@@ -137,7 +163,11 @@
  * content for shader-driven distortion. */
 .display-block {
   position: relative; /* containing block for the absolute asset */
-  min-height: 100svh;
+  /* `lvh` (large viewport height) instead of `svh`. On mobile, `svh`
+   * leaves a gap below this block when the browser chrome collapses
+   * — the next section peeks through. `lvh` sizes for the largest
+   * viewport so chrome state never reveals what's below. */
+  min-height: 100lvh;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start; /* title anchors to the top */
@@ -213,15 +243,19 @@
  * pseudo-elements, no sticky positioning — content of any height
  * scrolls through naturally first, then pins for the reveal.
  *
- * Without JS, the page degrades to a plain stack of sections — fully
- * readable, just without the overlay effect.
+ * Drawer-bearing scenes mark themselves `[data-flow]` so the JS skips
+ * pinning them — a `pinSpacing:false` pin makes the scene
+ * `position: fixed` which removes it from flow, and a drawer growing
+ * inside a fixed-positioned scene can't push downstream siblings.
+ * Flow scenes scroll past normally; the next pinned scene takes over
+ * via its own pin.
  *
  *   <div class="scene" data-scene>
  *     <section class="section scene__layer" data-theme="blue">…</section>
  *   </div>
- *
- * The last scene should omit `data-scene` — nothing needs to reveal
- * over it.
+ *   <div class="scene" data-scene data-flow>  ← drawer scene, no pin
+ *     <section …>…</section>
+ *   </div>
  * ────────────────────────────────────────────────────────────────── */
 
 .scene {
@@ -232,12 +266,22 @@
  * of the pin-and-reveal pattern: when a short scene is pinned, its bottom
  * must be at the viewport bottom, which means pin engages with the scene
  * occupying only the lower portion of the viewport — a split-screen effect
- * with the previous pinned scene still visible above. Enforcing 100svh
- * min-height means every pin lands with `top: 0`, filling the viewport,
+ * with the previous pinned scene still visible above. Enforcing viewport-
+ * tall min-height means every pin lands with `top: 0`, filling the viewport,
  * and the next scene covers cleanly on scroll. Tall content is unaffected
- * — min-height is a floor, not a ceiling. */
+ * — min-height is a floor, not a ceiling.
+ *
+ * `lvh` (large viewport height) — sized for the largest possible mobile
+ * viewport (chrome fully collapsed). With `svh` the section was exactly
+ * one *small* viewport tall, so when the browser chrome collapsed on
+ * scroll the visible area grew but the section didn't, revealing the
+ * next section in the freshly-uncovered strip at the bottom. `lvh`
+ * eliminates that — the section always extends at least to the bottom
+ * of the largest viewport, so any chrome state keeps the next scene
+ * fully covered. The cost: when chrome is shown, the section's bottom
+ * edge sits slightly behind the chrome (invisible to the user). */
 .scene__layer {
-  min-height: 100svh;
+  min-height: 100lvh;
 }
 
 /* Tilt/warp opt-in marker.

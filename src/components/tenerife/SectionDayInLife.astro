@@ -14,6 +14,7 @@
  */
 
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 
 export interface Props {
   /** Tenerife theme palette to apply via `data-theme`. */
@@ -146,6 +147,10 @@ const initial = arcVars(slots[0]);
     class="section split scene__layer scene__layer--tilt day-in-life"
     data-theme={theme}
   >
+    <!-- DESKTOP layout (≥768px): sticky clock on the left, scrollable
+         timeslot list on the right. Hidden on mobile by the
+         `.day__desktop` rule in the <style> block below. -->
+    <div class="day__desktop">
     <!-- LEFT: sticky title + animated clock. -->
     <div class="day__left">
       <SectionTitle lines={["A DAY AT TENERIFE"]} />
@@ -245,10 +250,106 @@ const initial = arcVars(slots[0]);
         ))}
       </ol>
     </div>
+    </div>
+
+    <!-- MOBILE layout (<768px): title + intro stack vertically (no
+         sticky, no clock), followed by a horizontal-scroll of slot
+         cards. Each card carries time, title, and description. -->
+    <div class="day__mobile">
+      <SectionTitle lines={["A DAY AT TENERIFE"]} />
+      <p class="font-body-l day__mobile-intro">
+        Every day at the camp follows the same rhythm — morning
+        learning blocks, an unhurried lunch, the afternoon programme
+        on the island, dinner together, and a deliberately quiet
+        evening before the next early start. Here's how a typical day
+        breaks down.
+      </p>
+
+      <HScrollMobile itemWidth="min(80%, 320px)">
+        {slots.map((s) => (
+          <article class="day-card">
+            <p class="font-caption day-card__time">{s.time}</p>
+            <h3 class="font-h3 day-card__title">{s.title}</h3>
+            <p class="font-body-s day-card__description">{s.description}</p>
+          </article>
+        ))}
+      </HScrollMobile>
+    </div>
   </section>
 </div>
 
 <style>
+  /* ── Desktop / mobile layout swap ───────────────────────────────
+   * Desktop renders the sticky clock + scrollable list inside the
+   * section's `.split` grid. Mobile renders a single-column block.
+   *
+   * `display: contents` keeps the wrapper transparent to layout so
+   * the parent `.split` grid still sees `.day__left` and
+   * `.day__column` as DIRECT children. Without it the split would
+   * collapse to a single column on desktop. */
+  .day__desktop {
+    display: contents;
+  }
+
+  .day__mobile {
+    display: none;
+  }
+
+  @media (max-width: 767.98px) {
+    .day__desktop {
+      display: none;
+    }
+    .day__mobile {
+      display: grid;
+      gap: var(--space-l);
+    }
+    /* The section's `.split` rule is irrelevant when only one
+     * column is rendered — collapse to a single column so the
+     * mobile block doesn't inherit half-width sizing. */
+    .day-in-life {
+      display: block;
+    }
+  }
+
+  .day__mobile-intro {
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  /* Mobile timeslot card — uses the design-system `--surface`
+   * token so it picks up the section theme's brand surface colour
+   * (orange-300 / blue-500 / yellow-300 per theme). Foreground
+   * stays on `--foreground` since `--surface` doesn't ship a
+   * matching foreground pair. */
+  .day-card {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    padding: var(--space-l) var(--space-m);
+    background: var(--surface);
+    color: var(--foreground);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .day-card__time {
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  .day-card__title {
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  .day-card__description {
+    margin: 0;
+    opacity: 0.85;
+  }
+
   .day-in-life {
     align-items: start;
   }

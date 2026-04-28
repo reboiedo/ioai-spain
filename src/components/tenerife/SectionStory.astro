@@ -1,0 +1,483 @@
+---
+/**
+ * SectionStory — narrative scene inspired by follow.art's "Our Story".
+ *
+ * Layout (desktop):
+ *   ┌──────────────────────────────────────┬──────────────────────────┐
+ *   │  Item 1                              │                          │
+ *   │  ─────────────────                   │   ╔══════════════╗        │
+ *   │  Item 2                              │   ║  HUGE LINE 1 ║        │
+ *   │  ─────────────────                   │   ║              ║        │
+ *   │  Item 3                              │   ║  ┌────────┐  ║        │
+ *   │  ─────────────────                   │   ║  │ video  │  ║        │
+ *   │  …                                   │   ║  │ poster │  ║        │
+ *   │                                      │   ║  └────────┘  ║        │
+ *   │                                      │   ║  HUGE LINE 2 ║        │
+ *   │                                      │   ╚══════════════╝        │
+ *   └──────────────────────────────────────┴──────────────────────────┘
+ *
+ * Right column is sticky — the giant 2-line title and the overlapping
+ * tilted video poster stay in view while the user scrolls past the
+ * left column's items.
+ *
+ * Mobile: title on top (still 2 stacked lines, sized down), video
+ * tile below it, item list flows underneath.
+ *
+ * Items are a content-only stub for now — replace as copy lands.
+ */
+
+import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
+import { Image, type ImageMetadata } from "astro:assets";
+import harbourLogo from "@/assets/harbour-space-logo.svg";
+import leaguesLogo from "@/assets/icons/leagues-logo.svg";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+  /** Two-line stacked title. */
+  titleLines?: [string, string];
+  /** Optional video poster image (any aspect). */
+  posterImage?: ImageMetadata;
+  /** URL the video tile links to / opens. */
+  videoUrl?: string;
+}
+
+interface Item {
+  label: string;
+  body: string;
+}
+
+const {
+  theme = "blue",
+  titleLines = ["ABOUT", "US"],
+  posterImage,
+  videoUrl,
+} = Astro.props;
+
+// Approach pillars — content lifted from the (now-removed) Approach
+// scene. Lives here so the Story scene carries the camp's full
+// narrative on a single page.
+const items: Item[] = [
+  {
+    label: "The academics and the summer are both real",
+    body: "The learning program and the extracurricular program are built with equal care. Mornings go deep into AI. Afternoons go to Tenerife's beaches, trails, and historic towns. Neither half is filler, and you don't have to sacrifice one to get the other.",
+  },
+  {
+    label: "Two tracks, one community",
+    body: "Foundations and applied ML run in parallel, plus a team research sprint that cuts across both. Mornings you're in your track; afternoons and evenings the whole cohort is together — meals, labs, problem sets, hikes.",
+  },
+  {
+    label: "The highest level is in the room",
+    body: "Students selected from the IOAI Spain qualifier, taught by researchers who publish at NeurIPS and ICML, with industry mentors from Barcelona's AI labs. Ambition is the baseline.",
+  },
+];
+
+// Quick-facts trio shown right under the lede paragraph. The
+// `Dates` value is a placeholder — swap once the calendar is set.
+const facts: { label: string; value: string }[] = [
+  { label: "Language", value: "English" },
+  { label: "Ages", value: "14–18" },
+  { label: "Dates", value: "TBD" },
+];
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section scene__layer scene__layer--tilt story"
+    data-theme={theme}
+  >
+    <div class="story__layout">
+      <!-- LEFT — scrollable list of items. Plain block flow on
+           desktop so it scrolls with the page; the right column is
+           sticky and stays in view as the user passes by. The big
+           lede paragraph sits above the item list. -->
+      <div class="story__items">
+        <!-- Lede + sponsors share a single visual block: the "Powered
+             and sponsored by" caption + logos sit immediately under
+             the paragraph with no border or extra padding, so the
+             sponsors read as part of the same opening statement. -->
+        <div class="story__intro">
+          <p class="font-body-l story__lede">
+            For over a decade behind the scenes of olympiad coaching and
+            AI research, we've watched ambitious students chase the same
+            handful of opportunities — and noticed how rarely those
+            opportunities reach beyond a familiar inner circle. The
+            Tenerife camp exists to widen that circle.
+          </p>
+
+          <div class="story__sponsors">
+            <p class="font-caption story__sponsors-label">Powered and sponsored by</p>
+            <div class="story__sponsors-logos">
+              <Image
+                src={harbourLogo}
+                alt="Harbour.Space"
+                class="story__sponsors-logo story__sponsors-logo--harbour"
+              />
+              <Image
+                src={leaguesLogo}
+                alt="Leagues of Code"
+                class="story__sponsors-logo story__sponsors-logo--leagues"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick facts row — three label/value pairs sat horizontally
+             beneath the intro block. Framed by horizontal rules so it
+             reads as a distinct section. -->
+        <ul class="story__facts">
+          {facts.map((f) => (
+            <li class="story-fact">
+              <span class="font-caption story-fact__label">{f.label}</span>
+              <span class="font-h4 story-fact__value">{f.value}</span>
+            </li>
+          ))}
+        </ul>
+
+        {items.map((it, i) => (
+          <article class="story-item" data-story-item-index={i}>
+            <h3 class="font-h4 story-item__label">{it.label}</h3>
+            <p class="font-body story-item__body">{it.body}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Vertical centreline divider. Lives in its own grid track
+           between the two content columns and `align-self: stretch`
+           so it spans the WHOLE section height — the items column
+           (much taller than the sticky right column) sets the row
+           height, so the divider always reaches the section's
+           bottom regardless of the sticky element's max-height. -->
+      <div class="story__divider" aria-hidden="true"></div>
+
+      <!-- RIGHT — sticky big-title + overlapping tilted video poster.
+           `HeroTitleStack` sizes each line so the shorter line's
+           letters match the longer line's height (right-anchored). -->
+      <div class="story__right">
+        <div class="story__title">
+          <HeroTitleStack
+            lines={titleLines}
+            defaultAlign="right"
+            noStretch
+            gap="var(--space-s)"
+          />
+        </div>
+
+        <!-- Video poster — tilted, sits between the two title lines
+             (overlapping both visually). Click to play (currently
+             links out — wire to inline player later). -->
+        <a
+          class="story__video"
+          href={videoUrl ?? "#"}
+          aria-label="Play story video"
+        >
+          {posterImage ? (
+            <Image
+              class="story__video-img"
+              src={posterImage}
+              alt=""
+              widths={[480, 720, 960]}
+              sizes="(min-width: 768px) 30vw, 70vw"
+              loading="lazy"
+            />
+          ) : (
+            <div class="story__video-placeholder" aria-hidden="true"></div>
+          )}
+          <span class="story__video-play" aria-hidden="true">▶</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  /* The section is intentionally tall — long enough for the user
+   * to scroll through the whole item list while the right column
+   * stays pinned. `min-height` is a sensible floor; the natural
+   * height grows with the item count. */
+  .story {
+    min-height: 100lvh;
+  }
+
+  /* Three-column grid on desktop; single-column stack on mobile.
+   * Mobile order is overridden so the title + video block appears
+   * FIRST (above the lede + items) — DOM order has items first
+   * for desktop layout, but mobile flips it via grid order. */
+  .story__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+
+  @media (max-width: 767.98px) {
+    .story__items {
+      order: 2;
+    }
+    .story__divider {
+      order: 1;
+      /* Already display: none on mobile — order is a no-op but
+       * harmless if the divider ever becomes visible later. */
+    }
+    .story__right {
+      order: 0;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .story__layout {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.1fr);
+      column-gap: var(--space-3xl);
+    }
+  }
+
+  .story__divider {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    /* Vertical line between the columns. `align-self: stretch` makes
+     * it fill the full grid row, which is sized by the (much taller)
+     * left items column — so the divider runs the entire section
+     * height regardless of the right column's sticky max-height. */
+    .story__divider {
+      display: block;
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+  }
+
+  /* ── LEFT: lede + scrollable items ──────────────────────────── */
+  .story__items {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Intro block — lede + sponsors sit together with tight spacing
+   * so they read as ONE statement. Bottom margin is the separator
+   * to the facts row below. The max-width caps the line length at
+   * a comfortable reading width without feeling cramped — 70ch is
+   * the upper end of standard line-length guidance (45–75ch). */
+  .story__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    max-width: 70ch;
+    margin: 0 0 var(--space-l);
+  }
+
+  .story__lede {
+    margin: 0;
+  }
+
+  /* Quick facts — three label/value pairs in a single row.
+   * Border-top only — the first item below provides its own
+   * border-top, which (combined with this row's bottom padding)
+   * doubles as the visual rule between the facts and the items. */
+  .story__facts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-m);
+    border-block-start: 1px solid var(--border);
+    padding-block: var(--space-l);
+  }
+
+  .story-fact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs, 0.25rem);
+  }
+
+  .story-fact__label {
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .story-fact__value {
+    margin: 0;
+  }
+
+  /* Sponsors row — caption + two logos. Lives inside `.story__intro`
+   * so it sits flush under the lede with no border or extra
+   * vertical room. */
+  .story__sponsors {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs, 0.4rem);
+  }
+
+  .story__sponsors-label {
+    margin: 0;
+    opacity: 0.65;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .story__sponsors-logos {
+    display: flex;
+    align-items: center;
+    gap: var(--space-l);
+    flex-wrap: wrap;
+  }
+
+  .story__sponsors-logo {
+    height: 1.6rem;
+    width: auto;
+    /* Logos ship in their brand colour; flatten to white so they
+     * read against any of the section themes. */
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+  }
+
+  /* Each pillar is its own row, stacked vertically with horizontal
+   * rules between. INSIDE each pillar, the label and body sit
+   * side-by-side on wider viewports (label left, body right) and
+   * fall back to stacked on mobile. */
+  .story-item {
+    padding-block: var(--space-xl);
+    border-block-start: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-s);
+  }
+
+  .story-item:last-child {
+    border-block-end: 1px solid var(--border);
+  }
+
+  .story-item__label {
+    margin: 0;
+  }
+
+  .story-item__body {
+    margin: 0;
+    opacity: 0.85;
+    max-width: 48ch;
+  }
+
+  /* Wider viewports: label left, body right inside each pillar.
+   * Both columns are CAPPED narrow so the title and body don't
+   * sprawl across the full pillar width — the max-width values
+   * keep each line at a comfortable measure. The remaining
+   * horizontal space inside the pillar becomes the gap between
+   * them, which we let `1fr` consume so the gap reads as the
+   * dominant negative space. */
+  @media (min-width: 768px) {
+    .story-item {
+      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr) minmax(0, 36ch);
+      column-gap: 0;
+      align-items: start;
+    }
+
+    /* Drop the body into the third column (skipping the elastic
+     * gap track in the middle). The label sits in column 1; the
+     * body in column 3; column 2 is the breathing room between. */
+    .story-item__body {
+      grid-column: 3;
+      max-width: 36ch;
+    }
+  }
+
+  /* ── RIGHT: sticky title + tilted video ─────────────────────── */
+  .story__right {
+    position: relative;
+  }
+
+  @media (min-width: 768px) {
+    .story__right {
+      position: sticky;
+      top: var(--sticky-top);
+      align-self: start;
+      /* Cap the sticky height to a single viewport so the title
+       * + video block always fits within the visible area when
+       * stuck. */
+      max-height: calc(100lvh - var(--sticky-top));
+    }
+  }
+
+  /* Wrapper around `HeroTitleStack`. The stack handles its own
+   * line layout / width math; we just give it room to breathe. */
+  .story__title {
+    display: block;
+  }
+
+  /* Tilted video poster — overlaps the title's centre so the two
+   * lines visually frame the video. Anchored via absolute on
+   * desktop; on mobile it returns to normal flow. */
+  .story__video {
+    display: block;
+    position: relative;
+    width: 70%;
+    max-width: 360px;
+    aspect-ratio: 4 / 5;
+    margin: var(--space-l) auto 0;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+    text-decoration: none;
+    color: inherit;
+    background: var(--card);
+  }
+
+  @media (min-width: 768px) {
+    /* Bottom-LEFT of the right column — sits roughly 15% in from
+     * the left edge so it doesn't kiss the centreline divider.
+     * Slightly tilted so it reads as a casually placed photo
+     * across the title. */
+    .story__video {
+      position: absolute;
+      bottom: 0;
+      left: 15%;
+      transform: rotate(-8deg);
+      width: clamp(200px, 26vw, 320px);
+      margin: 0;
+      z-index: 2;
+    }
+  }
+
+  .story__video-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .story__video-placeholder {
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--foreground) 22%, transparent) 0%,
+        color-mix(in oklab, var(--foreground) 6%, transparent) 100%
+      );
+  }
+
+  /* Play button overlay — centred, soft glass disc with a triangle
+   * glyph. Pointer-events on the parent <a> so the whole tile is
+   * clickable; this glyph is purely decorative. */
+  .story__video-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 1rem;
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+  }
+
+  .story__video:hover .story__video-play {
+    background: rgba(0, 0, 0, 0.7);
+  }
+</style>

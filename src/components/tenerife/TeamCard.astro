@@ -14,14 +14,18 @@
  *   <TeamCard initials="VA" name="Vladimir Arkhipov" bio="…" />
  */
 
+import { Image, type ImageMetadata } from "astro:assets";
+
 export interface Props {
   initials: string;
   name: string;
   role?: string;
   bio: string;
+  /** Optional portrait. When omitted, the initials placeholder is shown. */
+  image?: ImageMetadata;
 }
 
-const { initials, name, role, bio } = Astro.props;
+const { initials, name, role, bio, image } = Astro.props;
 
 /*
  * Split the name into the first token and the remainder so the
@@ -41,7 +45,18 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
        The corner signifier (plus/x) lives on top of both layers so
        it's always visible. -->
   <div class="team-card__face">
-    <div class="team-card__portrait" data-initials={initials} data-team-portrait></div>
+    <div class="team-card__portrait" data-initials={initials} data-team-portrait>
+      {image && (
+        <Image
+          class="team-card__photo"
+          src={image}
+          alt={`Portrait of ${name}`}
+          widths={[240, 360, 480, 640]}
+          sizes="(min-width: 768px) 22vw, 45vw"
+          loading="lazy"
+        />
+      )}
+    </div>
     <div class="team-card__bio" data-team-bio>
       <p class="font-body-s team-card__bio-text">{bio}</p>
     </div>
@@ -103,6 +118,10 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
     place-items: center;
   }
 
+  /* Initials fallback — only shown when no real photo is present.
+   * `:empty` doesn't quite work because the <Image> renders into the
+   * portrait container, so we instead suppress the pseudo when a
+   * `.team-card__photo` exists via `:has()`. */
   .team-card__portrait::after {
     content: attr(data-initials);
     font-family: var(--font-headings);
@@ -110,6 +129,21 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
     font-size: clamp(1.5rem, 3vw, 2.5rem);
     letter-spacing: -0.02em;
     color: color-mix(in oklab, var(--foreground) 55%, transparent);
+  }
+
+  .team-card__portrait:has(.team-card__photo)::after {
+    display: none;
+  }
+
+  /* Real photo fills the square face, cropped to centre. */
+  .team-card__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
 
   /* Bio layer. Long bios are allowed to scroll inside the square
@@ -198,9 +232,13 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
     display: block;
   }
 
-  /* Role — always 1 line of reserved space, even when absent. */
+  /* Role — always 1 line of reserved space, even when absent.
+   * Negative `margin-block-start` offsets the parent's `gap:
+   * var(--space-s)` so the role sits tighter to the name above —
+   * the wider gap remains between portrait and name. */
   .team-card__role {
     margin: 0;
+    margin-block-start: calc(var(--space-s) * -0.66);
     opacity: 0.7;
     min-height: 1lh;
   }

@@ -3,16 +3,17 @@ import TenerifeCampV2Layout from '@/layouts/TenerifeCampV2Layout.astro';
 import HeroTitle from '@/components/tenerife/HeroTitle.astro';
 import SectionTitle from '@/components/tenerife/SectionTitle.astro';
 import HoverShaderImage from '@/components/tenerife/HoverShaderImage.astro';
-import FocusSection from '@/components/tenerife/FocusSection.astro';
-import OverviewSection from '@/components/tenerife/OverviewSection.astro';
-import TeamSection from '@/components/tenerife/TeamSection.astro';
-import TracksSection from '@/components/tenerife/TracksSection.astro';
-import ActivitiesSection from '@/components/tenerife/ActivitiesSection.astro';
-import DayInLifeSection from '@/components/tenerife/DayInLifeSection.astro';
-import VenueSection from '@/components/tenerife/VenueSection.astro';
-import SafetySection from '@/components/tenerife/SafetySection.astro';
-import FaqSection from '@/components/tenerife/FaqSection.astro';
-import PricingSection from '@/components/tenerife/PricingSection.astro';
+import SectionHero from '@/components/tenerife/SectionHero.astro';
+import SectionStory from '@/components/tenerife/SectionStory.astro';
+import SectionTeam from '@/components/tenerife/SectionTeam.astro';
+import SectionTracks from '@/components/tenerife/SectionTracks.astro';
+import SectionActivities from '@/components/tenerife/SectionActivities.astro';
+import SectionDayInLife from '@/components/tenerife/SectionDayInLife.astro';
+import SectionVenue from '@/components/tenerife/SectionVenue.astro';
+import SectionSafety from '@/components/tenerife/SectionSafety.astro';
+import SectionFaq from '@/components/tenerife/SectionFaq.astro';
+import SectionPricing from '@/components/tenerife/SectionPricing.astro';
+import SectionApply from '@/components/tenerife/SectionApply.astro';
 ---
 
 <!-- Inline early to block native scroll restoration BEFORE the browser
@@ -29,102 +30,30 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
   title="Tenerife Summer Camp - IOAI Spain"
   description="An educational summer camp in Tenerife combining IT and math, creative activities, and outdoor adventure."
 >
-  <!-- Hero — full-bleed section with a DisplayTitle that fills the
-       viewport width. `.section` pads inward, nothing inside clamps. -->
-  <div class="scene" data-scene>
-    <section class="section scene__layer hero" data-theme="blue">
-      <div class="stack-l">
-        <HeroTitle>TENERIFE CAMP</HeroTitle>
-        <p class="font-body-l hero__lede">
-          Two weeks of maths, code and ocean — the IOAI Spain training camp on the
-          slopes of Mount Teide.
-        </p>
-      </div>
-    </section>
-  </div>
+  <SectionHero theme="blue" />
 
-  <FocusSection theme="orange" />
+  <SectionStory theme="orange" />
 
-  <OverviewSection theme="yellow" />
+  <SectionTracks theme="blue" />
 
-  <TracksSection theme="blue" />
+  <SectionTeam theme="orange" />
 
-  <TeamSection theme="orange" />
+  <SectionActivities theme="blue" />
 
-  <ActivitiesSection theme="blue" />
+  <SectionVenue theme="yellow" />
 
-  <VenueSection theme="yellow" />
+  <SectionSafety theme="orange" />
 
-  <SafetySection theme="blue" />
+  <SectionDayInLife theme="blue" />
 
-  <DayInLifeSection theme="yellow" />
+  <SectionPricing theme="orange" />
 
-  <PricingSection theme="orange" />
+  <SectionFaq theme="blue" />
 
-  <FaqSection theme="blue" />
-
-  <!-- Apply — split: hero "JOIN NOW" on the left, supporting copy
-       and CTA on the right. Same `.split` utility used by every
-       other split-headed section, so the columns line up with the
-       rest of the page. -->
-  <div class="scene">
-    <section class="section split scene__layer scene__layer--tilt apply" data-theme="orange">
-      <div class="apply__title">
-        <HeroTitle>JOIN NOW</HeroTitle>
-      </div>
-      <div class="apply__body stack-l">
-        <p class="font-body-l">
-          Applications open with the national qualifier round in February.
-          Shortlisted students are invited to camp; no separate application
-          is needed.
-        </p>
-      </div>
-    </section>
-  </div>
+  <SectionApply theme="orange" />
 
 </TenerifeCampV2Layout>
 
-<style>
-  /* Lock the hero to exactly 100svh — the DisplayTitle's extended
-   * SVG viewBox would otherwise push it past a viewport; we want a
-   * crisp single-screen opening shot. */
-  .hero {
-    height: 100svh;
-    min-height: 100svh; /* overrides .scene__layer's min-height */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding-block-end: var(--section-block);
-  }
-
-  .hero__eyebrow {
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
-    opacity: 0.8;
-    margin: 0;
-  }
-
-  .hero__title,
-  .hero__lede {
-    margin: 0;
-  }
-
-  .hero__lede {
-    max-width: 48ch;
-    opacity: 0.9;
-  }
-
-  /* Apply — keep the right-hand body vertically centred against
-   * the giant hero title on the left so they read as a balanced
-   * pair rather than top-aligned. */
-  @media (min-width: 768px) {
-    .apply {
-      align-items: center;
-    }
-  }
-
-</style>
 
 <script>
   import { gsap } from 'gsap';
@@ -144,7 +73,6 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
   ScrollTrigger.config({ ignoreMobileResize: true });
 
   let sceneTriggers: ScrollTrigger[] = [];
-  let sceneObservers: ResizeObserver[] = [];
   let tiltTweens: gsap.core.Tween[] = [];
   let displayAssetTweens: gsap.core.Tween[] = [];
   let lenis: Lenis | null = null;
@@ -173,67 +101,52 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
     gsap.ticker.lagSmoothing(0);
   }
 
+  /**
+   * initSceneStack
+   *
+   * Pin each `[data-scene]` for stack-reveal: the scene holds at vp
+   * bottom for one viewport of scroll while the next scene slides up
+   * over it. With `pinSpacing: false`, the next sibling's natural
+   * position takes over visually.
+   *
+   * Drawer-bearing scenes opt out via `[data-flow]` (or by containing
+   * a `<details>` element). With `pinSpacing: false`, a pinned scene
+   * is `position: fixed` and removed from flow — drawer growth inside
+   * couldn't push downstream siblings. Flow scenes scroll naturally
+   * and the next pinned scene reveals after them.
+   *
+   * No ResizeObserver here. Drawer toggles do shift downstream pin
+   * engagement scrollY, but we accept that staleness — the alternative
+   * (firing a global `ScrollTrigger.refresh()` on every drawer toggle)
+   * causes visible tilt flashes via `invalidateOnRefresh`, which
+   * always reads as broken motion.
+   */
   function initSceneStack() {
-    // Kill any stale triggers / observers (Astro view transitions).
     sceneTriggers.forEach((t) => t.kill());
     sceneTriggers = [];
-    sceneObservers.forEach((o) => o.disconnect());
-    sceneObservers = [];
 
     const scenes = gsap.utils.toArray<HTMLElement>('[data-scene]');
 
     scenes.forEach((scene) => {
+      const isFlowScene =
+        scene.matches('[data-flow]') ||
+        !!scene.querySelector('[data-flow]') ||
+        !!scene.querySelector('details');
+      if (isFlowScene) return;
+
       const trigger = ScrollTrigger.create({
         trigger: scene,
-        // `bottom bottom` works for both tall and short scenes:
-        //  - tall scene: user scrolls through content first; pin engages
-        //    only once the bottom of the scene reaches viewport bottom.
-        //  - short/viewport scene: equivalent to `top top` (bottom of a
-        //    viewport-sized scene touches vp bottom as its top enters).
         start: 'bottom bottom',
-        // Hold the pin for one viewport's worth of scroll — enough for
-        // the next scene (natural DOM sibling) to slide up and cover.
         end: '+=100%',
         pin: true,
-        // No reserved space below the pin. The next scene stays at its
-        // natural position and paints over the pinned one as scroll
-        // continues. This is what produces the stack-reveal effect
-        // without any negative margins.
         pinSpacing: false,
-        // Smooths the first-frame of a pin on mobile.
         anticipatePin: 1,
-        // Recompute start/end when ScrollTrigger refreshes (resize,
-        // content reflow, late-loading fonts, etc).
         invalidateOnRefresh: true,
       });
       sceneTriggers.push(trigger);
-
-      // Per-scene ResizeObserver. Sections that contain disclosure
-      // widgets (FAQ, Tracks) grow when the user opens an accordion;
-      // images and late-loading fonts can also shift heights. Refresh
-      // ONLY this scene's pin trigger so:
-      //  - the new `bottom bottom` is measured against the new height,
-      //  - the pin releases / re-engages cleanly at the right scroll,
-      //  - tilt scrub triggers on other scenes are NOT re-measured
-      //    (a global ScrollTrigger.refresh() destabilises them).
-      // Debounced so the refresh fires once at the end of the open/
-      // close transition rather than on every animation frame.
-      let lastH = scene.offsetHeight;
-      let timer: number | undefined;
-      const ro = new ResizeObserver(() => {
-        const h = scene.offsetHeight;
-        if (h === lastH) return;
-        lastH = h;
-        if (timer !== undefined) window.clearTimeout(timer);
-        timer = window.setTimeout(() => {
-          trigger.refresh();
-        }, 120);
-      });
-      ro.observe(scene);
-      sceneObservers.push(ro);
     });
 
-    // Late-loading content (fonts, images) can change scene heights
+    // Late-loading content (fonts, images) can shift scene heights
     // after triggers were created. Force one refresh to re-measure.
     ScrollTrigger.refresh();
   }
@@ -281,15 +194,12 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
         {
           rotation: 0,
           xPercent: 0,
-          // `power2.out` (quadratic ease-out, `cubic-bezier(0, 0,
-          // 0.58, 1)`). Reverse-engineered from follow.art's live DOM:
-          // at 42% scroll progress the tween is 66% complete, at 94%
-          // scroll it's 99.6% complete — exact quadratic ease-out
-          // match. Feel: section straightens quickly off the bottom,
-          // then decelerates as it lands at the top. `ease: 'none'`
-          // (our previous value) looks mechanical because it's linear
-          // — the final few degrees land on top of the pin instead of
-          // easing into it.
+          // `power2.out` (quadratic ease-out). Reverse-engineered
+          // from follow.art's live DOM. Feel: section straightens
+          // quickly off the bottom, then decelerates as it lands at
+          // the top. With bidirectional `scrub: true`, scroll-up
+          // mirrors this — section enters the top flat, gradually
+          // tilts to 15° as it descends to the bottom.
           ease: 'power2.out',
           immediateRender: true,
           scrollTrigger: {
@@ -379,8 +289,6 @@ import PricingSection from '@/components/tenerife/PricingSection.astro';
   function cleanup() {
     sceneTriggers.forEach((t) => t.kill());
     sceneTriggers = [];
-    sceneObservers.forEach((o) => o.disconnect());
-    sceneObservers = [];
     tiltTweens.forEach((t) => t.scrollTrigger?.kill());
     tiltTweens.forEach((t) => t.kill());
     tiltTweens = [];

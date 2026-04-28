@@ -1,6 +1,6 @@
 ---
 /**
- * OverviewSection — the "OUR APPROACH" scene.
+ * SectionOverview — the "OUR APPROACH" scene.
  *
  * Layout: split header on top (title left, sentence right — same
  * pattern as the Coaches section), then a 3-column grid of
@@ -85,35 +85,25 @@ const items: ApproachItem[] = [
     margin: 0;
   }
 
-  /* 3 columns × 4 explicit rows: number / media / title / body.
-   * The media row uses `1fr` to absorb extra vertical space so
-   * the title + body sit at the same baseline across all cells —
-   * regardless of how long each card's copy is. The remaining
-   * tracks size to content. */
+  /* Mobile-first: single-column stack, horizontal dividers between
+   * cards. The desktop 3-column subgrid layout is restored in the
+   * media query below at the same `768px` breakpoint used by the
+   * `.split` utility. */
   .overview__items {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto 1fr auto auto;
-    border-block: 1px solid var(--border);
-    min-height: 60svh;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Each cell is a subgrid child — its 4 direct children
-   * (number, media, title, body) snap onto the parent's row
-   * tracks. Padding goes on the cell so the dividers visually
-   * inset; gap controls the rhythm between the four tracks. */
   .approach-item {
     display: grid;
-    grid-template-rows: subgrid;
-    grid-row: span 4;
     gap: var(--space-l);
     padding: var(--space-l);
   }
 
-  /* Vertical divider between cells. `+ .approach-item` skips the
-   * first cell so only the inner gaps get a line. */
+  /* Horizontal divider between stacked cards on mobile. Skips the
+   * first card so only the inner gaps get a line. */
   .approach-item + .approach-item {
-    border-inline-start: 1px solid var(--border);
+    border-block-start: 1px solid var(--border);
   }
 
   .approach-item__num {
@@ -121,11 +111,10 @@ const items: ApproachItem[] = [
     opacity: 0.6;
   }
 
-  /* Media placeholder — stretches into the `1fr` row, so all three
-   * cells reserve the same vertical space for the illustration that
-   * will eventually drop in here. */
+  /* Media placeholder is hidden on mobile — it only serves to
+   * reserve the `1fr` row in the desktop subgrid. */
   .approach-item__media {
-    align-self: stretch;
+    display: none;
   }
 
   .approach-item__title,
@@ -135,5 +124,41 @@ const items: ApproachItem[] = [
 
   .approach-item__body {
     opacity: 0.85;
+  }
+
+  /* ── Desktop ≥ 768px ──────────────────────────────────────────────
+   *
+   * 3 columns × 4 explicit rows: number / media / title / body. The
+   * media row uses `1fr` to absorb extra vertical space so the
+   * title + body sit at the same baseline across all cells —
+   * regardless of how long each card's copy is. The remaining tracks
+   * size to content. Each cell is a subgrid child — its 4 direct
+   * children snap onto the parent's row tracks. */
+  @media (min-width: 768px) {
+    .overview__items {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: auto 1fr auto auto;
+      border-block: 1px solid var(--border);
+      min-height: 60svh;
+    }
+
+    .approach-item {
+      grid-template-rows: subgrid;
+      grid-row: span 4;
+    }
+
+    /* Swap the mobile horizontal divider for the desktop vertical
+     * divider between adjacent cells. */
+    .approach-item + .approach-item {
+      border-block-start: 0;
+      border-inline-start: 1px solid var(--border);
+    }
+
+    /* Media placeholder reserves vertical space in each cell so all
+     * three cards align across the row. */
+    .approach-item__media {
+      display: block;
+      align-self: stretch;
+    }
   }
 </style>

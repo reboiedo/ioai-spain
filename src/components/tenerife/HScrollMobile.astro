@@ -1,0 +1,242 @@
+---
+/**
+ * HScrollMobile — mobile-only horizontal-snap scroller with a
+ * scroll-progress indicator on the bottom.
+ *
+ * Use this to convert long vertical stacks of cards into a swipeable
+ * horizontal scroller on phones, while leaving desktop alone.
+ *
+ *   <HScrollMobile>
+ *     {items.map((it) => <Card {...it} />)}
+ *   </HScrollMobile>
+ *
+ * Behaviour:
+ *   - Mobile (<768px): children become flex children of a horizontal
+ *     scroll track that bleeds EDGE-TO-EDGE past the parent section's
+ *     `--section-inline` padding. Each child is a scroll-snap target.
+ *     A 2px progress rail sits below the track; the bar inside it
+ *     scales/translates to mirror the live scroll position.
+ *   - Desktop (≥768px): the wrapper does nothing — children flow
+ *     naturally and the parent section keeps its existing layout
+ *     (e.g. a CSS grid).
+ *
+ * Consumer responsibilities:
+ *   - Pass each card / row item as a direct child of the slot.
+ *   - On desktop, style the cards via the parent's normal grid /
+ *     flex rules (this component is invisible there).
+ *
+ * Props:
+ *   - `itemWidth` — CSS length / clamp expression for each child's
+ *     snap-target width on mobile. Defaults to a value that shows
+ *     ~one card with a peek of the next.
+ *   - `gap` — gap between cards on mobile. Defaults to `--space-m`.
+ *   - `progressOffset` — gap between the scroll track and the
+ *     progress bar. Defaults to `--space-l`.
+ */
+
+export interface Props {
+  /** Width per child on mobile. Use a CSS length / clamp / min(). */
+  itemWidth?: string;
+  /** Gap between children on mobile. CSS length. */
+  gap?: string;
+  /** Vertical gap between the track and the progress bar. CSS length. */
+  progressOffset?: string;
+}
+
+const {
+  itemWidth = "min(78%, 320px)",
+  gap = "var(--space-m)",
+  progressOffset = "var(--space-l)",
+} = Astro.props;
+---
+
+<div
+  class="hscroll"
+  data-hscroll
+  style={`--hscroll-item: ${itemWidth}; --hscroll-gap: ${gap}; --hscroll-progress-offset: ${progressOffset};`}
+>
+  <div class="hscroll__track" data-hscroll-track>
+    <slot />
+  </div>
+  <!-- Progress indicator. The bar's width is set by JS as a
+       percentage of the track's visible/total ratio; its translateX
+       reflects scroll progress. -->
+  <div class="hscroll__rail" aria-hidden="true">
+    <div class="hscroll__bar" data-hscroll-bar></div>
+  </div>
+</div>
+
+<style>
+  /* Mobile: edge-to-edge horizontal scroller.
+   *
+   * `margin-inline: calc(var(--section-inline) * -1)` undoes the
+   * parent section's horizontal padding so the track can run to the
+   * actual viewport edges. The track's own `padding-inline:
+   * var(--section-inline)` keeps the FIRST and LAST cards inset to
+   * the original content gutter — only the SCROLL ZONE bleeds. */
+  .hscroll {
+    margin-inline: calc(var(--section-inline) * -1);
+    /* `min-width: 0` lets the wrapper shrink under a flex/grid
+     * parent (the children of `.hscroll__track` are non-shrinkable
+     * so without this the wrapper's min-content size would inflate
+     * past the parent's width). `overflow-x: clip` belt-and-braces
+     * cuts any sub-pixel bleed past the viewport edge. */
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  .hscroll__track {
+    display: flex;
+    /* Same reasoning as on `.hscroll` — flex container's intrinsic
+     * width is the sum of its children's `flex-basis` values
+     * unless we explicitly say "you can shrink to 0". This is what
+     * makes `overflow-x: auto` actually scroll instead of forcing
+     * the parent to grow. */
+    min-width: 0;
+    gap: var(--hscroll-gap);
+    overflow-x: auto;
+    overflow-y: visible;
+    /* Scroll-snap with a soft mandatory: each child snaps as the
+     * dominant viewport element, but the user can still flick
+     * through multiple items at once. */
+    scroll-snap-type: x mandatory;
+    /* Inset the first/last cards by the section's normal gutter so
+     * they don't kiss the screen edges. `scroll-padding-inline`
+     * is the matching value for snap behaviour — without it the
+     * snap aligns the card's left edge to the SCROLLPORT edge
+     * (= viewport edge), ignoring `padding-inline`. With it, snap
+     * lands the card's left edge at the gutter, matching the
+     * visual layout. */
+    padding-inline: var(--section-inline);
+    scroll-padding-inline: var(--section-inline);
+    /* Hide the native scrollbar — the rail below replaces it. */
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hscroll__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Each direct child of the slot becomes a fixed-width snap card. */
+  .hscroll__track > :global(*) {
+    flex: 0 0 var(--hscroll-item);
+    scroll-snap-align: start;
+  }
+
+  /* Progress rail. Sits at the section gutter (NOT bleeding) so it
+   * reads as part of the section, not the track. `--border` is the
+   * design system's stroke colour; `--primary` is the brand fill. */
+  .hscroll__rail {
+    margin-inline: var(--section-inline);
+    margin-block-start: var(--hscroll-progress-offset);
+    height: 2px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .hscroll__bar {
+    height: 100%;
+    /* Width starts at 100% as a safe default (shown only briefly
+     * before JS measures); JS sets a smaller width that matches the
+     * visible/total scroll ratio, then translateX tracks position. */
+    width: 100%;
+    background: var(--primary);
+    transform-origin: left center;
+    /* Smooth out the per-frame transform writes from the scroll
+     * listener — feels less jittery without sacrificing
+     * responsiveness. */
+    transition: width 180ms ease;
+    will-change: transform;
+  }
+
+  /* Desktop: do nothing. The children flow naturally as direct
+   * descendants of `.hscroll__track`, which becomes a no-op
+   * wrapper. The parent section's CSS controls layout from here. */
+  @media (min-width: 768px) {
+    .hscroll {
+      margin-inline: 0;
+    }
+    .hscroll__track {
+      display: block;
+      gap: 0;
+      overflow: visible;
+      scroll-snap-type: none;
+      padding-inline: 0;
+    }
+    .hscroll__track > :global(*) {
+      flex: initial;
+      scroll-snap-align: none;
+    }
+    .hscroll__rail {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Live progress-bar updater. One ResizeObserver + one scroll
+   * listener per HScroll instance. The bar's inline `width` and
+   * `translateX` are written each frame the scroll position changes.
+   *
+   * Bar width = (visibleWidth / totalWidth) * 100%
+   * Bar translateX = scrollProgress * (100% - barWidth%)
+   *
+   * Both expressed in % of the rail so the math is unit-free.
+   */
+  function init() {
+    document.querySelectorAll<HTMLElement>('[data-hscroll]').forEach(setup);
+  }
+
+  function setup(host: HTMLElement) {
+    if (host.dataset.hooked === '1') return;
+    host.dataset.hooked = '1';
+    const track = host.querySelector<HTMLElement>('[data-hscroll-track]');
+    const bar = host.querySelector<HTMLElement>('[data-hscroll-bar]');
+    if (!track || !bar) return;
+
+    let raf = 0;
+    function schedule() {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        update();
+      });
+    }
+
+    function update() {
+      const visible = track!.clientWidth;
+      const total = track!.scrollWidth;
+      if (total <= visible) {
+        bar!.style.width = '100%';
+        bar!.style.transform = 'translateX(0)';
+        return;
+      }
+      const ratio = visible / total; // 0..1
+      const scrollProgress = track!.scrollLeft / (total - visible); // 0..1
+      const barWidthPct = ratio * 100;
+      const trackPct = (100 - barWidthPct) / barWidthPct * scrollProgress * 100;
+      bar!.style.width = `${barWidthPct}%`;
+      bar!.style.transform = `translateX(${trackPct}%)`;
+    }
+
+    track.addEventListener('scroll', schedule, { passive: true });
+    const ro = new ResizeObserver(schedule);
+    ro.observe(track);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('[data-hscroll]').forEach((el) => {
+      el.dataset.hooked = '';
+    });
+    init();
+  });
+</script>

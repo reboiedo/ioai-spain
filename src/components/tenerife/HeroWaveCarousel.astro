@@ -1,0 +1,445 @@
+---
+/**
+ * HeroWaveCarousel — Three.js wave-displaced image strip.
+ *
+ * A horizontally-tiled row of textured planes that auto-scrolls
+ * left like a marquee. A vertex shader bends each plane's y by
+ * `amp * sin(worldX * freq + phase)` — the same wave function
+ * sampled by the HeroTitle letters via the shared `wave` store,
+ * so the title and the image strip undulate together.
+ *
+ * Mouse near the top = bigger amplitude; mouse to the right =
+ * tighter waves; phase is gently nudged by cursor x.
+ *
+ * Touch / no-WebGL / `prefers-reduced-motion`: the canvas init
+ * bails and a fallback CSS marquee is shown instead.
+ */
+
+import { Image, type ImageMetadata } from "astro:assets";
+import carousel1 from "@/assets/tenerife-camp/experience-carousel1.jpg";
+import carousel2 from "@/assets/tenerife-camp/experience-carousel2.jpg";
+import carousel3 from "@/assets/tenerife-camp/experience-carousel3.jpg";
+import carousel4 from "@/assets/tenerife-camp/experience-carousel4.jpg";
+import carousel5 from "@/assets/tenerife-camp/experience-carousel5.jpg";
+import carousel6 from "@/assets/tenerife-camp/experience-carousel6.jpg";
+
+export interface Props {
+  /** Strip images. Defaults to the legacy carousel set. */
+  images?: ImageMetadata[];
+}
+
+const { images = [carousel1, carousel2, carousel3, carousel4, carousel5, carousel6] } =
+  Astro.props;
+
+// Duplicate so the loop seams are off-screen.
+const tiles = [...images, ...images];
+---
+
+<div class="hero-wave" data-hero-wave>
+  <!-- WebGL canvas. The script attaches a Three.js renderer here on
+       mount; until then (or as a fallback) the static marquee tiles
+       sitting underneath are visible. -->
+  <canvas class="hero-wave__canvas" data-hero-wave-canvas></canvas>
+
+  <!-- Static fallback (and SSR content for the renderer to read
+       textures from). Hidden once the canvas takes over. -->
+  <div class="hero-wave__fallback" data-hero-wave-fallback>
+    <div class="hero-wave__track">
+      {tiles.map((img) => (
+        <div class="hero-wave__tile">
+          <Image
+            class="hero-wave__img"
+            src={img}
+            alt=""
+            widths={[320, 480, 640]}
+            sizes="20vw"
+            loading="eager"
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .hero-wave {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* Slightly past the section edges so wave amplitude doesn't
+     * clip the imagery against the section padding. */
+    overflow: hidden;
+  }
+
+  .hero-wave__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Static CSS marquee fallback. Used as the source surface for
+   * texture loading AND as the visible content when WebGL fails.
+   * Hidden once the canvas reports it's running. */
+  .hero-wave__fallback {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    /* Hidden by default — JS reveals it if WebGL init fails or
+     * reduced-motion is set. */
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-wave[data-fallback="1"] .hero-wave__canvas {
+    display: none;
+  }
+  .hero-wave[data-fallback="1"] .hero-wave__fallback {
+    opacity: 1;
+  }
+
+  .hero-wave__track {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 1.5rem;
+    animation: hero-wave-scroll 60s linear infinite;
+    width: max-content;
+  }
+
+  .hero-wave__tile {
+    flex: 0 0 auto;
+    width: clamp(140px, 18vw, 240px);
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .hero-wave__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  @keyframes hero-wave-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-wave__track { animation: none; }
+  }
+</style>
+
+<script>
+  /**
+   * Three.js wave-displaced image strip.
+   *
+   * Geometry: one PlaneGeometry per image, segmented enough along x
+   * that the vertex shader's sine displacement reads as a smooth
+   * curve (not a low-poly zigzag).
+   *
+   * Layout: planes are placed end-to-end along x. The whole group
+   * scrolls left every frame; once a plane's right edge passes the
+   * camera's left frustum, it's wrapped to the back of the queue.
+   *
+   * Wave: a vertex shader reads `uTime`, `uPhase`, `uAmp`, `uFreq`
+   * uniforms (kept in sync with the shared `wave` store) and shifts
+   * each vertex's y by `amp * sin(worldX * freq + phase + time*speed)`.
+   */
+  import * as THREE from 'three';
+  import { wave } from '@/components/tenerife/wave';
+
+  type WaveCtx = {
+    container: HTMLElement;
+    canvas: HTMLCanvasElement;
+    fallback: HTMLElement;
+    renderer: THREE.WebGLRenderer;
+    scene: THREE.Scene;
+    camera: THREE.OrthographicCamera;
+    planes: THREE.Mesh[];
+    uniforms: {
+      uTime: { value: number };
+      uPhase: { value: number };
+      uAmp: { value: number };
+      uFreq: { value: number };
+      uSpeed: { value: number };
+      uViewWidth: { value: number };
+    };
+    tileWidth: number;
+    tileHeight: number;
+    gap: number;
+    scrollX: number;
+    scrollSpeed: number; // px/sec
+    width: number;
+    height: number;
+    unsubscribe: () => void;
+    resizeObs: ResizeObserver;
+  };
+
+  const VERT = /* glsl */ `
+    uniform float uTime;
+    uniform float uPhase;
+    uniform float uAmp;
+    uniform float uFreq;
+    uniform float uSpeed;
+    uniform float uViewWidth;
+
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      vec3 pos = position;
+      // The mesh's worldX comes from its mesh.position.x set in JS.
+      // Inside the shader we displace ONLY the local y, using the
+      // vertex's world x = mesh.position.x + position.x.
+      // We approximate that by reading from the modelMatrix's tx.
+      float worldX = (modelMatrix * vec4(pos, 1.0)).x;
+      float y = uAmp * sin(worldX * uFreq + uPhase + uTime * uSpeed);
+      pos.y += y;
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1.0);
+    }
+  `;
+
+  const FRAG = /* glsl */ `
+    uniform sampler2D uTex;
+    varying vec2 vUv;
+    void main() {
+      gl_FragColor = texture2D(uTex, vUv);
+    }
+  `;
+
+  const ctxRegistry = new WeakMap<HTMLElement, WaveCtx>();
+
+  function init(container: HTMLElement) {
+    if (ctxRegistry.has(container)) return;
+
+    const canvas = container.querySelector<HTMLCanvasElement>(
+      '[data-hero-wave-canvas]',
+    );
+    const fallback = container.querySelector<HTMLElement>(
+      '[data-hero-wave-fallback]',
+    );
+    if (!canvas || !fallback) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      container.dataset.fallback = '1';
+      return;
+    }
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        premultipliedAlpha: true,
+      });
+    } catch {
+      container.dataset.fallback = '1';
+      return;
+    }
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Skip Three's automatic sRGB → linear → sRGB pipeline. Our
+    // ShaderMaterial doesn't insert the inverse-encoding chunk that
+    // built-in materials do, so the default pipeline ends up
+    // double-encoding and darkening the image. Treating both ends as
+    // "no color management" passes the source bytes straight through
+    // to the canvas — the photos render at the brightness of the
+    // original JPG.
+    renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+
+    // Collect texture sources from the fallback DOM. They're
+    // already loaded by the browser when this runs because the
+    // <Image>s have loading="eager".
+    const imgs = Array.from(
+      fallback.querySelectorAll<HTMLImageElement>('img'),
+    );
+    if (imgs.length === 0) {
+      container.dataset.fallback = '1';
+      return;
+    }
+
+    const loader = new THREE.TextureLoader();
+    const textures = imgs.map((img) => {
+      const tex = loader.load(img.currentSrc || img.src);
+      // Match the renderer's no-management mode (see comment near
+      // `outputColorSpace`). Tagging as Linear means Three skips the
+      // sRGB-decode-on-sample step it does for SRGBColorSpace
+      // textures — the texel is sampled as raw 8-bit values that
+      // render-stage encoding will leave alone.
+      tex.colorSpace = THREE.LinearSRGBColorSpace;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      return tex;
+    });
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+    camera.position.z = 10;
+
+    // Shared uniforms — every plane uses the same material instance
+    // so updating these once per frame propagates to all tiles.
+    const uniforms = {
+      uTime: { value: 0 },
+      uPhase: { value: 0 },
+      uAmp: { value: 8 },
+      uFreq: { value: 0.006 },
+      uSpeed: { value: 0.6 },
+      uViewWidth: { value: 1 },
+    } satisfies WaveCtx['uniforms'];
+
+    // Build planes — one per UNIQUE texture; we'll wrap them as a
+    // ring buffer along x, repeating as needed to fill the viewport.
+    const tileHeight = 200; // px (initial; resized below)
+    const tileAspect = 4 / 3;
+    const tileWidth = tileHeight * tileAspect;
+    const gap = 24;
+
+    const planes: THREE.Mesh[] = [];
+    // Use enough copies so the strip always fills the widest viewport
+    // even when scrolled mid-tile.
+    const copies = 3;
+    for (let c = 0; c < copies; c++) {
+      for (const tex of textures) {
+        const geom = new THREE.PlaneGeometry(tileWidth, tileHeight, 32, 1);
+        const mat = new THREE.ShaderMaterial({
+          vertexShader: VERT,
+          fragmentShader: FRAG,
+          transparent: true,
+          uniforms: { ...uniforms, uTex: { value: tex } },
+        });
+        const mesh = new THREE.Mesh(geom, mat);
+        scene.add(mesh);
+        planes.push(mesh);
+      }
+    }
+
+    const ctx: WaveCtx = {
+      container,
+      canvas,
+      fallback,
+      renderer,
+      scene,
+      camera,
+      planes,
+      uniforms,
+      tileWidth,
+      tileHeight,
+      gap,
+      scrollX: 0,
+      scrollSpeed: 40, // px/sec — slow drift
+      width: 0,
+      height: 0,
+      unsubscribe: () => {},
+      resizeObs: new ResizeObserver(() => layout(ctx)),
+    };
+
+    ctxRegistry.set(container, ctx);
+    ctx.resizeObs.observe(container);
+
+    layout(ctx);
+
+    // Subscribe to wave ticks. The wave loop is the master clock —
+    // we update uniforms and advance the scroll inside the same
+    // callback so the strip and the letters move in lockstep.
+    let lastFrameT = performance.now() / 1000;
+    ctx.unsubscribe = wave.subscribe((s) => {
+      const now = performance.now() / 1000;
+      const dt = now - lastFrameT;
+      lastFrameT = now;
+
+      uniforms.uTime.value = s.time;
+      uniforms.uPhase.value = s.phase;
+      uniforms.uAmp.value = s.amp;
+      uniforms.uFreq.value = s.freq;
+      uniforms.uSpeed.value = s.speed;
+
+      // Advance scroll — wrap planes that pass the left edge.
+      ctx.scrollX -= ctx.scrollSpeed * dt;
+      const totalWidth = ctx.planes.length * (ctx.tileWidth + ctx.gap);
+      const halfWidth = ctx.width / 2;
+
+      ctx.planes.forEach((mesh, i) => {
+        const baseX = i * (ctx.tileWidth + ctx.gap);
+        let x = baseX + ctx.scrollX;
+        // Wrap into [-halfWidth - tile, totalWidth - halfWidth - tile]
+        const period = totalWidth;
+        const offset = -halfWidth - ctx.tileWidth;
+        x = ((x - offset) % period + period) % period + offset;
+        mesh.position.x = x;
+      });
+
+      renderer.render(scene, camera);
+    });
+  }
+
+  function layout(ctx: WaveCtx) {
+    const rect = ctx.container.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(rect.width));
+    const h = Math.max(1, Math.floor(rect.height));
+    if (w === ctx.width && h === ctx.height) return;
+    ctx.width = w;
+    ctx.height = h;
+
+    ctx.renderer.setSize(w, h, false);
+
+    // Orthographic camera in pixel-space — units = pixels, origin
+    // at the centre of the canvas. Easier to reason about plane
+    // positions and frustum wrapping.
+    ctx.camera.left = -w / 2;
+    ctx.camera.right = w / 2;
+    ctx.camera.top = h / 2;
+    ctx.camera.bottom = -h / 2;
+    ctx.camera.updateProjectionMatrix();
+
+    // Resize tiles to roughly 60% of canvas height, preserving aspect.
+    const newTileHeight = Math.max(120, h * 0.6);
+    const newTileWidth = newTileHeight * (4 / 3);
+    if (newTileHeight !== ctx.tileHeight) {
+      ctx.tileHeight = newTileHeight;
+      ctx.tileWidth = newTileWidth;
+      ctx.planes.forEach((mesh) => {
+        const old = mesh.geometry as THREE.PlaneGeometry;
+        old.dispose();
+        mesh.geometry = new THREE.PlaneGeometry(newTileWidth, newTileHeight, 32, 1);
+      });
+    }
+    ctx.uniforms.uViewWidth.value = w;
+  }
+
+  function destroy(container: HTMLElement) {
+    const ctx = ctxRegistry.get(container);
+    if (!ctx) return;
+    ctx.unsubscribe();
+    ctx.resizeObs.disconnect();
+    ctx.planes.forEach((mesh) => {
+      mesh.geometry.dispose();
+      (mesh.material as THREE.Material).dispose();
+    });
+    ctx.renderer.dispose();
+    ctxRegistry.delete(container);
+  }
+
+  function initAll() {
+    document
+      .querySelectorAll<HTMLElement>('[data-hero-wave]')
+      .forEach((el) => init(el));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll, { once: true });
+  } else {
+    initAll();
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    document
+      .querySelectorAll<HTMLElement>('[data-hero-wave]')
+      .forEach(destroy);
+    initAll();
+  });
+</script>

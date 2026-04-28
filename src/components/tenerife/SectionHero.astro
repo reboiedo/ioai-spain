@@ -1,0 +1,209 @@
+---
+/**
+ * SectionHero — the opening "TENERIFE CAMP" scene.
+ *
+ * Layout: full viewport height. Title anchored to the top (just below
+ * the fixed nav), supporting paragraph anchored to the bottom. The
+ * empty middle is intentional — it lets the giant title breathe and
+ * gives the lede room to land as a separate moment as you scroll.
+ *
+ * `lvh` (not `svh`) so the hero covers the full mobile viewport when
+ * the browser chrome collapses — otherwise a strip of the next scene
+ * peeks through at the bottom.
+ */
+import HeroTitle from './HeroTitle.astro';
+import HeroTitleStack from './HeroTitleStack.astro';
+import HeroWaveCarousel from './HeroWaveCarousel.astro';
+
+interface Props {
+  /** Theme key (orange | yellow | blue | neutral) — drives bg + fg. */
+  theme?: string;
+}
+
+const { theme = 'blue' } = Astro.props;
+---
+
+<div class="scene" data-scene>
+  <section class="section scene__layer hero" data-theme={theme}>
+    <!-- Desktop: single-line "TENERIFE CAMP". Mobile: two lines
+         stacked, each auto-sized to width via HeroTitle. CSS swaps
+         which one is visible at the 768px breakpoint. -->
+    <div class="hero__title hero__title--single">
+      <HeroTitle>TENERIFE CAMP</HeroTitle>
+    </div>
+    <div class="hero__title hero__title--stacked">
+      <!-- Two-line title via the reusable `HeroTitleStack` — it
+           sizes each line so the shorter row's letters end up the
+           same height as the longest row's. TENERIFE acts as the
+           anchor (noStretch); CAMP gets exaggerated per-letter
+           scaleY randomization via stretchScale > 1. -->
+      <HeroTitleStack
+        gap="clamp(2rem, 6vw, 4rem)"
+        lines={[
+          { text: "TENERIFE", align: "left", noStretch: true },
+          { text: "CAMP", align: "right", stretchScale: 1.5 },
+        ]}
+      />
+    </div>
+    <!-- Middle row (1fr): wave-displaced image strip. Mouse-driven,
+         shares its wave function with the HeroTitle letters via the
+         shared `wave` store so the title and the strip undulate in
+         lockstep. -->
+    <div class="hero__wave">
+      <HeroWaveCarousel />
+    </div>
+    <p class="font-body-l hero__lede">
+      <span class="hero__lede-line">Two weeks of maths, code and ocean —</span>
+      <span class="hero__lede-line">the IOAI Spain training camp on the slopes of Mount Teide.</span>
+    </p>
+  </section>
+</div>
+
+<style>
+  .hero {
+    position: relative; /* containing block for the absolutely-positioned wave */
+    height: 100lvh;
+    min-height: 100lvh; /* overrides .scene__layer's min-height */
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    /* No top padding — the title's wrapper is offset down by exactly
+     * the nav height via margin-top, so the SVG's top edge lands
+     * flush with the nav's bottom edge. */
+    padding-block-start: 0;
+    /* `--cta-clearance` is reserved at the bottom so the lede
+     * (anchored to grid row 3 with `align-self: end`) sits clear
+     * of the sticky Join CTA that floats above it. The default
+     * `.section` rule already does this, but the hero needs to
+     * override `padding-block-start` to 0 (the title controls its
+     * own top spacing via `margin-block-start`), and overriding
+     * shorthand-style requires explicitly re-stating the bottom
+     * value too. */
+    padding-block-end: var(--cta-clearance);
+  }
+
+  .hero__title {
+    grid-row: 1;
+    align-self: start;
+    line-height: 0;
+    /* Push the title down by the nav height plus a small visible
+     * gap so the cap-tops aren't kissing the nav line.
+     *   - `var(--nav-height, 80px)` is JS-synced (see syncNavHeight
+     *     in TenerifeCampV2Layout); the 80px fallback covers the
+     *     first paint window before JS lands.
+     *   - `var(--space-s)` (~16–24px) is the breathing gap.
+     *   - `env(safe-area-inset-top, 0px)` covers iPhone Dynamic
+     *     Island / notch devices where the visual top edge of the
+     *     viewport can extend above the nav element. */
+    margin-block-start: calc(
+      var(--nav-height, 80px) + var(--space-s) + env(safe-area-inset-top, 0px)
+    );
+  }
+
+  .hero__title :global(svg) {
+    /* No vertical translate — the SVG's viewBox is already tight
+     * around the cap-line (no ascender slack), so any translate
+     * pulls the cap-tops past the SVG element edge and risks
+     * clipping under the nav (especially on mobile where the nav's
+     * actual height is shorter than the hardcoded `--nav-height`
+     * CSS var). Zero keeps the cap-tops exactly at the container's
+     * top edge, which sits at `--nav-height` below the viewport
+     * top — flush with the nav's bottom edge, no overlap. */
+    transform: none;
+  }
+
+  /* Stacked title wrapper — `HeroTitleStack` handles the per-line
+   * width math and gap internally. We just toggle whether the
+   * wrapper is shown on mobile. */
+  .hero__title--stacked {
+    display: none;
+  }
+
+  @media (max-width: 767.98px) {
+    .hero__title--single {
+      display: none;
+    }
+    .hero__title--stacked {
+      display: block;
+      /* On mobile the title sits IN FRONT of the wave-strip photos
+       * (no per-letter alternation). `position: relative` activates
+       * `z-index`; 3 stacks above the wave's `z-index: 2`. */
+      position: relative;
+      z-index: 3;
+    }
+  }
+
+  /* The wave strip sits across the lower-middle of the section.
+   * Stacked at z-index 2 — letters with z-index ≥ 3 sit IN FRONT
+   * of the photos; letters with z-index ≤ 1 sit BEHIND. The
+   * HeroTitle generator assigns a deterministic z-index per glyph
+   * so the title ends up checkerboarded across the strip. */
+  .hero__wave {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 30%;
+    height: clamp(160px, 22vh, 280px);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .hero__lede {
+    /* Take the lede OUT of the grid flow and anchor it from the
+     * TOP using `100svh` (small-viewport-height) as the reference.
+     *
+     * Why: the hero is `height: 100lvh` so the next section never
+     * peeks at the bottom on mobile chrome retract. But that means
+     * when the chrome IS showing, the section's bottom edge sits
+     * BELOW the visible viewport — and a `align-self: end` lede
+     * goes with it, hidden behind the chrome.
+     *
+     * Anchoring from the top using `100svh` keeps the lede inside
+     * the visible viewport in BOTH chrome states:
+     *   - chrome shown → svh = visible area, lede sits clear of it.
+     *   - chrome hidden → svh stays the same definition, lede has
+     *     extra space below (no harm, just more breathing room).
+     *
+     * `transform: translateY(-100%)` pulls the lede's bottom edge
+     * up to the calculated `top` line — so the lede's bottom is at
+     * `100svh - cta-clearance` from the section top, regardless of
+     * its own intrinsic height. */
+    position: absolute;
+    top: calc(100svh - var(--cta-clearance));
+    transform: translateY(-100%);
+    left: var(--section-inline);
+    right: var(--section-inline);
+  }
+
+  /* Lede is absolutely positioned so default browser <p> margin
+   * collapses against the section padding instead of the ledge,
+   * but explicitly zero it just so any cascade noise is gone. */
+  .hero__lede {
+    margin: 0;
+    max-width: 48ch;
+    opacity: 0.9;
+  }
+
+  /* The two halves render inline on desktop so the paragraph reads
+   * as one continuous flow (CSS handles the natural wrap inside the
+   * 48ch max-width). Mobile flips them to block-level so each span
+   * lands on its own line — exactly two lines, controlled split. */
+  .hero__lede-line {
+    display: inline;
+  }
+
+  /* Mobile: lede right-aligns within its absolute box (already
+   * stretched to `left: section-inline; right: section-inline`),
+   * and the two halves stack as exactly two lines via the spans
+   * flipping to block. */
+  @media (max-width: 767.98px) {
+    .hero__lede {
+      text-align: right;
+    }
+    .hero__lede-line {
+      display: block;
+    }
+  }
+
+</style>

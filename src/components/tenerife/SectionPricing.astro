@@ -119,11 +119,11 @@ const tiers: Tier[] = [
 </div>
 
 <style>
-  /* Lock the section to one viewport. The content is compact —
-   * title + intro on the left, two small cards on the right —
-   * so it fits comfortably. */
+  /* Lock the section to one (large) viewport. `lvh` not `svh` so
+   * mobile chrome collapse doesn't reveal the next section in the
+   * gap — see `.scene__layer` in `tenerife/utilities.css`. */
   .pricing {
-    min-height: 100svh;
+    min-height: 100lvh;
     align-items: center;
   }
 

@@ -71,20 +71,22 @@ const faqs: Faq[] = [
 ];
 ---
 
-<div class="scene" data-scene>
+<div class="scene" data-scene data-flow>
   <section
     class="section scene__layer scene__layer--tilt faq"
     data-theme={theme}
   >
     <div class="split faq__grid">
-      <!-- Left: title + intro paragraph in a single sticky block. -->
+      <!-- Left: title pinned to the top, contact line pinned to the
+           bottom-left of the column. -->
       <div class="faq__intro">
-        <SectionTitle lines={["FAQ"]} />
-        <p class="font-body section-copy faq__intro-copy">
-          Most parents and students arrive with the same handful of
-          questions. Here's the short version. If you're left with
-          something specific, write to us — the team replies within
-          a working day.
+        <div class="faq__title">
+          <SectionTitle lines={["FAQ"]} />
+        </div>
+        <p class="font-body-l section-copy faq__contact">
+          Need to talk through something specific? Reach out anytime
+          at <a href="mailto:ioai.spain@harbour.space">ioai.spain@harbour.space</a>
+         <a href="tel:+34671498303">+34&nbsp;671&nbsp;498&nbsp;303</a>
         </p>
       </div>
 
@@ -109,15 +111,37 @@ const faqs: Faq[] = [
 </div>
 
 <style>
-  /* Left column — same sticky intro pattern as Tracks. */
+  /* Left column — title locked to the top, contact line locked to
+   * the bottom. On mobile they stack naturally with a gap; on
+   * desktop the column becomes a sticky viewport-tall flex with
+   * `space-between` so the contact line sits at the bottom-left. */
   .faq__intro {
     display: flex;
     flex-direction: column;
     gap: var(--space-l);
   }
 
-  .faq__intro-copy {
+  .faq__contact {
     margin: 0;
+    max-width: 30ch;
+  }
+
+  @media (min-width: 768px) {
+    .faq__contact {
+      /* Centre vertically inside the sticky column, anchor to the
+       * right edge with text aligned right. `margin-block: auto`
+       * eats the leftover space above and below equally; the title
+       * stays at the top because its block remains at the top of
+       * the flex column. */
+      margin-block: auto;
+      align-self: flex-end;
+    }
+  }
+
+  .faq__contact a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
 
   @media (min-width: 768px) {
@@ -125,6 +149,20 @@ const faqs: Faq[] = [
       position: sticky;
       top: var(--sticky-top);
       align-self: start;
+      /* Fill the viewport (minus the sticky offset and a small bottom
+       * inset) so `justify-content: space-between` can push the
+       * contact line to the bottom-left. */
+      height: calc(100lvh - var(--sticky-top) - var(--space-l));
+    }
+  }
+
+  /* Vertical divider between the halves — same convention as
+   * SectionSafety: a 1px line on the right cell's left edge with
+   * matching inset padding so the rule sits on the centreline. */
+  @media (min-width: 768px) {
+    .faq__list {
+      border-inline-start: 1px solid var(--border);
+      padding-inline-start: var(--space-2xl);
     }
   }
 

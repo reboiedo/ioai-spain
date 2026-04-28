@@ -1,0 +1,78 @@
+---
+/**
+ * StickyJoinCta — global "Join now" button fixed to the bottom-right
+ * of the viewport for the duration of the Tenerife camp v2 page.
+ *
+ * Always visible — there are no in-page Join CTAs on the page now,
+ * so this sticky button is the only Join action and shouldn't hide.
+ *
+ * Pointer events are kept on the button only; the rest of the page
+ * scrolls and clicks normally underneath.
+ */
+
+export interface Props {
+  /** Where the CTA links to. */
+  href?: string;
+}
+
+const { href = "/form/tenerife-camp/" } = Astro.props;
+---
+
+<a class="sticky-join-cta" href={href}>
+  <span class="sticky-join-cta__label">Join now</span>
+  <span class="sticky-join-cta__arrow" aria-hidden="true">→</span>
+</a>
+
+<style>
+  .sticky-join-cta {
+    position: fixed;
+    right: clamp(1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    z-index: 50; /* above the nav-bar's prev-bg (lower) and any scenes */
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2xl);
+    padding: var(--space-m) var(--space-l);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    text-decoration: none;
+    border-radius: 0.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    transition:
+      transform 220ms ease,
+      opacity 280ms ease,
+      visibility 0s linear 280ms;
+  }
+
+
+  .sticky-join-cta:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Mobile: anchor the button to BOTH sides with `--cta-inset` of
+   * margin so it reads as a wide bar rather than a corner pill —
+   * but with breathing room on the sides + bottom (not edge-to-
+   * edge). `env(safe-area-inset-bottom)` keeps the button clear of
+   * the iOS home-indicator strip. */
+  @media (max-width: 767.98px) {
+    .sticky-join-cta {
+      left: var(--cta-inset);
+      right: var(--cta-inset);
+      bottom: calc(var(--cta-inset) + env(safe-area-inset-bottom, 0px));
+      justify-content: space-between;
+    }
+  }
+
+  .sticky-join-cta__label {
+    font-family: var(--font-body);
+    font-weight: 500;
+  }
+
+  .sticky-join-cta__arrow {
+    font-size: 1.25em;
+    line-height: 1;
+  }
+
+</style>
+

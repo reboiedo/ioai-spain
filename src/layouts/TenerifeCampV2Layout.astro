@@ -1,6 +1,7 @@
 ---
 import { Font } from 'astro:assets';
 import BaseLayout from './BaseLayout.astro';
+import StickyJoinCta from '@/components/tenerife/StickyJoinCta.astro';
 import '@/styles/tenerife-camp-v2.css';
 
 export interface Props {
@@ -79,6 +80,7 @@ const {
   <div class="tenerife-camp-v2">
     <slot />
   </div>
+  <StickyJoinCta />
 </BaseLayout>
 
 <!--
@@ -198,18 +200,60 @@ const {
       nav.insertBefore(prevBg, nav.firstChild);
     }
 
-    const navHeight = parseInt(
-      getComputedStyle(document.documentElement)
-        .getPropertyValue('--nav-height') || '80',
-      10,
+    // Resolve (or create) the `<meta name="theme-color">` tag. Used
+    // to tint iOS Safari and Android Chrome's address-bar / toolbar
+    // chrome to match the active section. Combined with the body
+    // background write below, this means any incidental sub-pixel
+    // gap during chrome show/hide animation, and the chrome's own
+    // background, both visually merge with the underlying section.
+    let themeMeta = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
     );
+    if (!themeMeta) {
+      themeMeta = document.createElement('meta');
+      themeMeta.setAttribute('name', 'theme-color');
+      document.head.appendChild(themeMeta);
+    }
+
+    // Nav's actual rendered height is read from the DOM each tick
+    // (see `update`). The `--nav-height` CSS variable is hardcoded
+    // 80px to match desktop, but nav padding uses `var(--space-2xs)`
+    // which clamps down on smaller viewports — actual nav height on
+    // mobile is closer to ~56px. Using the stale 80px would make the
+    // transition trigger when the section's top is still ~24px below
+    // the nav, reading as "the nav animates before the section
+    // touches it" on mobile.
 
     function bgOf(el: HTMLElement | null) {
       if (!el) return '';
       return getComputedStyle(el).getPropertyValue('--background').trim();
     }
 
+    // Sync the `--nav-height` CSS variable with the nav's actual
+    // rendered height. Hardcoding 80px is wrong on mobile (the nav
+    // collapses to ~56px on iOS/Android) — when stale, anything
+    // anchored against `--nav-height` (the SectionHero title's
+    // top margin, sticky-top offsets, scene padding) ends up
+    // misaligned and the title's cap-tops can clip under the nav.
+    // ResizeObserver covers chrome show/hide AND orientation flips
+    // without polling.
+    function syncNavHeight() {
+      const h = nav!.getBoundingClientRect().height;
+      if (h > 0) {
+        document.documentElement.style.setProperty('--nav-height', `${h}px`);
+      }
+    }
+    syncNavHeight();
+    const navResizeObs = new ResizeObserver(syncNavHeight);
+    navResizeObs.observe(nav);
+
     function update() {
+      // Re-read the nav's rendered height each tick (cheap — it's
+      // a single `getBoundingClientRect`). Lets the transition
+      // threshold track viewport-width-driven padding changes
+      // without needing a separate resize listener.
+      const navHeight = nav!.getBoundingClientRect().height;
+
       // Walk DOM-ordered sections and find the deepest one whose
       // top is at or above viewport top. That's "current".
       let currentIdx = -1;
@@ -223,6 +267,28 @@ const {
 
       const currentBg = bgOf(current);
       const nextBg = bgOf(next);
+
+      // Body bg + iOS theme-color always track the *current* section.
+      // Any body strip that becomes visible (overscroll bounce, sub-
+      // pixel `lvh` rounding under chrome animation, etc.) and the
+      // mobile chrome's own background colour both merge with the
+      // section the user is reading.
+      if (currentBg) {
+        document.body.style.backgroundColor = currentBg;
+        themeMeta!.setAttribute('content', currentBg);
+      }
+
+      // Mirror the current section's `data-theme` onto the nav so
+      // any nav child reading `--primary` / `--foreground` / etc.
+      // picks up the right brand colour for that section. Tokens
+      // are scoped per-`data-theme` block in tokens.css, so setting
+      // the attribute is all it takes.
+      const themeAttr = current?.getAttribute('data-theme');
+      if (themeAttr) {
+        nav!.setAttribute('data-theme', themeAttr);
+      } else {
+        nav!.removeAttribute('data-theme');
+      }
 
       if (next) {
         const nextTop = next.getBoundingClientRect().top;
@@ -264,9 +330,31 @@ const {
 </script>
 
 <style>
+  /* Body background tracks the active section's `--background`
+   * (set by JS in `installNavBg`). The CSS default is the root
+   * `--background`, so the very first paint isn't blank. The
+   * 150ms transition softens the colour swap as the user scrolls
+   * across section boundaries. Scoped via `:has(.tenerife-camp-v2)`
+   * so this only applies to the camp-v2 page. */
+  body:has(.tenerife-camp-v2) {
+    background-color: var(--background);
+    transition: background-color 150ms ease;
+  }
+
   .tenerife-camp-v2 {
-    min-height: 100vh;
-    background: var(--background);
+    /* `lvh` not `vh` — `vh` resolves differently across browsers
+     * (Safari uses largest viewport; Chrome historically used the
+     * dynamic value). `lvh` is explicit and consistent, matching
+     * `.scene__layer`'s sizing in `tenerife/utilities.css`. */
+    min-height: 100lvh;
+    /* No `background` here on purpose. The root `--background` is
+     * the default orange — if we set it on the wrapper, GSAP-pinned
+     * sections (which become `position: fixed`, leaving their flow
+     * slot empty) will reveal the wrapper's orange in that empty
+     * area between scenes during the stack-reveal transition. The
+     * body's dynamic bg (set per active section by `installNavBg`)
+     * shows through instead, which always matches the section the
+     * user is currently reading. */
     color: var(--foreground);
     /* Scenes with `scene__layer--tilt` rotate up to 12° on entry,
      * which extends their bounding box diagonally beyond the viewport
@@ -313,6 +401,42 @@ const {
     /* Clip the slide-up overlay so it doesn't paint above the nav
      * once it animates past `top: 0`. */
     overflow: hidden;
+  }
+
+  /* Hide the shared Navigation's primary "Join Now" CTA on the v2
+   * page — the global StickyJoinCta and the SectionApply CTAs cover
+   * that role. The CTA is the last `<a>` child of `.nav-right` (the
+   * Dropdown is a `<div>`, not `<a>`), so this targets it cleanly
+   * without changing shared component code. */
+  body:has(.tenerife-camp-v2) nav .nav-right > a {
+    display: none;
+  }
+
+  /* Language dropdown — recolour for the v2 page. Border matches
+   * the nav's own bottom rule (the `rgba(255, 255, 255, 0.25)`
+   * underline on the nav element above), so the dropdown reads as
+   * part of the same chrome system. Text + chevron stay
+   * `--foreground` (white) for legibility on the coloured section
+   * backgrounds. */
+  body:has(.tenerife-camp-v2) nav .dropdown {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  /* Override the shared Dropdown's `:hover { border-color:
+   * --color-primary }` rule so hover stays in our subtle white-25%
+   * tone instead of jumping to a different brand colour. */
+  body:has(.tenerife-camp-v2) nav .dropdown:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  body:has(.tenerife-camp-v2) nav .dropdown__text {
+    color: var(--foreground);
+  }
+  /* The chevron is a colored SVG loaded via `<Image>`. CSS can't
+   * recolor an `<img>` directly, but `filter: brightness(0)
+   * invert(1)` reliably paints any opaque SVG white — which is the
+   * `--foreground` for every theme on this page (orange / blue /
+   * yellow / neutral all use white as foreground). */
+  body:has(.tenerife-camp-v2) nav .dropdown__icon {
+    filter: brightness(0) invert(1);
   }
 
   /* Slide-up overlay (follow.art's `__previous-bg` pattern). Lives

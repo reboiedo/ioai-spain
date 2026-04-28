@@ -1,0 +1,403 @@
+---
+/**
+ * SectionApply — final CTA scene.
+ *
+ * Layout (desktop):
+ *   ┌──────────────────────────────┬────────────────────────────┐
+ *   │                              │ Short copy (top)           │
+ *   │  Massive HeroTitle: "JOIN"   │                            │
+ *   │   + image-trail overlay      │                            │
+ *   │                              │             ┌───────────┐  │
+ *   │                              │             │  Join →   │  │
+ *   └──────────────────────────────┴────────────────────────────┘
+ *
+ * The left half hosts the giant title AND a mouse-follow image
+ * trail (inspired by follow.art/#join). When the cursor moves
+ * inside the left half, square portraits pop in at the cursor and
+ * fade older ones out, with only the 3 most recent visible
+ * (active-1 = newest/largest, active-2/-3 = smaller predecessors).
+ * Touch / no-hover devices skip the interactive trail and just show
+ * the three default-positioned portraits.
+ *
+ * Mechanism: ring buffer of N photos. Each cursor movement past a
+ * distance threshold (~80px) advances the head, demoting older
+ * entries by one rank. Class swaps drive scale/opacity via plain
+ * CSS transitions — no GSAP, no scroll trigger.
+ *
+ * Drop square portraits into `src/assets/tenerife/join/` and they
+ * get picked up automatically — no prop wiring required. Astro's
+ * image pipeline (`astro:assets`) handles AVIF/WebP conversion,
+ * resizing, and content-hashed URLs at build time.
+ *
+ * To override the auto-discovered set (e.g. for a different page
+ * passing the same component), supply `images` explicitly.
+ */
+
+import { Image, type ImageMetadata } from "astro:assets";
+import HeroTitle from "@/components/tenerife/HeroTitle.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+  /** Where the primary CTA links to. */
+  href?: string;
+  /** URL the brochure download CTA points at. */
+  brochureHref?: string;
+  /** Optional override for the trail portraits. Falls back to the
+   * auto-discovered set in `src/assets/tenerife/join/`. */
+  images?: ImageMetadata[];
+}
+
+const {
+  theme = "orange",
+  href = "/form/tenerife-camp/",
+  brochureHref = "/brochure/tenerife-camp.pdf",
+  images,
+} = Astro.props;
+
+// Auto-discover portraits at build time. `eager: true` resolves each
+// import synchronously so we have the metadata in frontmatter (no
+// promise plumbing). Sort by filename for deterministic order — drop
+// `01-name.jpg`, `02-name.jpg`, etc. to control the sequence.
+const discovered = Object.entries(
+  import.meta.glob<{ default: ImageMetadata }>(
+    "@/assets/tenerife/join/*.{jpg,jpeg,png,webp,avif}",
+    { eager: true },
+  ),
+)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, mod]) => mod.default);
+
+// Render at least 6 slots so the interaction always has somewhere to
+// land. If fewer real photos are available, the remaining slots fall
+// through as placeholder gradient cards.
+const PLACEHOLDER_COUNT = 6;
+const sourceImages = images ?? discovered;
+const photos: (ImageMetadata | null)[] = Array.from(
+  { length: Math.max(PLACEHOLDER_COUNT, sourceImages.length) },
+  (_, i) => sourceImages[i] ?? null,
+);
+---
+
+<div class="scene">
+  <section
+    class="section split scene__layer apply"
+    data-theme={theme}
+  >
+    <!-- LEFT — giant title + image-trail overlay. -->
+    <div class="apply__left">
+      <div class="apply__title">
+        <HeroTitle>JOIN</HeroTitle>
+      </div>
+
+      <!-- Image trail. Pointer events on the container so we capture
+           cursor moves; individual photos are pointer-events: none so
+           they don't intercept anything. -->
+      <div class="image-trail" data-image-trail>
+        {photos.map((img, i) => (
+          <div class={`image-trail__photo image-trail__photo--${i + 1}`} data-photo>
+            {img ? (
+              <Image
+                src={img}
+                alt=""
+                width={320}
+                height={320}
+                loading="lazy"
+                widths={[160, 240, 320]}
+                sizes="(min-width: 1280px) 10rem, 11vw"
+              />
+            ) : (
+              <div class="image-trail__placeholder" aria-hidden="true"></div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- RIGHT — short copy. The page-wide sticky `StickyJoinCta`
+         is the only Join action across the page; this section
+         doesn't render its own buttons. -->
+    <div class="apply__body">
+      <p class="font-body-l apply__copy">
+        Ready to take part in the IOAI Spain training camp? Applications
+        open with the national qualifier round in February — shortlisted
+        students are invited directly to camp.
+      </p>
+    </div>
+  </section>
+</div>
+
+<style>
+  .apply {
+    min-height: 100lvh;
+  }
+
+  /* LEFT — `position: relative` so the absolutely-positioned trail
+   * can pin to its bounds. */
+  .apply__left {
+    position: relative;
+    align-self: stretch;
+  }
+
+  .apply__title {
+    line-height: 0;
+  }
+
+  /* RIGHT — flex column: copy at the top, CTA at the bottom-right. */
+  .apply__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+    justify-content: space-between;
+    align-self: stretch;
+  }
+
+  .apply__copy {
+    margin: 0;
+    max-width: 38ch;
+  }
+
+  @media (min-width: 768px) {
+    .apply__body {
+      border-inline-start: 1px solid var(--border);
+      padding-inline-start: var(--space-2xl);
+    }
+  }
+
+  /* ── Image trail ──────────────────────────────────────────────
+   *
+   * Container is absolutely positioned over the left column so the
+   * photos NEVER add to the section's flow height. Pointer events
+   * are captured on the container; photos themselves opt out so they
+   * never intercept the cursor. All transforms / opacity changes
+   * happen via GSAP — CSS just defines the static layout. */
+  .image-trail {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+    z-index: 2;
+    overflow: hidden; /* clip stray photos to the left column */
+  }
+
+  .image-trail__photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: clamp(7rem, 11vw, 10rem);
+    aspect-ratio: 1;
+    pointer-events: none;
+    opacity: 0;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: var(--foreground);
+    color: var(--background);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    /* GSAP writes transform (translate + scale). `will-change` keeps
+     * the layer promoted so the trail stays smooth on rapid moves. */
+    will-change: transform, opacity;
+    transform-origin: center center;
+  }
+
+  .image-trail__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .image-trail__placeholder {
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(135deg,
+        color-mix(in oklab, var(--foreground) 25%, transparent) 0%,
+        color-mix(in oklab, var(--foreground) 8%, transparent) 100%);
+  }
+
+  /* Touch devices / no-hover: skip the interactive trail entirely.
+   * The default static composition is still drawn by the script. */
+  @media (hover: none), (pointer: coarse) {
+    .image-trail {
+      pointer-events: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Image-trail interaction (GSAP edition).
+   *
+   * Ring buffer of N photo elements, all `position: absolute` inside
+   * `.image-trail` so they contribute zero flow height to the section.
+   * On pointer move past a distance threshold, the head advances:
+   *   - newest photo → x/y/scale 1/opacity 1 at the cursor
+   *   - previous     → scale 0.78
+   *   - one before   → scale 0.62
+   *   - anything older → opacity 0 (faded out)
+   *
+   * GSAP `to()` with `overwrite: true` is used so rapid pointer moves
+   * cancel any in-flight tweens on the same element instead of queuing
+   * conflicting transforms. `gsap.set` seeds initial state so the first
+   * paint never flashes the photos at full opacity.
+   */
+
+  import { gsap } from 'gsap';
+
+  const THRESHOLD_SQ = 80 * 80;
+  const DEFAULT_POSITIONS = [
+    [0.32, 0.55],
+    [0.50, 0.35],
+    [0.28, 0.22],
+  ];
+  const RANK_SCALE = [1, 0.78, 0.62];
+  const TRANSITION = 0.45;
+  const EASE = 'power3.out';
+
+  type PhotoState = {
+    x: number;
+    y: number;
+    rank: number; // -1 inactive; 0 newest; 1, 2 visible; >2 hidden
+    isSet: boolean;
+  };
+
+  function initTrails() {
+    const trails = document.querySelectorAll<HTMLElement>('[data-image-trail]');
+    trails.forEach(setupTrail);
+  }
+
+  function setupTrail(container: HTMLElement) {
+    const photos = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-photo]'),
+    );
+    if (photos.length === 0) return;
+
+    const N = photos.length;
+    let head = N - 1;
+    let lastX = -Infinity;
+    let lastY = -Infinity;
+
+    // Seed each photo: invisible, scaled-down, parked at 0,0. GSAP owns
+    // the `transform` from here on — no inline `style.translate` or CSS
+    // transitions can race against the tweens.
+    gsap.set(photos, { xPercent: -50, yPercent: -50, scale: 0.6, opacity: 0 });
+
+    const state: PhotoState[] = photos.map(() => ({
+      x: 0, y: 0, rank: -1, isSet: false,
+    }));
+
+    function show(x: number, y: number) {
+      const next = (head + 1) % N;
+      state[next] = { x, y, rank: 0, isSet: true };
+
+      // Walk backward from next-1, demoting each previously-set entry.
+      let i = (next - 1 + N) % N;
+      let rank = 1;
+      while (i !== next) {
+        const p = state[i];
+        if (p.isSet) {
+          p.rank = rank;
+          rank++;
+        }
+        i = (i - 1 + N) % N;
+      }
+      head = next;
+      render();
+    }
+
+    function render() {
+      state.forEach((p, i) => {
+        const el = photos[i];
+        if (!p.isSet) return;
+
+        // z-index: newest on top. Plain inline style — no need to tween.
+        el.style.zIndex = String(N - p.rank);
+
+        if (p.rank === 0) {
+          // Newest: SNAP to the cursor position (no x/y tween — animating
+          // the position from wherever the photo previously lived would
+          // make it fly across the screen on every move). Then fade in
+          // and scale up in place. Older entries hold their last
+          // position, so the visible trail reads as "newest pops in
+          // here, predecessors stay where they were and shrink".
+          gsap.killTweensOf(el);
+          gsap.set(el, { x: p.x, y: p.y, scale: 0.4, opacity: 0 });
+          gsap.to(el, {
+            scale: RANK_SCALE[0],
+            opacity: 1,
+            duration: TRANSITION,
+            ease: EASE,
+          });
+        } else if (p.rank < RANK_SCALE.length) {
+          // Visible older entries: stay where they are, just shrink.
+          gsap.to(el, {
+            scale: RANK_SCALE[p.rank],
+            opacity: 1,
+            duration: TRANSITION,
+            ease: EASE,
+            overwrite: 'auto',
+          });
+        } else {
+          // Past the visible window: fade out.
+          gsap.to(el, {
+            opacity: 0,
+            duration: TRANSITION,
+            ease: EASE,
+            overwrite: 'auto',
+          });
+        }
+      });
+    }
+
+    function fillDefaults() {
+      const rect = container.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      DEFAULT_POSITIONS.forEach(([fx, fy], i) => {
+        setTimeout(() => {
+          show(rect.width * fx, rect.height * fy);
+        }, i * 80);
+      });
+    }
+
+    function onMove(e: PointerEvent) {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const dx = x - lastX;
+      const dy = y - lastY;
+      if (dx * dx + dy * dy < THRESHOLD_SQ) return;
+      lastX = x;
+      lastY = y;
+      show(x, y);
+    }
+
+    let leaveTimeout: number | undefined;
+    function onLeave() {
+      window.clearTimeout(leaveTimeout);
+      leaveTimeout = window.setTimeout(fillDefaults, 500);
+    }
+    function onEnter() {
+      window.clearTimeout(leaveTimeout);
+    }
+
+    const supportsHover = window.matchMedia(
+      '(hover: hover) and (pointer: fine)',
+    ).matches;
+    if (supportsHover) {
+      container.addEventListener('pointermove', onMove, { passive: true });
+      container.addEventListener('pointerleave', onLeave);
+      container.addEventListener('pointerenter', onEnter);
+    }
+
+    // Initial defaults — wait one frame so getBoundingClientRect returns
+    // sensible dimensions after layout settles.
+    requestAnimationFrame(fillDefaults);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTrails, { once: true });
+  } else {
+    initTrails();
+  }
+
+  document.addEventListener('astro:page-load', initTrails);
+</script>

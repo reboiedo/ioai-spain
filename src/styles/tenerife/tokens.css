@@ -55,7 +55,7 @@
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
   --leading-snug: 1.375;
-  --leading-tight: 1.25;
+  --leading-tight: 1.15;
   --space-2xl: clamp(3rem, 2.6176rem + 1.5686vw, 4.5rem);
   --space-2xl-3xl: clamp(3rem, 2.2353rem + 3.1373vw, 6rem);
   --space-3xl: clamp(4rem, 3.4902rem + 2.0915vw, 6rem);
@@ -90,7 +90,7 @@
   --type-step-4: clamp(2rem, 1.6176rem + 1.5686vw, 3.5rem);
   --type-step-5: clamp(2.25rem, 1.6765rem + 2.3529vw, 4.5rem);
   --type-step-6: clamp(2.625rem, 1.3824rem + 5.098vw, 7.5rem);
-  --type-step-7: clamp(2.625rem, 0.4265rem + 9.0196vw, 11.25rem);
+  --type-step-7: clamp(5rem, 1.8137rem + 13.0719vw, 17.5rem);
   --weight-black: 900;
   --weight-bold: 700;
   --weight-extrabold: 800;
@@ -129,6 +129,14 @@
 .font-body-s {
   font-family: var(--font-body);
   font-size: var(--type-14);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-normal);
+}
+
+.font-body-xl {
+  font-family: var(--font-body);
+  font-size: var(--type-step-3);
   font-weight: var(--weight-regular);
   letter-spacing: var(--tracking-normal);
   line-height: var(--leading-normal);

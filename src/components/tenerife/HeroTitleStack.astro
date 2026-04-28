@@ -1,0 +1,117 @@
+---
+/**
+ * HeroTitleStack — a vertical stack of `HeroTitle` lines where every
+ * line renders at the SAME letter size as the longest line.
+ *
+ * `HeroTitle` sizes its glyphs to fill 100% of its container's width.
+ * This wrapper gives each line a container with width proportional to
+ * the line's character count vs. the longest line — so a 4-character
+ * line in a 4/8 = 50% wide container ends up with letters at the same
+ * approximate height as an 8-character line in a 100% wide container.
+ *
+ * Per-line config (object form) lets each line opt into:
+ *   - `align`: 'left' | 'right' | 'center' (defaults to `defaultAlign`)
+ *   - `noStretch`: skip the per-letter scaleY randomization
+ *   - `stretchScale`: dial up or down the per-letter stretch amount
+ *
+ * Usage:
+ *
+ *   <HeroTitleStack
+ *     lines={[
+ *       { text: "TENERIFE", align: "left", noStretch: true },
+ *       { text: "CAMP",     align: "right", stretchScale: 1.5 },
+ *     ]}
+ *   />
+ *
+ *   <HeroTitleStack lines={["OUR", "STORY"]} defaultAlign="right" />
+ */
+
+import HeroTitle from "@/components/tenerife/HeroTitle.astro";
+
+type LineAlign = "left" | "right" | "center";
+
+export interface Line {
+  text: string;
+  align?: LineAlign;
+  noStretch?: boolean;
+  stretchScale?: number;
+}
+
+export interface Props {
+  /** Each line is a string (uses defaults) OR a per-line config object. */
+  lines: (string | Line)[];
+  /** Default alignment applied to any line that doesn't specify one. */
+  defaultAlign?: LineAlign;
+  /** Vertical gap between stacked lines. CSS length / clamp / etc. */
+  gap?: string;
+  /** Default `noStretch` for every line that doesn't override it. */
+  noStretch?: boolean;
+}
+
+const {
+  lines,
+  defaultAlign = "left",
+  gap = "clamp(2rem, 6vw, 4rem)",
+  noStretch: defaultNoStretch = false,
+} = Astro.props;
+
+const normalized = lines.map((l): Required<Pick<Line, "text" | "align">> & Line => {
+  const obj = typeof l === "string" ? { text: l } : l;
+  return {
+    text: obj.text,
+    align: obj.align ?? defaultAlign,
+    noStretch: obj.noStretch ?? defaultNoStretch,
+    stretchScale: obj.stretchScale,
+  };
+});
+
+// Char count is a coarse proxy for letter width — fine for the
+// condensed display font where most uppercase glyphs are similar
+// width. If a future use case needs exact per-line width matching
+// we can swap this for a post-render measurement pass.
+const maxLen = Math.max(...normalized.map((l) => l.text.length), 1);
+---
+
+<div class="hts" style={`--hts-gap: ${gap};`}>
+  {normalized.map((l) => {
+    const widthPct = (l.text.length / maxLen) * 100;
+    return (
+      <div
+        class:list={["hts__line", `hts__line--${l.align}`]}
+        style={`width: ${widthPct.toFixed(2)}%;`}
+      >
+        <HeroTitle noStretch={l.noStretch} stretchScale={l.stretchScale}>
+          {l.text}
+        </HeroTitle>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .hts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hts-gap);
+  }
+
+  /* Each line is a fixed-width block. `line-height: 0` removes the
+   * inline whitespace that would otherwise sit below the SVG. */
+  .hts__line {
+    display: block;
+    line-height: 0;
+  }
+
+  /* Per-line alignment via auto margins. The wrapper's width is
+   * already constrained by the inline `width: X%` set above, so
+   * the auto margin pushes it to the desired edge of its parent. */
+  .hts__line--left {
+    margin-inline-end: auto;
+  }
+  .hts__line--right {
+    margin-inline-start: auto;
+  }
+  .hts__line--center {
+    margin-inline: auto;
+  }
+</style>
