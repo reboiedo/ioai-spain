@@ -178,9 +178,14 @@ const facts: { label: string; value: string }[] = [
       <div class="story__right">
         <div class="story__title">
           <HeroTitleStack
-            lines={titleLines}
+            lines={[
+              // Top line stays flat — only the bottom line carries
+              // the scroll-driven per-letter scaleY animation so
+              // the stretch reads as intent rather than noise.
+              { text: titleLines[0], noStretch: true },
+              { text: titleLines[1] },
+            ]}
             defaultAlign="right"
-            noStretch
             gap="var(--space-s)"
             maxWidth="80%"
           />

@@ -18,16 +18,16 @@
                   "minPx": 14
                 },
                 {
-                  "maxPx": 18,
+                  "maxPx": 20,
                   "minPx": 16
                 },
                 {
-                  "maxPx": 24,
-                  "minPx": 18
+                  "maxPx": 26,
+                  "minPx": 20
                 },
                 {
                   "maxPx": 40,
-                  "minPx": 24
+                  "minPx": 26
                 },
                 {
                   "maxPx": 120,
@@ -277,7 +277,7 @@
   "designSystem": {
     "name": "Tenerife Camp"
   },
-  "generatedAt": "2026-04-29T11:40:07.305Z",
+  "generatedAt": "2026-04-29T20:22:25.636Z",
   "modes": [
     "default",
     "orange",

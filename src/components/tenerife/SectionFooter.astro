@@ -1,0 +1,60 @@
+---
+/**
+ * SectionFooter — short terminating band at the bottom of the
+ * Tenerife camp page.
+ *
+ * Placed AFTER `SectionApply` (the final scene) without a
+ * `[data-scene]` wrapper so it isn't pinned. As the user scrolls
+ * past the apply scene's pin window, this footer rises naturally
+ * into view and the StickyJoinCta lifts up to stay above it
+ * (see StickyJoinCta.astro for the lift logic — driven by an
+ * IntersectionObserver on `[data-camp-footer]`).
+ *
+ * Currently 80px tall, themed to match whichever section came
+ * before (passed via `theme` prop), with a 1px top rule.
+ */
+
+export interface Props {
+  /** Theme palette to apply via `data-theme`. Defaults to orange to
+   *  match the SectionApply scene above. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "orange" } = Astro.props;
+---
+
+<footer class="camp-footer" data-theme={theme} data-camp-footer>
+  <p class="camp-footer__copy">
+    © {new Date().getFullYear()} IOAI Spain · Tenerife Camp
+  </p>
+</footer>
+
+<style>
+  .camp-footer {
+    position: relative;
+    /* 80px keeps the band visually small — just enough to host a
+     * single line of text plus a touch of breathing room. The
+     * theme's `--background` / `--foreground` carry through via
+     * `data-theme`, matching the section directly above. */
+    min-height: 80px;
+    padding: var(--space-m) var(--section-inline);
+    border-block-start: 1px solid var(--border);
+    background: var(--background);
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* Above the per-scene pin layers below it. The apply scene is
+     * pinned with `pinSpacing: false`, so it stays at the
+     * viewport bottom while this footer rises over it. A modest
+     * z-index keeps the stacking unambiguous. */
+    z-index: 5;
+  }
+
+  .camp-footer__copy {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
+</style>

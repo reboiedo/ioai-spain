@@ -1,0 +1,681 @@
+---
+/**
+ * SectionTestimonials — testimonial slider scene.
+ *
+ * Layout (desktop):
+ *   ┌───────────────────────────────────────────────────────────┐
+ *   │  TESTIMONIALS  ← full-width HeroTitle at the top           │
+ *   │                                                            │
+ *   │             ┌──────────────────┐                           │
+ *   │             │  ACTIVE          │                           │
+ *   │             │  testimonial     │                           │
+ *   │             │  (one at a time) │                           │
+ *   │             └──────────────────┘                           │
+ *   │                                                            │
+ *   │             ←  Prev    Next  →                             │
+ *   └───────────────────────────────────────────────────────────┘
+ *
+ * Single active card in the middle of the section, prev/next
+ * cycles through. Plain crossfade — once the basic placement
+ * lands we'll layer on the adjacent-card flair.
+ *
+ * Mobile (<768px): horizontal-snap scroll via `HScrollMobile`.
+ */
+
+import HeroTitle from "@/components/tenerife/HeroTitle.astro";
+import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
+
+export interface Props {
+  /** Tenerife theme palette to apply via `data-theme`. */
+  theme?: "orange" | "blue" | "yellow" | "neutral";
+}
+
+const { theme = "blue" } = Astro.props;
+
+interface Testimonial {
+  quote: string;
+  name: string;
+  role: string;
+  context: string;
+}
+
+const testimonials: Testimonial[] = [
+  {
+    quote:
+      "I won Spain's first-ever gold medal at the 2024 International Olympiad in Informatics, after training at the Harbour.Space Menorca Camp 2023.",
+    name: "Alejandro Vivero",
+    role: "Gold winner student",
+    context: "IOI 2024",
+  },
+  {
+    quote:
+      "The experience was truly eye-opening. Learning advanced math and programming alongside talented students from around the world in Barcelona pushed my skills forward and gave me a strong foundation.",
+    name: "Maxim Oboznyi",
+    role: "Silver Medalist",
+    context: "Southwestern European Regional Contest 2022",
+  },
+  {
+    quote:
+      "My daughter arrived unsure about STEM, but the projects and mentors helped her see it differently. It genuinely helped her find her direction. She's now studying programming at university. We're really grateful!!",
+    name: "Anna",
+    role: "Parent",
+    context: "Barcelona Summer Camp 2019",
+  },
+  {
+    quote:
+      "The Menorca camp was honestly incredible. The activities were hands-on, so it never felt like school, and the mentors were super friendly and helped whenever you got stuck. I'd 100% do it again.",
+    name: "Jaime",
+    role: "Participant",
+    context: "Menorca Summer Camp 2023",
+  },
+];
+---
+
+<div class="scene" data-scene>
+  <section
+    class="section scene__layer scene__layer--tilt testimonials"
+    data-theme={theme}
+  >
+    <!-- Full-width title — positioned absolutely so the slider
+         can overlap it. The card paints in front of the giant
+         type. -->
+    <div class="testimonials__hero" aria-hidden="true">
+      <HeroTitle>TESTIMONIALS</HeroTitle>
+    </div>
+
+    <!-- DESKTOP layout: horizontal track of cards with the
+         active card framed by the stage. Adjacent cards peek
+         out to the right (clipped by the section's
+         overflow:hidden). The track is GSAP Draggable, so the
+         user can drag/swipe through the testimonials. -->
+    <div class="testimonials__desktop">
+      <div class="testimonials__stage" data-testi-stage>
+        <div class="testimonials__track" data-testi-track>
+          {testimonials.map((t, i) => (
+            <article
+              class="testi-card"
+              data-testi-index={String(i)}
+              data-active={i === 0 ? "true" : undefined}
+            >
+              <blockquote class="testi-card__quote">
+                <p class="font-body">{t.quote}</p>
+              </blockquote>
+              <div class="testi-card__author">
+                <div class="testi-card__avatar" aria-hidden="true"></div>
+                <div class="testi-card__meta">
+                  <p class="font-body testi-card__name">{t.name}</p>
+                  <p class="font-caption testi-card__role">{t.role}</p>
+                  <p class="font-caption testi-card__context">{t.context}</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div class="testimonials__nav">
+        <button
+          type="button"
+          class="testi-nav-btn testi-nav-btn--prev"
+          data-testi-prev
+          aria-label="Previous testimonial"
+        >
+          <span class="testi-nav-btn__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10.5" />
+              <path d="M14 8 L10 12 L14 16" />
+            </svg>
+          </span>
+          <span class="testi-nav-btn__label">Prev</span>
+        </button>
+        <button
+          type="button"
+          class="testi-nav-btn testi-nav-btn--next"
+          data-testi-next
+          aria-label="Next testimonial"
+        >
+          <span class="testi-nav-btn__label">Next</span>
+          <span class="testi-nav-btn__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10.5" />
+              <path d="M10 8 L14 12 L10 16" />
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom-left tagline — same anchor pattern as
+         follow.art's "Curators & Artists / About Us" block. -->
+    <p class="testimonials__tagline" aria-hidden="true">
+      <span>Real voices</span>
+      <span>from camp</span>
+    </p>
+
+    <!-- MOBILE layout: section title + horizontal-scroll list. -->
+    <div class="testimonials__mobile">
+      <SectionTitle lines={["TESTIMONIALS"]} />
+
+      <HScrollMobile itemWidth="min(82%, 360px)">
+        {testimonials.map((t) => (
+          <article class="testi-card testi-card--mobile">
+            <blockquote class="testi-card__quote">
+              <p class="font-body">{t.quote}</p>
+            </blockquote>
+            <div class="testi-card__author">
+              <div class="testi-card__avatar" aria-hidden="true"></div>
+              <div class="testi-card__meta">
+                <p class="font-body testi-card__name">{t.name}</p>
+                <p class="font-caption testi-card__role">{t.role}</p>
+                <p class="font-caption testi-card__context">{t.context}</p>
+              </div>
+            </div>
+          </article>
+        ))}
+      </HScrollMobile>
+    </div>
+  </section>
+</div>
+
+<style>
+  /* Section: exactly one viewport tall. Drop the base
+   * `padding-block-start` so the absolutely-positioned hero
+   * title can pin flush below the nav line (mirrors follow.art's
+   * testimonials block). The title supplies its own nav
+   * clearance via `top: var(--nav-height)`. */
+  .testimonials {
+    position: relative;
+    height: 100lvh;
+    min-height: 100lvh;
+    overflow: hidden;
+    /* Desktop: drop the base section's top padding so the
+     * absolute hero banner can pin flush below the nav. The
+     * mobile breakpoint below restores the standard top
+     * padding because mobile uses an in-flow `SectionTitle`
+     * that needs the nav clearance. */
+    padding-block-start: 0;
+  }
+
+  @media (max-width: 767.98px) {
+    .testimonials {
+      /* Restore the base `.section` top padding so the
+       * mobile in-flow title sits below the nav. */
+      padding-block-start: calc(
+        var(--section-block) + var(--nav-height)
+      );
+    }
+  }
+
+  /* Title — full-width banner pinned to the TOP of the section,
+   * behind the slider (`z-index: 1`). Cream / dark text sits in
+   * front of it, overlapping its lower half — same composition
+   * as follow.art.
+   *
+   * Top offset = nav-height + a comfortable breathing gap
+   * (`--space-l`) so the cap-tops don't kiss the nav line.
+   * Same idea as `SectionHero`'s title margin. */
+  .testimonials__hero {
+    position: absolute;
+    top: calc(
+      var(--nav-height, 80px)
+        + var(--space-l)
+        + env(safe-area-inset-top, 0px)
+    );
+    left: var(--section-inline);
+    right: var(--section-inline);
+    line-height: 0;
+    pointer-events: none;
+    z-index: 1;
+    color: var(--foreground);
+    opacity: 0.95;
+  }
+
+  .testimonials__hero :global(svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @media (max-width: 767.98px) {
+    /* Hide the hero title on mobile so the horizontal-scroll
+     * cards have full vertical room. */
+    .testimonials__hero {
+      display: none;
+    }
+  }
+
+  /* Slider region — absolute, fills the section, vertically
+   * centres the active card on top of the giant title. Pointer
+   * events on the cards/buttons via the children rule below
+   * (the layer itself is click-through). */
+  .testimonials__desktop {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-l);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .testimonials__desktop > * {
+    pointer-events: auto;
+  }
+
+  .testimonials__mobile {
+    display: none;
+  }
+
+  @media (max-width: 767.98px) {
+    .testimonials__desktop {
+      display: none;
+    }
+    .testimonials__mobile {
+      /* Section title at the top, h-scroll cards below.
+       * Plain block flow — the section's `padding-block-start`
+       * pads the title under the nav, the content grows
+       * downward naturally. */
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-l);
+      position: relative;
+      z-index: 2;
+    }
+  }
+
+  /* Stage — frames the active card. The track inside is a
+   * horizontal flex row of cards that translates left/right
+   * (GSAP / Draggable). The stage's HEIGHT comes from the
+   * track / cards inside (content-driven), so the cards are
+   * "smart": short quotes give shorter cards, long quotes
+   * grow taller — and on narrow tablet/portrait viewports
+   * the cards don't stay artificially tall the way a fixed
+   * aspect-ratio would force.
+   *
+   * `overflow: visible` so adjacent cards spill beyond the
+   * stage's right edge; the section's `overflow: hidden`
+   * still clips them at the section bound. */
+  .testimonials__stage {
+    --testi-card-gap: var(--space-m);
+    position: relative;
+    width: min(34rem, 80%);
+    aspect-ratio: 5 / 4;
+    overflow: visible;
+  }
+
+  /* Tablet portrait (iPad Mini etc.): same 5/4 aspect, just
+   * a narrower max-width so the card doesn't read as "wide
+   * and short" on the tighter viewport. */
+  @media (max-width: 1023.98px) {
+    .testimonials__stage {
+      width: min(22rem, 70%);
+    }
+  }
+
+  /* Track holds every card in a horizontal row. `position:
+   * absolute` fills the stage so the active card is flush
+   * with the stage's left edge; cards to the right peek
+   * beyond the stage and get clipped by the section.
+   *
+   * `align-items: stretch` (flex default) means every card
+   * adopts the tallest card's height — neighbours stay
+   * visually balanced regardless of which testimonial is
+   * longest. */
+  .testimonials__track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    display: flex;
+    gap: var(--testi-card-gap);
+    cursor: grab;
+    will-change: transform;
+    touch-action: pan-y; /* allow vertical page scroll on touch */
+  }
+
+
+  .testimonials__track.is-dragging,
+  .testimonials__track:active {
+    cursor: grabbing;
+  }
+
+  .testi-card {
+    /* Each card matches the stage's width; JS sets it in
+     * pixels at install / on resize. Height fills the stage
+     * (desktop, where aspect-ratio governs) or stretches to
+     * the tallest sibling via flex (tablet/mobile, where
+     * stage height is content-driven). */
+    flex: 0 0 auto;
+    height: 100%;
+    padding: var(--space-l);
+    /* `--secondary` is white in every Tenerife theme;
+     * `--secondary-foreground` is black. Cards read as cream
+     * postcards in front of the dark `TESTIMONIALS` banner —
+     * same composition as follow.art. */
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+    border-radius: 4px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+    /* Quote at top, footer at bottom — middle row pushes the
+     * footer down regardless of quote length. */
+    gap: var(--space-l);
+    /* Scale is owned by JS — it's tied to each card's distance
+     * from the stage centre, so dragging continuously scales
+     * the cards (active grows as it nears centre, neighbours
+     * shrink as they slide away). The track's translate lives
+     * on the parent, so the per-card scale composes naturally. */
+    transform-origin: center center;
+  }
+
+  /* Quote takes the available middle, footer pinned to the
+   * bottom via `margin-top: auto`. Replaces the previous
+   * `justify-content: space-between` which leaves big empty
+   * gaps when a quote is short. */
+  .testi-card__quote {
+    margin: 0;
+  }
+
+  .testi-card__author {
+    margin-top: auto;
+  }
+
+  /* Mobile cards live inside HScrollMobile. Override the
+   * desktop-row defaults (`height: 100%` collapses to 0 in
+   * the h-scroll context; the JS-driven scale doesn't apply
+   * because the carousel script ignores cards outside the
+   * desktop track).
+   *
+   * `height: auto` + content-driven sizing means the card
+   * grows to fit its quote on every phone width. The card's
+   * `flex` setting comes from HScrollMobile's grid, so we
+   * just reset the desktop transform/aspect/height. */
+  .testi-card--mobile {
+    width: 100%;
+    height: auto;
+    transform: none;
+    aspect-ratio: auto;
+  }
+
+  .testi-card__quote {
+    margin: 0;
+  }
+  .testi-card__quote p {
+    margin: 0;
+  }
+
+  .testi-card__author {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: var(--space-m);
+    /* Divider tinted from the card's own foreground (black) so
+     * it reads as a soft rule on the white surface. */
+    border-block-start: 1px solid color-mix(in oklab, var(--secondary-foreground) 18%, transparent);
+    padding-block-start: var(--space-m);
+  }
+
+  .testi-card__avatar {
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--secondary-foreground) 18%, transparent);
+  }
+
+  .testi-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    min-width: 0;
+  }
+
+  .testi-card__name {
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .testi-card__role,
+  .testi-card__context {
+    margin: 0;
+    opacity: 0.7;
+  }
+
+  /* Nav controls — same shape as follow.art's: a small circular
+   * arrow icon + label text, no pill background. The icon is
+   * an inline SVG (circle outline + chevron) so it inherits
+   * `currentColor` and tracks the section foreground. */
+  .testimonials__nav {
+    display: flex;
+    gap: var(--space-2xl);
+  }
+
+  .testi-nav-btn {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 220ms ease;
+  }
+
+  .testi-nav-btn:hover {
+    opacity: 1;
+  }
+
+  .testi-nav-btn__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 1.65rem;
+    height: 1.65rem;
+    transition: transform 220ms ease;
+  }
+
+  .testi-nav-btn__icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .testi-nav-btn--prev:hover .testi-nav-btn__icon {
+    transform: translateX(-3px);
+  }
+
+  .testi-nav-btn--next:hover .testi-nav-btn__icon {
+    transform: translateX(3px);
+  }
+
+  .testi-nav-btn__label {
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* Bottom-left tagline — section anchor in the corner, same
+   * spot follow.art uses for "Curators & Artists / About Us". */
+  .testimonials__tagline {
+    position: absolute;
+    bottom: var(--space-l);
+    left: var(--section-inline);
+    margin: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    font-size: 1.25rem;
+    color: var(--foreground);
+  }
+
+  @media (max-width: 767.98px) {
+    .testimonials__tagline {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Testimonials slider — horizontal track, draggable.
+   *
+   * All cards live in a single horizontal flex track inside
+   * the stage. The active card is flush with the stage's left
+   * edge; the next cards peek to the right, clipped by the
+   * section's `overflow: hidden`.
+   *
+   * GSAP Draggable lets the user grab the track and swipe;
+   * Prev/Next clicks `snapTo` the next index. On drag-end the
+   * track snaps to the nearest card. Card width is measured
+   * from the stage and refreshed via ResizeObserver so resizes
+   * (window, orientation) don't desync the snap math.
+   */
+  import { gsap } from 'gsap';
+  import { Draggable } from 'gsap/Draggable';
+
+  gsap.registerPlugin(Draggable);
+
+  function install() {
+    const stage = document.querySelector<HTMLElement>('[data-testi-stage]');
+    if (!stage) return;
+    const track = stage.querySelector<HTMLElement>('[data-testi-track]');
+    if (!track) return;
+    const cards = Array.from(
+      track.querySelectorAll<HTMLElement>('[data-testi-index]'),
+    );
+    const prevBtn = document.querySelector<HTMLButtonElement>(
+      '[data-testi-prev]',
+    );
+    const nextBtn = document.querySelector<HTMLButtonElement>(
+      '[data-testi-next]',
+    );
+    if (cards.length === 0) return;
+
+    const clamp = gsap.utils.clamp(0, cards.length - 1);
+    const SCALE_MIN = 0.7;
+    let cardWidth = 0;
+    let gapPx = 0;
+    let step = 0;
+    let active = 0;
+
+    function measure() {
+      cardWidth = stage.clientWidth;
+      // Read the gap from the stage's CSS var so it matches
+      // whatever value `--testi-card-gap` resolves to on this
+      // viewport (it's a `clamp()` token).
+      const gapStr = getComputedStyle(stage)
+        .getPropertyValue('--testi-card-gap')
+        .trim();
+      gapPx = parseFloat(gapStr) || 0;
+      // `var(--space-m)` may resolve to an em-relative `clamp`
+      // — fall back to reading the computed gap on the track
+      // itself if our token parse came back as zero.
+      if (!gapPx) {
+        const trackGap = getComputedStyle(track).columnGap;
+        gapPx = parseFloat(trackGap) || 0;
+      }
+      step = cardWidth + gapPx;
+      cards.forEach((c) => {
+        c.style.width = cardWidth + 'px';
+      });
+      snapTo(active, true);
+    }
+
+    /**
+     * Per-card scale based on distance from the stage centre.
+     * Card at the centre = 1.0; ≥ one full step away = 0.7.
+     * Linear ramp in between, so dragging continuously rescales
+     * — the active grows in as you snap toward it, neighbours
+     * shrink as they slide away. `trackX` is the track's
+     * current x-translate (negative = scrolled forward).
+     */
+    function updateScales(trackX: number) {
+      cards.forEach((card, i) => {
+        // Card i's centre on the stage's local x-axis given
+        // the current track translate. The stage's centre is
+        // at `cardWidth / 2`; when the track is at -i*step,
+        // card i's centre lands exactly there.
+        const cardCenter = i * step + cardWidth / 2 + trackX;
+        const distance = Math.abs(cardCenter - cardWidth / 2);
+        const t = Math.min(distance / step, 1);
+        const scale = 1 - (1 - SCALE_MIN) * t;
+        gsap.set(card, { scale });
+      });
+    }
+
+    function snapTo(idx: number, instant = false) {
+      const next = clamp(idx);
+      active = next;
+      const targetX = -active * step;
+      gsap.to(track, {
+        x: targetX,
+        duration: instant ? 0 : 0.6,
+        ease: 'power3.out',
+        overwrite: 'auto',
+        onUpdate() {
+          // Read the live x and refresh per-card scale every
+          // tick so the snap animation is also tied to the
+          // track's interpolated position.
+          updateScales(Number(gsap.getProperty(track, 'x')));
+        },
+      });
+      // Initial / instant calls don't tick `onUpdate` reliably,
+      // so write the final scales explicitly too.
+      if (instant) updateScales(targetX);
+      cards.forEach((c, i) => {
+        if (i === active) c.setAttribute('data-active', 'true');
+        else c.removeAttribute('data-active');
+      });
+    }
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(stage);
+
+    if (prevBtn) prevBtn.onclick = () => snapTo(active - 1);
+    if (nextBtn) nextBtn.onclick = () => snapTo(active + 1);
+
+    // Drag/swipe. Bounds clamp the track so the user can only
+    // pull within the available range (no rubber-band beyond
+    // the first/last card). On release we snap to whichever
+    // card's slot is closest to the resting `x`.
+    Draggable.create(track, {
+      type: 'x',
+      inertia: false,
+      edgeResistance: 0.7,
+      bounds: () => ({
+        minX: -((cards.length - 1) * step),
+        maxX: 0,
+      }),
+      onDragStart() {
+        track.classList.add('is-dragging');
+      },
+      onDrag() {
+        // Live scale during drag — every pointermove ticks
+        // this, so cards continuously grow/shrink as they
+        // approach / leave the centre.
+        updateScales(this.x);
+      },
+      onDragEnd() {
+        track.classList.remove('is-dragging');
+        const idx = Math.round(-this.x / step);
+        snapTo(idx);
+      },
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', install, { once: true });
+  } else {
+    install();
+  }
+  document.addEventListener('astro:page-load', install);
+</script>

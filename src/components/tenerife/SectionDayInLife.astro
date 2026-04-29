@@ -1,18 +1,39 @@
 ---
 /**
- * DayInLifeSection — "A DAY AT TENERIFE CAMP" scene.
+ * SectionDayInLife — "A DAY AT TENERIFE" scene.
  *
- * Same shape as ActivitiesSection but the left visual is an
- * animated clock instead of a polaroid pile. As the user scrolls
- * through the timeslot rows on the right, the clock's hour and
- * minute hands rotate to the active slot's start time.
+ * Layout (desktop, ≥768px):
+ *   ┌──────────────────────────────┬───────────────────────────────┐
+ *   │  Sticky                      │  Intro paragraph              │
+ *   │   ╔══════════════╗           │  ──────────────────           │
+ *   │   ║   A DAY AT   ║           │  Slot 1 (time, title, desc)   │
+ *   │   ║              ║           │  ──────────────────           │
+ *   │   ║  ┌────────┐  ║           │  Slot 2 …                     │
+ *   │   ║  │ photo  │  ║           │  ──────────────────           │
+ *   │   ║  │ tilted │  ║           │  Slot 3 …                     │
+ *   │   ║  └────────┘  ║           │     …                         │
+ *   │   ║   TENERIFE   ║           │                               │
+ *   │   ╚══════════════╝           │                               │
+ *   └──────────────────────────────┴───────────────────────────────┘
  *
- * Schedule data is sourced from `src/i18n/camp/schedule.ts`
- * (8 slots from 07:00 → 22:00). Hand angles are pre-computed
- * server-side from each slot's start time so the SSR render
- * shows the right initial state for slot 0.
+ * Left column mirrors the SectionStory pattern: a big two-line
+ * `HeroTitleStack` with a tilted asset positioned absolutely
+ * between/over the title. Here the asset is a photo cross-fader
+ * — every slot photo is mounted in the same box; only the
+ * active one is at opacity 1. JS toggles `data-active` based on
+ * which slot row is currently in the right column's reading band.
+ *
+ * Mobile (<768px): title + intro stack vertically, then a
+ * horizontal-scroll of slot cards.
+ *
+ * Photos: drop images into `src/assets/tenerife/day-in-life/`
+ * (named `01-…`, `02-…`, etc.) and they'll be picked up
+ * automatically. Falls back to the activities photo set if the
+ * folder is empty so the layout reads correctly during dev.
  */
 
+import { Image, type ImageMetadata } from "astro:assets";
+import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 
@@ -27,48 +48,9 @@ interface Slot {
   time: string;
   title: string;
   description: string;
-  startHour: number;
-  startMinute: number;
-  endHour: number;
-  endMinute: number;
 }
 
-/**
- * Parse a single "7:00am" / "1:30pm" segment into 24-hour
- * { hour, minute }.
- */
-function parseSegment(seg: string): { hour: number; minute: number } {
-  const m = seg.trim().toLowerCase().match(/(\d{1,2}):(\d{2})\s*(am|pm)?/);
-  if (!m) return { hour: 0, minute: 0 };
-  let hour = parseInt(m[1], 10);
-  const minute = parseInt(m[2], 10);
-  const meridiem = m[3];
-  if (meridiem === "pm" && hour < 12) hour += 12;
-  if (meridiem === "am" && hour === 12) hour = 0;
-  return { hour, minute };
-}
-
-/**
- * Split a time range string ("7:00am – 9:00am") into start + end.
- * Accepts both ASCII hyphen and en-dash separators.
- */
-function parseRange(range: string) {
-  const parts = range.split(/[-–—]/);
-  const start = parseSegment(parts[0] ?? "");
-  const end = parseSegment(parts[1] ?? "");
-  return { start, end };
-}
-
-/**
- * Map a time on the analog (12-hour) face to its angle in
- * degrees, where 0° = 12 o'clock and the dial advances
- * clockwise. Each hour is 30°; minutes add 0.5°.
- */
-function angleAt(hour: number, minute: number) {
-  return ((hour % 12) * 30) + (minute * 0.5);
-}
-
-const rawSlots: Array<{ time: string; title: string; description: string }> = [
+const slots: Slot[] = [
   {
     time: "7:00am – 9:00am",
     title: "Early rise",
@@ -119,27 +101,25 @@ const rawSlots: Array<{ time: string; title: string; description: string }> = [
   },
 ];
 
-const slots: Slot[] = rawSlots.map((s) => {
-  const { start, end } = parseRange(s.time);
-  return {
-    ...s,
-    startHour: start.hour,
-    startMinute: start.minute,
-    endHour: end.hour,
-    endMinute: end.minute,
-  };
-});
-
-/** SSR initial values for slot 0's arc, so the first paint is correct. */
-function arcVars(slot: Slot) {
-  const start = angleAt(slot.startHour, slot.startMinute);
-  let end = angleAt(slot.endHour, slot.endMinute);
-  // Wrap if the range crosses 12 (e.g. 11pm → 1am).
-  if (end < start) end += 360;
-  return { start, extent: end - start };
-}
-
-const initial = arcVars(slots[0]);
+// Photo set. Prefer dedicated `day-in-life/` images when present;
+// otherwise borrow from `activities/` so the layout has content
+// during dev. Sorted by filename so order maps to slot index 1:1.
+const dayInLifeModules = import.meta.glob<{ default: ImageMetadata }>(
+  "@/assets/tenerife/day-in-life/*.{png,jpg,jpeg,webp,avif}",
+  { eager: true },
+);
+const activityModules = import.meta.glob<{ default: ImageMetadata }>(
+  "@/assets/tenerife/activities/*.{png,jpg,jpeg,webp,avif}",
+  { eager: true },
+);
+const sourceModules =
+  Object.keys(dayInLifeModules).length > 0
+    ? dayInLifeModules
+    : activityModules;
+const photos: ImageMetadata[] = Object.entries(sourceModules)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, mod]) => mod.default)
+  .slice(0, slots.length);
 ---
 
 <div class="scene" data-scene>
@@ -147,114 +127,89 @@ const initial = arcVars(slots[0]);
     class="section split scene__layer scene__layer--tilt day-in-life"
     data-theme={theme}
   >
-    <!-- DESKTOP layout (≥768px): sticky clock on the left, scrollable
-         timeslot list on the right. Hidden on mobile by the
-         `.day__desktop` rule in the <style> block below. -->
+    <!-- DESKTOP layout (≥768px). Hidden on mobile via the
+         `.day__desktop` rule below. -->
     <div class="day__desktop">
-    <!-- LEFT: sticky title + animated clock. -->
-    <div class="day__left">
-      <SectionTitle lines={["A DAY AT TENERIFE"]} />
-
-      <!-- Clock — pure SVG. The active timeslot is shown as a
-           single arc swept on the dial; JS lerps the start angle
-           and arc length toward the active slot's range. -->
-      <div class="day__clock" data-day-clock>
-        <svg
-          class="day__clock-svg"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <!-- Face outline. -->
-          <circle
-            class="day__clock-face"
-            cx="50"
-            cy="50"
-            r="46"
-            fill="none"
+      <!-- LEFT (sticky): big two-line HeroTitleStack with the
+           tilted photo poster positioned between the lines.
+           Same pattern as `SectionStory`'s right column. -->
+      <div class="day__left">
+        <div class="day__title">
+          <HeroTitleStack
+            lines={[
+              // Top line stays flat — multi-line stretch on every
+              // line reads as noise. The bottom line carries the
+              // scroll-driven per-letter scaleY animation.
+              { text: "A DAY AT", noStretch: true },
+              { text: "TENERIFE" },
+            ]}
+            defaultAlign="left"
+            gap="var(--space-s)"
+            maxWidth="100%"
           />
-          <!-- 12 hour ticks. Quarter ticks (12, 3, 6, 9) are
-               longer + bolder. -->
-          {Array.from({ length: 12 }).map((_, i) => {
-            const angle = (i * 30) - 90; // start at top, step 30°
-            const rad = (angle * Math.PI) / 180;
-            const isQuarter = i % 3 === 0;
-            const inner = isQuarter ? 38 : 41;
-            const outer = 46;
-            const x1 = 50 + Math.cos(rad) * inner;
-            const y1 = 50 + Math.sin(rad) * inner;
-            const x2 = 50 + Math.cos(rad) * outer;
-            const y2 = 50 + Math.sin(rad) * outer;
-            return (
-              <line
-                class="day__clock-tick"
-                data-quarter={isQuarter ? "true" : undefined}
-                x1={x1.toFixed(2)}
-                y1={y1.toFixed(2)}
-                x2={x2.toFixed(2)}
-                y2={y2.toFixed(2)}
+        </div>
+
+        <!-- Photo trail. Same mechanism as the CTA section
+             (`.image-trail`): a ring buffer of N photos with the
+             newest snapping in at its slot's deterministic
+             position, predecessors demoting to smaller scales,
+             oldest fading out. Triggered by scroll (active slot
+             change) instead of the cursor. -->
+        <div class="day__trail" data-day-trail>
+          {photos.map((photo, i) => (
+            <div
+              class="day__trail-photo"
+              data-day-trail-photo
+              data-day-trail-index={String(i)}
+            >
+              <Image
+                src={photo}
+                alt=""
+                width={320}
+                height={400}
+                widths={[240, 360, 480]}
+                sizes="(min-width: 768px) 18vw, 50vw"
+                loading={i < 2 ? "eager" : "lazy"}
               />
-            );
-          })}
-          <!-- Active range arc.
-               * `pathLength="360"` rescales the path length to
-                 360 units, so dasharray/offset values are simple
-                 degrees.
-               * The group is rotated -90° so 0° = 12 o'clock
-                 (SVG circles default to starting at 3 o'clock).
-               * Initial inline styles from SSR cover the no-JS /
-                 first-paint case for slot 0; JS overrides on
-                 scroll. -->
-          <g class="day__clock-arc-group">
-            <circle
-              class="day__clock-arc"
-              cx="50"
-              cy="50"
-              r="44"
-              fill="none"
-              pathLength="360"
-              style={`stroke-dasharray: ${initial.extent.toFixed(2)} ${(360 - initial.extent).toFixed(2)}; stroke-dashoffset: ${(-initial.start).toFixed(2)};`}
-            />
-          </g>
-        </svg>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Vertical centreline divider — same convention as the
+           other split sections. -->
+      <div class="day__divider" aria-hidden="true"></div>
+
+      <!-- RIGHT: intro paragraph (flows with the content) +
+           list of timeslot rows. No opacity dimming on inactive
+           rows — every slot reads at full strength. -->
+      <div class="day__right">
+        <p class="font-body-l day__intro">
+          Every day at the camp follows the same rhythm — morning
+          learning blocks, an unhurried lunch, the afternoon programme
+          on the island, dinner together, and a deliberately quiet
+          evening before the next early start. Here's how a typical
+          day breaks down.
+        </p>
+
+        <ol class="day__list">
+          {slots.map((s, i) => (
+            <li
+              class="day-row"
+              data-day-index={String(i)}
+              data-active={i === 0 ? "true" : undefined}
+            >
+              <p class="font-caption day-row__time">{s.time}</p>
+              <h3 class="font-h3 day-row__title">{s.title}</h3>
+              <p class="font-body day-row__description">{s.description}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     </div>
 
-    <!-- RIGHT: intro paragraph + list of timeslot rows. The intro
-         scrolls with the column (not sticky) and stays out of the
-         IntersectionObserver's pool so it doesn't trigger the clock. -->
-    <div class="day__column">
-      <p class="font-body-l day__intro">
-        Every day at the camp follows the same rhythm — morning
-        learning blocks, an unhurried lunch, the afternoon programme
-        on the island, dinner together, and a deliberately quiet
-        evening before the next early start. Here's how a typical
-        day breaks down.
-      </p>
-
-      <ol class="day__list">
-        {slots.map((s, i) => (
-          <li
-            class="day-row"
-            data-day-index={String(i)}
-            data-active={i === 0 ? "true" : undefined}
-            data-start-hour={String(s.startHour)}
-            data-start-minute={String(s.startMinute)}
-            data-end-hour={String(s.endHour)}
-            data-end-minute={String(s.endMinute)}
-          >
-            <p class="font-caption day-row__time">{s.time}</p>
-            <h3 class="font-h3 day-row__title">{s.title}</h3>
-            <p class="font-body day-row__description">{s.description}</p>
-          </li>
-        ))}
-      </ol>
-    </div>
-    </div>
-
-    <!-- MOBILE layout (<768px): title + intro stack vertically (no
-         sticky, no clock), followed by a horizontal-scroll of slot
-         cards. Each card carries time, title, and description. -->
+    <!-- MOBILE layout (<768px). Title + intro stacked, then a
+         horizontal scroll of slot cards. Hidden on desktop. -->
     <div class="day__mobile">
       <SectionTitle lines={["A DAY AT TENERIFE"]} />
       <p class="font-body-l day__mobile-intro">
@@ -280,13 +235,9 @@ const initial = arcVars(slots[0]);
 
 <style>
   /* ── Desktop / mobile layout swap ───────────────────────────────
-   * Desktop renders the sticky clock + scrollable list inside the
-   * section's `.split` grid. Mobile renders a single-column block.
-   *
-   * `display: contents` keeps the wrapper transparent to layout so
-   * the parent `.split` grid still sees `.day__left` and
-   * `.day__column` as DIRECT children. Without it the split would
-   * collapse to a single column on desktop. */
+   * Same `display: contents` trick as the other split sections so
+   * the section's own `.split` grid sees the desktop subtree's
+   * children directly. */
   .day__desktop {
     display: contents;
   }
@@ -303,9 +254,6 @@ const initial = arcVars(slots[0]);
       display: grid;
       gap: var(--space-l);
     }
-    /* The section's `.split` rule is irrelevant when only one
-     * column is rendered — collapse to a single column so the
-     * mobile block doesn't inherit half-width sizing. */
     .day-in-life {
       display: block;
     }
@@ -316,11 +264,164 @@ const initial = arcVars(slots[0]);
     max-width: 52ch;
   }
 
+  .day-in-life {
+    align-items: start;
+  }
+
+  /* Centreline divider — hidden by default (mobile collapses to
+   * single column); revealed at ≥768px as its own grid track. */
+  .day__divider {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .day-in-life {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--space-xl);
+    }
+    .day__divider {
+      display: block;
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+  }
+
+  /* LEFT — sticky big-title + tilted photo poster.
+   *
+   * `position: relative` makes this the containing block for the
+   * absolutely-positioned photo poster. Everything inside it
+   * (the title) flows normally; the poster is `position: absolute`
+   * and overlays. */
+  .day__left {
+    position: relative;
+  }
+
+  @media (min-width: 768px) {
+    .day__left {
+      position: sticky;
+      top: var(--sticky-top);
+      align-self: start;
+      max-height: calc(100lvh - var(--sticky-top));
+    }
+  }
+
+  .day__title {
+    display: block;
+  }
+
+  /* Photo trail container. Sits between/over the two title
+   * lines like the SectionStory video, but larger so the trail's
+   * 2–3 visible photos all fit. Each photo inside is absolutely
+   * positioned at a deterministic (x, y, rotate) — see the
+   * `data-day-trail-index` attributes; positions are written by
+   * JS at init time from a fixed table. */
+  .day__trail {
+    position: absolute;
+    inset: 8% 4% 8% 4%;
+    z-index: 2;
+    /* Capture pointer events on the trail container so hover
+     * advances the photo stack like the CTA. Individual photos
+     * keep `pointer-events: none` (set below) so they never
+     * intercept the cursor. Touch devices skip the hover
+     * interaction via the `(hover: hover)` query at the bottom. */
+    pointer-events: auto;
+    overflow: visible;
+  }
+
+  /* Touch / no-hover: the trail stays scroll-driven only. */
+  @media (hover: none), (pointer: coarse) {
+    .day__trail {
+      pointer-events: none;
+    }
+  }
+
+  .day__trail-photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Each photo is roughly 4:5 polaroid-shaped so it reads as a
+     * picture rather than a square chip. Width clamps so the
+     * trail stays legible from tablet portrait up. */
+    width: clamp(8rem, 16vw, 14rem);
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--card);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+    /* GSAP owns transform + opacity. Seeded at scale 0.4 / opacity
+     * 0 in JS so the first paint never flashes the photos. The
+     * photos themselves never intercept the cursor — the
+     * `.day__trail` container catches all the pointer events. */
+    pointer-events: none;
+    will-change: transform, opacity;
+    opacity: 0;
+    transform-origin: center center;
+  }
+
+  .day__trail-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* RIGHT — intro paragraph + timeslot list. */
+  .day__right {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .day__intro {
+    margin: 0;
+    max-width: 52ch;
+    /* Generous space below so the first slot row lands well into
+     * the reading band rather than hugging the intro. */
+    padding-block-end: 25vh;
+  }
+
+  .day__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+
+  /* Timeslot row. All rows render at the same opacity — the left
+   * column's photo carries the "where am I in the day" signal. */
+  .day-row {
+    display: grid;
+    gap: var(--space-s);
+    padding-block: var(--space-l);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .day-row:first-child {
+    padding-block-start: var(--space-l);
+  }
+
+  .day-row:last-child {
+    padding-block-end: 30vh;
+  }
+
+  .day-row__time {
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  .day-row__title,
+  .day-row__description {
+    margin: 0;
+  }
+
+  .day-row__description {
+    opacity: 0.85;
+    max-width: 60ch;
+  }
+
   /* Mobile timeslot card — uses the design-system `--surface`
-   * token so it picks up the section theme's brand surface colour
-   * (orange-300 / blue-500 / yellow-300 per theme). Foreground
-   * stays on `--foreground` since `--surface` doesn't ship a
-   * matching foreground pair. */
+   * token so it picks up the section theme's brand surface
+   * colour. */
   .day-card {
     width: 100%;
     aspect-ratio: 4 / 5;
@@ -350,140 +451,8 @@ const initial = arcVars(slots[0]);
     opacity: 0.85;
   }
 
-  .day-in-life {
-    align-items: start;
-  }
-
-  /* LEFT — sticky title + clock. */
-  .day__left {
-    position: sticky;
-    top: var(--sticky-top);
-    align-self: start;
-    display: grid;
-    gap: var(--space-l);
-    max-height: calc(100svh - var(--sticky-top) - var(--space-xl));
-  }
-
-  /* Clock container. Sized by min() so it fits both width and the
-   * remaining vertical space inside the sticky column on short
-   * viewports. */
-  .day__clock {
-    --day-title-h: 8rem;
-    width: min(
-      560px,
-      100%,
-      calc(100svh - var(--sticky-top) - var(--day-title-h) - var(--space-2xl))
-    );
-    aspect-ratio: 1 / 1;
-    margin-inline: auto;
-  }
-
-  .day__clock-svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  .day__clock-face {
-    stroke: var(--foreground);
-    stroke-width: 0.6;
-    opacity: 0.4;
-  }
-
-  .day__clock-tick {
-    stroke: var(--foreground);
-    stroke-width: 0.5;
-    opacity: 0.4;
-  }
-
-  .day__clock-tick[data-quarter="true"] {
-    stroke-width: 1.2;
-    opacity: 0.85;
-  }
-
-  /* Active-range arc.
-   *
-   * Drawn as a `<circle>` with `pathLength="360"` so its dasharray /
-   * dashoffset are addressable in degrees. The wrapping group is
-   * rotated -90° so 0° = 12 o'clock (matching the tick layout).
-   * `stroke-dasharray` and `stroke-dashoffset` are written by JS
-   * inline on the circle (animated via rAF lerp — see <script>),
-   * so no CSS transition is needed here. */
-  .day__clock-arc-group {
-    transform: rotate(-90deg);
-    transform-origin: 50px 50px;
-  }
-
-  .day__clock-arc {
-    stroke: var(--foreground);
-    stroke-width: 3;
-    stroke-linecap: round;
-  }
-
-  /* RIGHT — intro paragraph + timeslot list. */
-  .day__column {
-    display: grid;
-  }
-
-  /* Intro paragraph — body-l, max measure, scrolls with the
-   * column. Sits up top with generous padding below so the first
-   * timeslot row lands comfortably. */
-  .day__intro {
-    margin: 0;
-    max-width: 52ch;
-    padding-block-end: 25vh;
-  }
-
-  /* Timeslot list. Same pattern as the activities list:
-   * dim non-active rows; centre row gets full opacity. */
-  .day__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-  }
-
-  .day-row {
-    display: grid;
-    gap: var(--space-s);
-    padding-block: var(--space-l);
-    border-block-start: 1px solid var(--border);
-    /* Match the activity-row dim treatment: deeper inactive opacity
-     * (0.2) and a long ease-out-expo curve so focus shifts read as
-     * a slow cross-fade rather than a snap. */
-    opacity: 0.2;
-    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .day-row[data-active="true"] {
-    opacity: 1;
-  }
-
-  .day-row:first-child {
-    padding-block-start: var(--space-l);
-  }
-
-  .day-row:last-child {
-    padding-block-end: 30vh;
-  }
-
-  .day-row__time {
-    margin: 0;
-    opacity: 0.6;
-  }
-
-  .day-row__title,
-  .day-row__description {
-    margin: 0;
-  }
-
-  .day-row__description {
-    opacity: 0.85;
-    max-width: 60ch;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .day-row {
+    .day__photo-img {
       transition: none;
     }
   }
@@ -491,107 +460,178 @@ const initial = arcVars(slots[0]);
 
 <script>
   /**
-   * IO picks the active timeslot row; the arc on the clock face
-   * is animated to span that slot's [start, end] range.
+   * Day-in-life photo trail.
    *
-   * The arc is two values:
-   *   - startDeg: where the arc begins on the dial (0° = 12 o'clock,
-   *     advancing clockwise). 0..360, can wrap.
-   *   - extentDeg: how many degrees of arc to draw. 0..360.
+   * Same shape as the CTA's image-trail (`.image-trail`), but
+   * scroll-driven instead of cursor-driven. As the user scrolls
+   * past slot rows on the right, each new "active" slot pops
+   * its photo in at its designated position; the previous
+   * photo demotes to a smaller scale; the one before demotes
+   * further; older still fade out. Net effect: a small trail
+   * of the last few slots stays visible, with the newest most
+   * prominent.
    *
-   * Both are JS-lerped toward their targets in a single rAF loop,
-   * so movement is smooth and no CSS transition is needed (CSS
-   * doesn't interpolate `stroke-dasharray` reliably between values
-   * with different magnitudes). The startDeg accumulates forward
-   * so the arc sweeps clockwise across the day rather than
-   * unwinding back to morning when scrolling up.
+   * Photo positions and rotations are deterministic per index
+   * (drawn from POSITIONS) so the layout is stable across
+   * renders but feels organic.
    */
+  import { gsap } from 'gsap';
+
+  type TrailState = {
+    rank: number; // 0 = newest, 1, 2 visible, >=3 hidden
+    isSet: boolean;
+    x: number;
+    y: number;
+  };
+
+  // Per-slot deterministic placement within `.day__trail`. Values
+  // are fractions of the container (x, y) plus a rotation in
+  // degrees. Tweak by feel — the goal is variety without any one
+  // photo overlapping another's centre. 8 entries match the slot
+  // count; if more slots are added, the array wraps modulo length.
+  const POSITIONS: Array<{ x: number; y: number; r: number }> = [
+    { x: 0.20, y: 0.18, r: -6 },
+    { x: 0.62, y: 0.10, r: 5 },
+    { x: 0.30, y: 0.55, r: 8 },
+    { x: 0.70, y: 0.50, r: -7 },
+    { x: 0.15, y: 0.82, r: 4 },
+    { x: 0.55, y: 0.78, r: -3 },
+    { x: 0.40, y: 0.30, r: 7 },
+    { x: 0.78, y: 0.74, r: -5 },
+  ];
+
+  const RANK_SCALE = [1, 0.78, 0.62];
+  const TRANSITION = 0.55;
+  const EASE = 'power3.out';
+
   function install() {
     if ((window as any).__dayInLifeHooked) return;
     (window as any).__dayInLifeHooked = true;
 
     const rows = document.querySelectorAll<HTMLElement>('[data-day-index]');
-    const arc = document.querySelector<SVGCircleElement>('.day__clock-arc');
-    if (rows.length === 0 || !arc) return;
+    const trail = document.querySelector<HTMLElement>('[data-day-trail]');
+    const photos = trail
+      ? Array.from(
+          trail.querySelectorAll<HTMLElement>('[data-day-trail-photo]'),
+        )
+      : [];
+    if (rows.length === 0 || photos.length === 0 || !trail) return;
 
-    function angleAt(hour: number, minute: number) {
-      return ((hour % 12) * 30) + (minute * 0.5);
+    // Default position for each photo when no cursor is driving
+    // the trail (scroll-only mode). Reads from POSITIONS as a
+    // fraction of the trail container's current size.
+    function defaultPosition(i: number) {
+      const rect = trail!.getBoundingClientRect();
+      const pos = POSITIONS[i % POSITIONS.length];
+      return { x: rect.width * pos.x, y: rect.height * pos.y };
     }
 
-    function rangeFor(row: HTMLElement) {
-      const sH = Number(row.dataset.startHour);
-      const sM = Number(row.dataset.startMinute);
-      const eH = Number(row.dataset.endHour);
-      const eM = Number(row.dataset.endMinute);
-      const start = angleAt(sH, sM);
-      let end = angleAt(eH, eM);
-      if (end < start) end += 360; // crosses 12 o'clock
-      return { start, extent: end - start };
+    // Seed each photo: invisible, parked at its default spot,
+    // pre-rotated. GSAP owns `transform` + `opacity` from here on.
+    function placePhotos() {
+      photos.forEach((el, i) => {
+        const { x, y } = defaultPosition(i);
+        const pos = POSITIONS[i % POSITIONS.length];
+        gsap.set(el, {
+          x,
+          y,
+          xPercent: -50,
+          yPercent: -50,
+          rotate: pos.r,
+          scale: 0.4,
+          opacity: 0,
+        });
+      });
     }
+    placePhotos();
+    window.addEventListener('resize', placePhotos);
 
-    const ratios = new Map<number, number>();
+    const state: TrailState[] = photos.map(() => ({
+      rank: -1,
+      isSet: false,
+      x: 0,
+      y: 0,
+    }));
     let currentIndex = -1;
 
-    // Initial state from row 0 so SSR / first paint and the JS
-    // animator agree on the starting arc.
-    const first = rangeFor(rows[0]);
-    let accStart = first.start; // accumulated, forward-only
-    let lastStartMod = first.start; // last target mod 360
-    let targetStart = first.start;
-    let targetExtent = first.extent;
-    let renderStart = first.start;
-    let renderExtent = first.extent;
-    let raf = 0;
-
-    const LERP = 0.14;
-
-    function applyArc(start: number, extent: number) {
-      arc.style.strokeDasharray = `${extent.toFixed(2)} ${(360 - extent).toFixed(2)}`;
-      arc.style.strokeDashoffset = `${(-start).toFixed(2)}`;
-    }
-
-    function loop() {
-      renderStart += (targetStart - renderStart) * LERP;
-      renderExtent += (targetExtent - renderExtent) * LERP;
-      applyArc(renderStart, renderExtent);
-      const settled =
-        Math.abs(targetStart - renderStart) < 0.05 &&
-        Math.abs(targetExtent - renderExtent) < 0.05;
-      raf = settled ? 0 : requestAnimationFrame(loop);
-    }
-
-    function start() {
-      if (!raf) raf = requestAnimationFrame(loop);
-    }
-
-    function setActive(i: number) {
-      if (i === currentIndex) return;
+    /**
+     * Show slot `i` at position (x, y).
+     *  - If x,y omitted → use the slot's default POSITIONS spot.
+     *    Used by the scroll observer.
+     *  - If x,y given → snap the newest photo to the cursor.
+     *    Used by hover. Older photos stay at their last
+     *    position (their previous cursor coordinates), so the
+     *    visible trail follows the cursor's recent path.
+     */
+    function showSlot(i: number, x?: number, y?: number) {
+      const dx = x !== undefined && y !== undefined;
+      if (i === currentIndex && !dx) return;
       currentIndex = i;
+
+      const next =
+        x !== undefined && y !== undefined ? { x, y } : defaultPosition(i);
+
+      // Demote whatever was previously set — every set entry
+      // walks back one rank. Anything past `RANK_SCALE.length`
+      // fades out in render().
+      state.forEach((s) => {
+        if (s.isSet) s.rank += 1;
+      });
+      state[i] = { rank: 0, isSet: true, x: next.x, y: next.y };
+      render();
+
       rows.forEach((row) => {
         const idx = Number(row.dataset.dayIndex);
         row.setAttribute('data-active', idx === i ? 'true' : 'false');
       });
-
-      const row = rows[i];
-      if (!row) return;
-      const next = rangeFor(row);
-
-      // Take the SHORTEST path between the last and next start
-      // angles — clockwise when scrolling forward through the day,
-      // anti-clockwise when scrolling back. Normalising the delta
-      // to (-180, +180] picks whichever direction is shorter, so
-      // a small backward scroll doesn't trigger a full revolution.
-      let delta = next.start - lastStartMod;
-      if (delta > 180) delta -= 360;
-      if (delta < -180) delta += 360;
-      accStart += delta;
-      lastStartMod = next.start;
-
-      targetStart = accStart;
-      targetExtent = next.extent;
-      start();
     }
 
+    function render() {
+      state.forEach((p, i) => {
+        const el = photos[i];
+        if (!p.isSet) return;
+        el.style.zIndex = String(POSITIONS.length - p.rank);
+
+        if (p.rank === 0) {
+          // Newest: snap to its (potentially cursor-driven)
+          // position, then fade in + scale up.
+          gsap.killTweensOf(el);
+          gsap.set(el, { x: p.x, y: p.y, scale: 0.4, opacity: 0 });
+          gsap.to(el, {
+            scale: RANK_SCALE[0],
+            opacity: 1,
+            duration: TRANSITION,
+            ease: EASE,
+          });
+        } else if (p.rank < RANK_SCALE.length) {
+          // Visible older entries — stay where they last were
+          // (their `p.x` / `p.y`), just shrink.
+          gsap.to(el, {
+            scale: RANK_SCALE[p.rank],
+            opacity: 1,
+            duration: TRANSITION,
+            ease: EASE,
+            overwrite: 'auto',
+          });
+        } else {
+          // Past the visible window — fade out.
+          gsap.to(el, {
+            opacity: 0,
+            duration: TRANSITION,
+            ease: EASE,
+            overwrite: 'auto',
+          });
+        }
+      });
+    }
+
+    // Pick the active slot row the same way the cross-fader did
+    // — top-heavy IntersectionObserver band so the row that's
+    // just above the viewport centre wins. We also remember the
+    // *scroll-driven* index separately so the trail can fall back
+    // to it when the cursor leaves the trail area.
+    let scrollIndex = 0;
+    const ratios = new Map<number, number>();
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -606,15 +646,79 @@ const initial = arcVars(slots[0]);
             bestIdx = i;
           }
         });
-        if (bestIdx >= 0 && bestRatio > 0) setActive(bestIdx);
+        if (bestIdx >= 0 && bestRatio > 0) {
+          scrollIndex = bestIdx;
+          showSlot(bestIdx);
+        }
       },
       {
         rootMargin: '-40% 0px -20% 0px',
         threshold: [0, 0.5, 1],
       },
     );
-
     rows.forEach((row) => io.observe(row));
+
+    // Hover-driven trail. The newest photo SNAPS to the cursor;
+    // older photos stay at their last position (their previous
+    // cursor coordinates), so the visible trail follows the
+    // cursor's recent path — same shape as the CTA's image trail.
+    //
+    // The slot index advances sequentially per move so each
+    // pop-in is a different photo from the day. On `pointerleave`
+    // we re-show the scroll-active slot at its default position
+    // so the trail returns to "the photo for what you're reading".
+    const HOVER_THRESHOLD_SQ = 80 * 80;
+    let lastHoverX = -Infinity;
+    let lastHoverY = -Infinity;
+    let hoverHead = 0;
+
+    function onPointerMove(e: PointerEvent) {
+      const rect = trail!.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const dx = x - lastHoverX;
+      const dy = y - lastHoverY;
+      if (dx * dx + dy * dy < HOVER_THRESHOLD_SQ) return;
+      lastHoverX = x;
+      lastHoverY = y;
+      hoverHead = (hoverHead + 1) % photos.length;
+      showSlot(hoverHead, x, y);
+    }
+
+    let leaveTimeout: number | undefined;
+    function onPointerLeave() {
+      window.clearTimeout(leaveTimeout);
+      // Small grace period — quick out-and-back hovers don't
+      // strobe the trail back to the scroll state and forward
+      // again.
+      leaveTimeout = window.setTimeout(() => {
+        // Force a re-show by clearing currentIndex first, in
+        // case scrollIndex matches the last hover-shown slot
+        // (which would otherwise short-circuit showSlot's
+        // dedupe). This re-promotes the scroll-active photo
+        // to head and demotes the cursor-trail photos behind
+        // it.
+        currentIndex = -1;
+        showSlot(scrollIndex);
+      }, 180);
+    }
+    function onPointerEnter() {
+      window.clearTimeout(leaveTimeout);
+    }
+
+    const supportsHover = window.matchMedia(
+      '(hover: hover) and (pointer: fine)',
+    ).matches;
+    if (supportsHover) {
+      trail.addEventListener('pointermove', onPointerMove, { passive: true });
+      trail.addEventListener('pointerleave', onPointerLeave);
+      trail.addEventListener('pointerenter', onPointerEnter);
+    }
+
+    // Show slot 0 immediately so the first paint has something
+    // visible (otherwise the trail stays blank until the user
+    // scrolls past the first row).
+    requestAnimationFrame(() => showSlot(0));
   }
 
   if (document.readyState === 'loading') {

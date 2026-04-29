@@ -2,17 +2,20 @@
 /**
  * SafetySection — the "SAFETY" scene.
  *
- * Single split, 100svh tall:
- *   LEFT  — title pinned to the top, paragraph vertically centred
- *           below it.
- *   RIGHT — placeholder asset.
+ * Single split, 100lvh tall:
+ *   LEFT  — title pinned to the top, intro paragraph vertically
+ *           centred below it.
+ *   RIGHT — 2×2 grid of dark cards, each with a number + label.
+ *           Capped width so the 4 cards stay visually centred in
+ *           the column.
  *
- * A thin vertical rule between the halves frames the split. Blue
- * theme.
+ * Mobile (<768px): title + intro stacked, then a horizontal-scroll
+ * row of the same 4 cards via `HScrollMobile`.
  */
 
 import { Image } from "astro:assets";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 import safetyImage from "@/assets/tenerife/safety/safety.jpg";
 
 export interface Props {
@@ -21,6 +24,34 @@ export interface Props {
 }
 
 const { theme = "blue" } = Astro.props;
+
+interface Pillar {
+  title: string;
+  description: string;
+}
+
+const pillars: Pillar[] = [
+  {
+    title: "24/7 supervision",
+    description:
+      "Nineteen dedicated supervisors on the ground plus eight coaches always accessible — day, night, on every activity.",
+  },
+  {
+    title: "Trained mentors",
+    description:
+      "Every staff member carries extensive experience working with children and is trained to age group and individual needs.",
+  },
+  {
+    title: "Insurance & medical",
+    description:
+      "Camp insurance is included; on-site first aid plus a clear escalation path to local medical services for anything more.",
+  },
+  {
+    title: "Daily updates",
+    description:
+      "Parents are kept in the loop with regular check-ins and a direct channel to the camp coordinator for anything urgent.",
+  },
+];
 ---
 
 <div class="scene" data-scene>
@@ -28,60 +59,179 @@ const { theme = "blue" } = Astro.props;
     class="section split scene__layer scene__layer--tilt safety"
     data-theme={theme}
   >
-    <!-- LEFT — title top, paragraph vertically centred. -->
-    <div class="safety__text">
-      <SectionTitle lines={["SAFETY"]} />
-      <p class="font-body section-copy safety__copy">
-        Your child is looked after at all times. Nineteen dedicated
-        supervisors on the ground plus eight coaches who are always
-        accessible — for help with learning, with activities, or
-        with anything in between. All staff have extensive
-        experience working with children and are trained to be
-        attentive to individual needs and age group. Camp insurance
-        is included in the price.
-      </p>
+    <!-- DESKTOP layout (≥768px). Hidden on mobile via the
+         `.safety__desktop` rule below. -->
+    <div class="safety__desktop">
+      <!-- LEFT — title top, intro paragraph vertically centred,
+           supporting photograph anchored absolute against the
+           bottom-right of the column. -->
+      <div class="safety__text">
+        <SectionTitle lines={["SAFETY"]} />
+        <p class="font-body section-copy safety__copy">
+          Your child is looked after at all times. Below is exactly
+          how we take care of every camper, from the moment they
+          land in Tenerife to the day they fly home.
+        </p>
+
+        <Image
+          class="safety__photo"
+          src={safetyImage}
+          alt="Camp staff supervising students during an outdoor activity"
+          widths={[240, 360, 480]}
+          sizes="(min-width: 768px) 16vw, 50vw"
+          loading="lazy"
+        />
+      </div>
+
+      <!-- RIGHT — 2×2 grid of pillar cards. Each card flips on
+           hover (desktop) / tap (mobile) to reveal a short
+           description on the back. -->
+      <div class="safety__grid-cell">
+        <ol class="safety__grid">
+          {pillars.map((p, i) => (
+            <li class="safety-card-cell">
+              <button
+                type="button"
+                class="safety-card"
+                aria-expanded="false"
+                data-safety-card
+                aria-label={`${p.title} — tap for more`}
+              >
+                <span class="safety-card__inner">
+                  <span class="safety-card__face safety-card__face--front">
+                    <span class="font-caption safety-card__num">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span class="font-h4 safety-card__title">
+                      {p.title}
+                    </span>
+                  </span>
+                  <span class="safety-card__face safety-card__face--back">
+                    <span class="font-body-s safety-card__desc">
+                      {p.description}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
     </div>
 
-    <!-- RIGHT — supporting photograph, vertically centred. -->
-    <div class="safety__media-cell">
-      <Image
-        class="safety__media"
-        src={safetyImage}
-        alt="Camp staff supervising students during an outdoor activity"
-        widths={[480, 720, 960, 1280]}
-        sizes="(min-width: 768px) 40vw, 90vw"
-        loading="lazy"
-      />
+    <!-- MOBILE layout (<768px). Title + intro stacked, then a
+         2×2 grid of the same flip cards. No 100svh height —
+         the section grows naturally with content. -->
+    <div class="safety__mobile">
+      <SectionTitle lines={["SAFETY"]} />
+      <p class="font-body-l safety__mobile-intro">
+        Your child is looked after at all times. Below is how we
+        take care of every camper, from the moment they land in
+        Tenerife to the day they fly home.
+      </p>
+
+      <ol class="safety__mobile-grid">
+        {pillars.map((p, i) => (
+          <li class="safety-card-cell">
+            <button
+              type="button"
+              class="safety-card safety-card--mobile"
+              aria-expanded="false"
+              data-safety-card
+              aria-label={`${p.title} — tap for more`}
+            >
+              <span class="safety-card__inner">
+                <span class="safety-card__face safety-card__face--front">
+                  <span class="font-caption safety-card__num">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span class="font-h4 safety-card__title">{p.title}</span>
+                </span>
+                <span class="safety-card__face safety-card__face--back">
+                  <span class="font-body-s safety-card__desc">
+                    {p.description}
+                  </span>
+                </span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 </div>
 
 <style>
-  /* Tall, breathing scene — one short paragraph against an asset.
-   * Lock to a single (large) viewport so the section is exactly one
-   * screen tall regardless of content. `lvh` not `svh` so mobile
-   * chrome collapse doesn't reveal the next section in the gap —
-   * see `.scene__layer` in `tenerife/utilities.css`. Stretch grid
-   * items so the right column's left border (the vertical divider)
-   * runs the full height of the row. */
+  /* ── Desktop / mobile layout swap ────────────────────────────── */
+  .safety__desktop {
+    display: contents;
+  }
+
+  .safety__mobile {
+    display: none;
+  }
+
+  @media (max-width: 767.98px) {
+    .safety__desktop {
+      display: none;
+    }
+    .safety__mobile {
+      display: grid;
+      gap: var(--space-l);
+    }
+    .safety {
+      display: block;
+    }
+  }
+
+  .safety__mobile-intro {
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  /* Mobile 2×2 grid — same shape as the desktop pillar grid,
+   * just inside the single-column mobile flow. */
+  .safety__mobile-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-s);
+  }
+
+  /* Section frame.
+   *
+   * Desktop (≥768px): at least one viewport tall, grid row
+   * stretches both columns so the centreline divider runs the
+   * full section height and the centred paragraph + the cards
+   * grid have a tall parent to centre against.
+   *
+   * Mobile (<768px): the desktop row-stretch and `100lvh`
+   * floor are dropped — the section grows naturally with the
+   * mobile content (title + intro + 2×2 grid + CTA clearance
+   * from the base `.section` rule). */
   .safety {
-    height: 100lvh;
     align-items: stretch;
   }
 
-  /* LEFT — flex column. Title pinned to the top via the natural
-   * order; paragraph is pushed to the vertical centre with a
-   * `margin-block: auto` (top auto + bottom auto = centred in the
-   * remaining space below the title). */
+  @media (min-width: 768px) {
+    .safety {
+      min-height: 100lvh;
+      grid-template-rows: minmax(0, 1fr);
+    }
+  }
+
+  /* LEFT — flex column. Title pinned to the top in document
+   * order; paragraph centred via `margin-block: auto`.
+   * `position: relative` makes the column the containing block
+   * for the absolutely-positioned `.safety__photo`. */
   .safety__text {
+    position: relative;
     display: flex;
     flex-direction: column;
   }
 
-  /* Vertically centred (margin auto on the block axis), and pushed
-   * to the right of the left column (margin-inline-start: auto)
-   * so the paragraph sits next to the centre divider — same
-   * pattern as the Hotel row in the Venue section. */
   .safety__copy {
     margin-block: auto;
     margin-inline-start: auto;
@@ -89,41 +239,223 @@ const { theme = "blue" } = Astro.props;
     max-width: 48ch;
   }
 
-  /* RIGHT — grid so we can centre + constrain the asset along
-   * both axes. `min-height: 0` lets the cell honour the row's
-   * fixed height (otherwise grid items refuse to shrink below
-   * their content's intrinsic size). */
-  .safety__media-cell {
+  /* Supporting photograph — absolute, anchored bottom-LEFT of
+   * the sticky column with a slight tilt for a hand-placed feel.
+   * `height: auto` honours the source's true aspect ratio
+   * (~2:3 portrait — 2405×3600).
+   *
+   * Width is bounded with `clamp` so the photo can never grow
+   * tall enough to clip the centred paragraph above it: at the
+   * lower bound it's a comfortable 8rem regardless of column
+   * width; at the upper bound it caps at 11rem ≈ 176px so even
+   * on a short iPad Mini landscape (744px viewport, ~644px
+   * sticky column) the photo height (~16.5rem) leaves room for
+   * the title + copy. */
+  .safety__photo {
+    position: absolute;
+    width: clamp(8rem, 30%, 11rem);
+    height: auto;
+    bottom: var(--space-m);
+    left: var(--space-l);
+    border-radius: 4px;
+    transform: rotate(-3deg);
+    transform-origin: bottom left;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+    /* Sit BELOW the title + paragraph in the stacking order on
+     * the off chance content overlaps. */
+    z-index: 0;
+  }
+
+  @media (max-width: 767.98px) {
+    /* Hide on mobile — the desktop layout is the only one with
+     * the left column to anchor against. */
+    .safety__photo {
+      display: none;
+    }
+  }
+
+  /* Narrow desktops / tablet portrait: the left column is too
+   * tight for the photo + the centred paragraph + the title to
+   * coexist comfortably. Hide the photo there and re-introduce
+   * it from a comfortable threshold up. */
+  @media (max-width: 1023.98px) and (min-width: 768px) {
+    .safety__photo {
+      display: none;
+    }
+  }
+
+  /* RIGHT — wrapper centres the GRID (not the cell) so the 2×2
+   * stays compact and visually centred even when the column
+   * grows wide. */
+  .safety__grid-cell {
     display: flex;
-    place-items: center;
+    align-items: center;
+    justify-content: center;
     min-height: 0;
-    /* `overflow: hidden` is a belt-and-braces clip in case the
-     * asset somehow exceeds the cell bounds — keeps the divider
-     * line clean. */
+  }
+
+  .safety__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 32rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-s);
+  }
+
+  /* List-cell wrapper — kills the default bullet so the
+   * pillar grid reads as a clean 2×2. */
+  .safety-card-cell {
+    list-style: none;
+  }
+
+  /* ── Flip card ───────────────────────────────────────────────
+   *
+   * `.safety-card` is the perspective host (button reset baked in).
+   * `.safety-card__inner` carries the rotateY transition; each
+   * `.safety-card__face` is absolutely positioned with
+   * `backface-visibility: hidden` so the non-active face
+   * disappears mid-flip.
+   *
+   * Hover on pointer devices, tap toggle via `aria-expanded` on
+   * touch — both feed the same rotated state. */
+  .safety-card {
+    /* Button reset. */
+    appearance: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+    /* Layout. */
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    perspective: 1000px;
+  }
+
+  .safety-card--mobile {
+    width: 100%;
+  }
+
+  .safety-card:focus-visible {
+    outline: 2px solid var(--card);
+    outline-offset: 4px;
+  }
+
+  .safety-card__inner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .safety-card[aria-expanded="true"] .safety-card__inner {
+    transform: rotateY(180deg);
+  }
+  @media (hover: hover) {
+    .safety-card:hover .safety-card__inner {
+      transform: rotateY(180deg);
+    }
+  }
+
+  /* Both faces share the dark surface (number+title front,
+   * description back). `--card` / `--card-foreground` tokens
+   * resolve to black-on-cream in every theme. Padding lives on
+   * the FACE (not the card) so the flip pivots cleanly around
+   * the centre without padding affecting the perspective. */
+  .safety-card__face {
+    position: absolute;
+    inset: 0;
+    background: var(--card);
+    color: var(--card-foreground);
+    border-radius: 4px;
+    padding: var(--space-s);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     overflow: hidden;
   }
 
-  /* Real photograph. The image fills the cell box, then
-   * `object-fit: contain` letterboxes it to the source's TRUE
-   * aspect ratio (2405×3600 → 2:3 portrait) — no cropping, no
-   * stretching. The transparent letterbox area is invisible
-   * against the section background. */
-  .safety__media {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-    border-radius: 8px;
-    display: block;
+  /* FRONT — number top-left, title pinned bottom-left via the
+   * auto / 1fr / auto grid rows. Same composition as the
+   * pre-flip version. */
+  .safety-card__face--front {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 0.25rem;
   }
 
-  /* Vertical divider between the halves. Sits on the right cell's
-   * left edge with matching padding so the line reads cleanly down
-   * the centreline. Only meaningful when the split is two-column. */
+  .safety-card__num {
+    margin: 0;
+    opacity: 0.55;
+    letter-spacing: 0.08em;
+  }
+
+  .safety-card__title {
+    margin: 0;
+    grid-row: 3;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  /* BACK — full-bleed description, centred. Pre-rotated 180°
+   * so the text reads correctly once the inner element flips. */
+  .safety-card__face--back {
+    transform: rotateY(180deg);
+    display: grid;
+    place-items: center;
+  }
+
+  .safety-card__desc {
+    margin: 0;
+    opacity: 0.85;
+    text-wrap: balance;
+  }
+
+  /* Vertical divider between the halves (desktop only). */
   @media (min-width: 768px) {
-    .safety__media-cell {
+    .safety__grid-cell {
       border-inline-start: 1px solid var(--border);
       padding-inline-start: var(--space-2xl);
     }
   }
 </style>
+
+<script>
+  /**
+   * Tap-to-flip toggle for the safety cards. Desktop already
+   * flips on `:hover` via CSS; this handler covers touch / tap
+   * by toggling `aria-expanded`, which the same CSS rule reads.
+   * Delegated from `document` so it survives Astro view
+   * transitions and doesn't need per-card listeners.
+   */
+  function installSafetyCard() {
+    if ((window as any).__safetyCardHooked) return;
+    (window as any).__safetyCardHooked = true;
+    document.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement | null)?.closest<HTMLButtonElement>(
+        '[data-safety-card]',
+      );
+      if (!card) return;
+      const open = card.getAttribute('aria-expanded') === 'true';
+      card.setAttribute('aria-expanded', String(!open));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installSafetyCard, {
+      once: true,
+    });
+  } else {
+    installSafetyCard();
+  }
+  document.addEventListener('astro:page-load', () => {
+    (window as any).__safetyCardHooked = false;
+    installSafetyCard();
+  });
+</script>

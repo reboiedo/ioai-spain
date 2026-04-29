@@ -18,7 +18,7 @@ export interface Props {
 const { href = "/form/tenerife-camp/" } = Astro.props;
 ---
 
-<a class="sticky-join-cta" href={href}>
+<a class="sticky-join-cta" href={href} data-sticky-join-cta>
   <span class="sticky-join-cta__label">Join now</span>
   <span class="sticky-join-cta__arrow" aria-hidden="true">→</span>
 </a>
@@ -27,7 +27,13 @@ const { href = "/form/tenerife-camp/" } = Astro.props;
   .sticky-join-cta {
     position: fixed;
     right: clamp(1rem, 3vw, 2rem);
-    bottom: clamp(1rem, 3vw, 2rem);
+    /* `--cta-lift` is written from JS as the page footer rises
+     * into the viewport — it's added to `bottom` directly (not
+     * via transform) so the lift is *not* eased and tracks
+     * scroll 1:1. The CSS `transition` only applies to
+     * `transform`, which is reserved for the hover micro-lift. */
+    --cta-lift: 0px;
+    bottom: calc(clamp(1rem, 3vw, 2rem) + var(--cta-lift));
     z-index: 50; /* above the nav-bar's prev-bg (lower) and any scenes */
     display: inline-flex;
     align-items: center;
@@ -59,7 +65,11 @@ const { href = "/form/tenerife-camp/" } = Astro.props;
     .sticky-join-cta {
       left: var(--cta-inset);
       right: var(--cta-inset);
-      bottom: calc(var(--cta-inset) + env(safe-area-inset-bottom, 0px));
+      bottom: calc(
+        var(--cta-inset)
+          + env(safe-area-inset-bottom, 0px)
+          + var(--cta-lift)
+      );
       justify-content: space-between;
     }
   }
@@ -76,3 +86,50 @@ const { href = "/form/tenerife-camp/" } = Astro.props;
 
 </style>
 
+<script>
+  /**
+   * Lift the sticky Join CTA above the camp footer.
+   *
+   * The footer lives at the very bottom of the document. As the
+   * user scrolls past the apply section's pin window the footer
+   * rises into the viewport. Without intervention it overlaps
+   * the fixed CTA pill. This script measures how much of the
+   * footer has entered from the bottom on each frame and writes
+   * that overlap into `--cta-lift`, so the CTA's transform stays
+   * tucked just above it. CSS handles the hover-lift separately
+   * via `--cta-hover` — the two compose in the transform.
+   */
+  function installCtaFooterLift() {
+    const cta = document.querySelector<HTMLElement>('[data-sticky-join-cta]');
+    const footer = document.querySelector<HTMLElement>('[data-camp-footer]');
+    if (!cta || !footer) return;
+
+    let raf = 0;
+    function update() {
+      raf = 0;
+      const r = footer!.getBoundingClientRect();
+      // Only count overlap that's actually in the viewport. A
+      // small extra `gap` keeps the CTA hovering above the
+      // footer's top edge rather than kissing it.
+      const gap = 16;
+      const overlap = Math.max(0, window.innerHeight - r.top + gap);
+      cta!.style.setProperty('--cta-lift', `${overlap}px`);
+    }
+    function schedule() {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    }
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installCtaFooterLift, {
+      once: true,
+    });
+  } else {
+    installCtaFooterLift();
+  }
+  document.addEventListener('astro:page-load', installCtaFooterLift);
+</script>

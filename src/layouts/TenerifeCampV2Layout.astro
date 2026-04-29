@@ -342,7 +342,17 @@ const {
     }
 
     update();
-    window.addEventListener('scroll', update, { passive: true });
+    // Drive the nav update on every gsap tick instead of just
+    // on `scroll` events. Lenis (the smooth-scroll layer used
+    // by the page) lerps the scroll position in its own rAF
+    // loop and doesn't always emit native `scroll` events at
+    // every frame — particularly inside tall pinned scenes
+    // (e.g. SectionDayInLife) where the section's
+    // `getBoundingClientRect().top` keeps advancing but the
+    // window scroll handler fires intermittently. Running
+    // `update()` on the gsap ticker (which Lenis shares) keeps
+    // the nav in sync with the smoothed scroll position.
+    gsap.ticker.add(update);
     window.addEventListener('resize', update);
   }
 

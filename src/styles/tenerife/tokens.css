@@ -84,9 +84,9 @@
   --tracking-widest: 0.1em;
   --type-12: 0.75rem;
   --type-14: 0.875rem;
-  --type-step-1: clamp(1rem, 0.9681rem + 0.1307vw, 1.125rem);
-  --type-step-2: clamp(1.125rem, 1.0294rem + 0.3922vw, 1.5rem);
-  --type-step-3: clamp(1.5rem, 1.2451rem + 1.0458vw, 2.5rem);
+  --type-step-1: clamp(1rem, 0.9363rem + 0.2614vw, 1.25rem);
+  --type-step-2: clamp(1.25rem, 1.1544rem + 0.3922vw, 1.625rem);
+  --type-step-3: clamp(1.625rem, 1.402rem + 0.915vw, 2.5rem);
   --type-step-4: clamp(2rem, 1.6176rem + 1.5686vw, 3.5rem);
   --type-step-5: clamp(2.25rem, 1.6765rem + 2.3529vw, 4.5rem);
   --type-step-6: clamp(2.625rem, 1.3824rem + 5.098vw, 7.5rem);

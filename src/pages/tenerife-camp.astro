@@ -14,6 +14,8 @@ import SectionSafety from '@/components/tenerife/SectionSafety.astro';
 import SectionFaq from '@/components/tenerife/SectionFaq.astro';
 import SectionPricing from '@/components/tenerife/SectionPricing.astro';
 import SectionApply from '@/components/tenerife/SectionApply.astro';
+import SectionFooter from '@/components/tenerife/SectionFooter.astro';
+import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro';
 ---
 
 <!-- Inline early to block native scroll restoration BEFORE the browser
@@ -46,11 +48,15 @@ import SectionApply from '@/components/tenerife/SectionApply.astro';
 
   <SectionDayInLife theme="blue" />
 
+  <SectionTestimonials theme="yellow" />
+
   <SectionPricing theme="orange" />
 
   <SectionFaq theme="blue" />
 
   <SectionApply theme="orange" />
+
+  <SectionFooter theme="orange" />
 
 </TenerifeCampV2Layout>
 
