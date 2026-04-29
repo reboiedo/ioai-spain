@@ -37,3 +37,18 @@
   --font-neue-corp: 'PP Neue Corp Condensed', var(--font-inter-tight), sans-serif;
 }
 
+/* Re-scope Tenerife font tokens under the page wrapper.
+ *
+ * `BaseLayout.css` defines `--font-display: "Funnel Display"` and
+ * `--font-sans: "Funnel Sans"` on `:root` and is bundled AFTER
+ * `tenerife/tokens.css`, so on prod the Tenerife `:root` values
+ * lose the cascade and section titles render in Funnel Display
+ * instead of PP Neue Corp. Re-declaring on the wrapper beats any
+ * `:root` rule regardless of load order. */
+.tenerife-camp-v2 {
+  --font-display: var(--font-neue-corp);
+  --font-heading: var(--font-inter-tight);
+  --font-body: var(--font-inter-tight);
+  --font-script: var(--font-rock-salt);
+}
+
