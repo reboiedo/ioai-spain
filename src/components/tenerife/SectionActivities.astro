@@ -444,7 +444,7 @@ const activities: Activity[] = [
    * the card is open. Same pattern as the FAQ accordion icon. */
   .ap-card__cue {
     position: absolute;
-    top: var(--space-s);
+    bottom: var(--space-s);
     right: var(--space-s);
     width: 1.25rem;
     height: 1.25rem;
@@ -504,15 +504,74 @@ const activities: Activity[] = [
     flex-direction: column;
     align-items: center;
     gap: var(--space-l);
+    /* Extra runway below the last card so its sticky pin window
+     * extends past its natural position — without it, the last
+     * polaroid releases as soon as it reaches the centre because
+     * the parent's bottom edge is right beneath it. The padding
+     * gives every card the same "dwell at centre" time. */
+    padding-block-end: max(
+      0px,
+      calc(50svh - 262.5px - var(--section-block))
+    );
   }
 
-  /* Cap each row at 420px and let the parent's `align-items:
-   * center` centre it in the column. The cap goes on the `<li>`
-   * (the actual flex item) — putting it on the inner `.ap-card`
-   * doesn't centre, because the full-width `<li>` left-aligns
-   * the button inside it. */
+  /* Stacking polaroids.
+   *
+   * Each row is `position: sticky` pinned to the same viewport
+   * line — the vertical centre. As the user scrolls, every
+   * polaroid scrolls up until its top edge reaches that line,
+   * then pins. The next card slides up over it (later DOM order
+   * = higher paint order, so the new card naturally sits on top
+   * of the pile).
+   *
+   * The pin position is `50svh - half-card-height`. Worst-case
+   * card height is `420 * 5/4 = 525px` so half-height = 262.5px.
+   * On narrower columns the pin lands a hair below true centre,
+   * which actually reads better — the bottom of the stack peeks
+   * a touch above where you'd think it should.
+   *
+   * The flex `gap` on `.activities__stream` is the scroll runway
+   * between pin events — a smaller gap means cards stack faster
+   * (less scroll between each landing); a larger gap means more
+   * scroll per card. `var(--space-l)` is the current default;
+   * we'll tune by feel.
+   *
+   * `width: min(100%, 420px)` caps each row and the parent's
+   * `align-items: center` centres it horizontally. */
   .activities__stream .activity-row {
+    position: sticky;
+    top: calc(50svh - 262.5px);
     width: min(100%, 420px);
+  }
+
+  /* Push the first card down so it lands at the viewport vertical
+   * centre when the user scrolls into the section, rather than
+   * sitting at the section-content top edge. Without this, the
+   * sticky pin point exists but the first card has no scroll
+   * runway to "rise" into it — the user sees the stack start
+   * above centre and only converge once they've scrolled far
+   * enough. The math mirrors the sticky `top` value, minus the
+   * section's own block padding (already applied above). */
+  .activities__stream .activity-row:first-child {
+    margin-block-start: max(
+      0px,
+      calc(50svh - 262.5px - var(--section-block) - var(--nav-height))
+    );
+  }
+
+  /* Subtle polaroid-pile feel: each card sits at a tiny rotation,
+   * alternating left/right by index. The natural DOM stacking
+   * order means the topmost (most recently pinned) card paints
+   * over the rest, so you see the pile's edges fanning out
+   * underneath.
+   *
+   * Kept small (±1.5°) so text stays readable; bump if you want
+   * a more chaotic feel. */
+  /* GSAP owns the polaroid rotation (per-card alternating tilt).
+   * `will-change` hints the compositor; cursor is the default
+   * pointer since hover toggles the drawer rather than grabbing. */
+  .activities__stream .ap-card {
+    will-change: transform;
   }
 
   /* Polaroid stack frame.
@@ -729,4 +788,35 @@ const activities: Activity[] = [
     (window as any).__apCardHooked = false;
     installApCard();
   });
+
+  /**
+   * Polaroid stack — alternating rotation only.
+   *
+   * Each row pins to the viewport vertical centre via CSS sticky.
+   * GSAP applies a deterministic per-card rotation (±1.5°) so the
+   * pile fans out a touch as cards land on top. No drag, no
+   * scale — pure layout + sticky + a stamped-in tilt.
+   */
+  import { gsap } from 'gsap';
+
+  function installStack() {
+    const rows = gsap.utils.toArray<HTMLElement>(
+      '.activities__stream .activity-row',
+    );
+    rows.forEach((row, i) => {
+      const card = row.querySelector<HTMLElement>('.ap-card');
+      if (!card) return;
+      gsap.set(card, {
+        rotate: i % 2 === 0 ? -1.5 : 1.5,
+        transformOrigin: 'center center',
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installStack, { once: true });
+  } else {
+    installStack();
+  }
+  document.addEventListener('astro:page-load', installStack);
 </script>
