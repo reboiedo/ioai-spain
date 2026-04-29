@@ -46,6 +46,17 @@ export interface Props {
   gap?: string;
   /** Default `noStretch` for every line that doesn't override it. */
   noStretch?: boolean;
+  /**
+   * Maximum width of the WHOLE stack as a CSS length. Use any unit:
+   *   `"80%"` — 80% of the parent container
+   *   `"40rem"` — fixed cap
+   *   `"min(90%, 720px)"` — responsive cap
+   * Combined with `defaultAlign` to control where the constrained
+   * stack sits inside its parent (e.g. `defaultAlign="right"` +
+   * `maxWidth="80%"` keeps the stack flush with the right edge of
+   * its container).
+   */
+  maxWidth?: string;
 }
 
 const {
@@ -53,6 +64,7 @@ const {
   defaultAlign = "left",
   gap = "clamp(2rem, 6vw, 4rem)",
   noStretch: defaultNoStretch = false,
+  maxWidth,
 } = Astro.props;
 
 const normalized = lines.map((l): Required<Pick<Line, "text" | "align">> & Line => {
@@ -72,7 +84,10 @@ const normalized = lines.map((l): Required<Pick<Line, "text" | "align">> & Line 
 const maxLen = Math.max(...normalized.map((l) => l.text.length), 1);
 ---
 
-<div class="hts" style={`--hts-gap: ${gap};`}>
+<div
+  class:list={["hts", `hts--align-${defaultAlign}`]}
+  style={`--hts-gap: ${gap};${maxWidth ? ` max-width: ${maxWidth};` : ""}`}
+>
   {normalized.map((l) => {
     const widthPct = (l.text.length / maxLen) * 100;
     return (
@@ -93,6 +108,21 @@ const maxLen = Math.max(...normalized.map((l) => l.text.length), 1);
     display: flex;
     flex-direction: column;
     gap: var(--hts-gap);
+  }
+
+  /* When a `maxWidth` is set the stack becomes narrower than its
+   * parent. These rules anchor the constrained stack to the edge
+   * matching `defaultAlign` so e.g. `right` + `maxWidth: 80%` puts
+   * the stack flush with the parent's right edge instead of
+   * defaulting to the left. */
+  .hts--align-left {
+    margin-inline-end: auto;
+  }
+  .hts--align-right {
+    margin-inline-start: auto;
+  }
+  .hts--align-center {
+    margin-inline: auto;
   }
 
   /* Each line is a fixed-width block. `line-height: 0` removes the

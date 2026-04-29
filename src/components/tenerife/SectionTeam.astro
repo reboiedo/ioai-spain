@@ -119,12 +119,11 @@ const rowB = members.slice(4, 8);
     data-theme={theme}
   >
     <div class="team__layout">
-      <!-- Title left, intro paragraph right. Uses the shared
-           `.split` utility so the 50/50 alignment matches every
-           other split-headed section on the page. -->
-      <div class="split team__header">
+      <!-- LEFT — sticky title + intro paragraph. Stays in view as
+           the user scrolls past the coach grid on the right. -->
+      <div class="team__intro">
         <SectionTitle lines={["COACHES"]} />
-        <p class="font-body section-copy team__header-copy">
+        <p class="font-body section-copy team__intro-copy">
           Every track is led by someone who works in the field, not just
           teaches it. The team includes research engineers from leading
           AI institutes, competitive programming coaches, olympiad
@@ -134,32 +133,26 @@ const rowB = members.slice(4, 8);
         </p>
       </div>
 
-      <!-- Desktop: two rows of four cards each (4-col grid per row,
-           shared baselines via deterministic min-heights inside the
-           card). Hidden on mobile by the `.team__rows` rule below. -->
-      <div class="team__rows">
-        <div class="team__row">
-          {rowA.map((m) => (
-            <TeamCard
-              initials={m.initials}
-              name={m.name}
-              role={m.role}
-              bio={m.bio}
-              image={m.imageKey ? portraits[m.imageKey] : undefined}
-            />
-          ))}
-        </div>
-        <div class="team__row">
-          {rowB.map((m) => (
-            <TeamCard
-              initials={m.initials}
-              name={m.name}
-              role={m.role}
-              bio={m.bio}
-              image={m.imageKey ? portraits[m.imageKey] : undefined}
-            />
-          ))}
-        </div>
+      <!-- Vertical centreline divider. Same convention as
+           SectionStory — its own grid track between the two content
+           columns, `align-self: stretch` so it spans the full
+           section height regardless of the sticky left column's
+           bounded max-height. -->
+      <div class="team__divider" aria-hidden="true"></div>
+
+      <!-- RIGHT — scrollable 2-column grid of all 8 coaches.
+           Card sizing/baselines handled by `.team-card` itself
+           (deterministic min-heights on name/role tracks). -->
+      <div class="team__grid">
+        {members.map((m) => (
+          <TeamCard
+            initials={m.initials}
+            name={m.name}
+            role={m.role}
+            bio={m.bio}
+            image={m.imageKey ? portraits[m.imageKey] : undefined}
+          />
+        ))}
       </div>
 
       <!-- Mobile: a single horizontal-scroll row of all 8 cards
@@ -185,59 +178,87 @@ const rowB = members.slice(4, 8);
 <style>
   .team__layout {
     display: grid;
-    /* Explicit `minmax(0, 1fr)` column — without this the implicit
-     * grid track sizes to its content's min-content width, which
-     * for the mobile HScroll's non-shrinkable flex track is the
-     * sum of all card widths. That inflates the column past the
-     * section width and breaks the edge-bleed math. */
+    /* Mobile: single column collapse; the `.team__intro` /
+     * `.team__divider` / `.team__grid` subtree all stack one above
+     * the other. Desktop promotes to a 3-column grid (intro /
+     * divider / grid) below. */
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-2xl);
+    gap: var(--space-l);
   }
 
-  .team__header-copy {
+  .team__intro-copy {
     margin: 0;
   }
 
-  /* Two stacked rows. */
-  .team__rows {
-    display: grid;
-    gap: var(--space-xl);
+  /* Vertical centreline divider — same convention as SectionStory.
+   * Hidden on mobile (single-column stack); revealed at ≥768px as
+   * its own grid track. */
+  .team__divider {
+    display: none;
   }
 
-  /* Each row is a 4-column grid. Cards keep their own internal
-   * layout (see TeamCard). Alignment across cards is handled by
-   * deterministic `min-height` on the name (2lh) and role (1lh)
-   * tracks, which keeps siblings lined up without subgrid — and
-   * crucially lets one card hide its portrait in the expanded
-   * state without leaving a hole where a subgrid track would be. */
-  .team__row {
+  /* Coach grid — 2 columns on desktop, defaults to 1 on mobile.
+   * The mobile path is irrelevant since we hide this and show
+   * `.team__hscroll` instead. */
+  .team__grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: var(--space-l);
-    row-gap: var(--space-l);
+    row-gap: var(--space-xl);
     align-items: start;
   }
 
-  /* Mobile: hide the desktop two-row grid and show the
-   * HScrollMobile-wrapped single row of cards instead. Desktop
-   * does the opposite. */
+  /* Desktop: 3-column layout (sticky intro / divider / scrollable
+   * coach grid). Both content columns are EQUAL (`1fr / 1fr`) —
+   * matches the half-and-half split used everywhere else on the
+   * page. The divider track is `auto` (just 1px) between them. */
+  @media (min-width: 768px) {
+    .team__layout {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--space-2xl);
+    }
+
+    .team__intro {
+      position: sticky;
+      top: var(--sticky-top);
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-l);
+      max-height: calc(100lvh - var(--sticky-top));
+    }
+
+    .team__divider {
+      display: block;
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+
+    /* Extra space after the last coach so the bottom cards clear
+     * the floating Join CTA pill in the bottom-right corner. The
+     * padding lives on the GRID itself (not the section) so it
+     * extends the right column's height without making the
+     * sticky left column scroll past at the end. `--space-5xl`
+     * (~6–9rem responsive) is generous enough to leave the last
+     * card visually breathing above the CTA at every viewport. */
+    .team__grid {
+      padding-block-end: var(--space-7xl);
+    }
+  }
+
+  /* Mobile: hide the desktop 2-col grid and show the
+   * HScrollMobile-wrapped horizontal-scroll row instead. */
   .team__hscroll {
     display: none;
   }
 
   @media (max-width: 767.98px) {
-    .team__rows {
+    .team__grid {
       display: none;
     }
     .team__hscroll {
       display: block;
-    }
-  }
-
-  /* Under 768px, 4-up is too cramped. Drop to 2 columns. */
-  @media (max-width: 767.98px) {
-    .team__row {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>

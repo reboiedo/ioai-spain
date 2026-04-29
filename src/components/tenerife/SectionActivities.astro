@@ -147,99 +147,60 @@ const activities: Activity[] = [
          row list. Hidden on mobile via the `.activities__desktop`
          rule in the <style> block below. -->
     <div class="activities__desktop">
-    <!-- LEFT: sticky title + image. The image swaps as the user
-         scrolls past activity rows on the right (driven by the
-         IntersectionObserver in the <script> below). -->
+    <!-- LEFT (50%): sticky pane — same pattern as SectionTeam. -->
     <div class="activities__left">
       <SectionTitle lines={["ACTIVITIES"]} />
-      <div class="activities__stack" data-activities-stack>
-        <!-- Inner wrapper exists so the mouse-driven rotateX/Y can
-             be applied as a group transform without disturbing the
-             outer aspect-ratio sizing. -->
-        <div class="activities__stack-inner">
-          <!-- A polaroid per activity. They stack inside this box: as
-               the user scrolls down, each new "current" activity
-               reveals its polaroid on top of the previous ones with a
-               small random tilt/offset, building a casual pile by the
-               end. Scroll back up and the most recent ones drop off.
 
-               Placeholder solid colour for the photo area for now —
-               swap `<div class="polaroid__photo">` for an `<img>` when
-               real photography lands. -->
-          {activities.map((a, i) => {
-          // Deterministic per-card rotation + offset so the same
-          // polaroid always lands in the same spot on every render.
-          // Uses a tiny PRNG seeded by index so the values look
-          // random but are stable.
-          const seed = (i + 1) * 9301 + 49297;
-          const rand = ((seed % 233280) / 233280);
-          const rand2 = (((seed * 7) % 233280) / 233280);
-          const rand3 = (((seed * 13) % 233280) / 233280);
-          const rotate = (rand - 0.5) * 14; // -7° to +7°
-          const offsetX = (rand2 - 0.5) * 12; // -6% to +6%
-          const offsetY = (rand - 0.5) * 8; // -4% to +4%
-          // Mouse-shift multiplier: each card responds to the
-          // cursor with a slightly different magnitude so the
-          // pile "loosens" instead of moving as a single block.
-          // Range 0.4 → 1.6 keeps the differential subtle.
-          const mouseMult = 0.4 + rand3 * 1.2;
-          return (
-            <figure
-              class="polaroid"
-              data-activities-polaroid={String(i)}
-              data-active={i === 0 ? "true" : undefined}
-              style={`--polaroid-rotate: ${rotate}deg; --polaroid-x: ${offsetX}%; --polaroid-y: ${offsetY}%; --polaroid-z: ${i}; --polaroid-mouse-mult: ${mouseMult.toFixed(2)};`}
-              aria-hidden="true"
-            >
-              <div class="polaroid__photo">
-                {photos[i] && (
-                  <Image
-                    class="polaroid__img"
-                    src={photos[i]}
-                    alt={a.title}
-                    widths={[320, 480, 640, 800]}
-                    sizes="(min-width: 768px) 30vw, 60vw"
-                    loading="lazy"
-                  />
-                )}
-                <span class="font-caption-script polaroid__day">Day {a.day}</span>
-              </div>
-              <figcaption class="font-caption-script polaroid__caption">{a.title}</figcaption>
-            </figure>
-          );
-        })}
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: intro paragraph + list of activity rows. The intro
-         scrolls with the list (not sticky), uses body-l, and
-         doesn't participate in the active-row IntersectionObserver.
-         Top border per row; first row drops its border so the list
-         starts flush. -->
-    <div class="activities__column">
       <p class="font-body-l activities__intro">
         Outside of study hours, campers have a full schedule of
         activities across Tenerife — beaches, national parks,
         historic towns, and cultural workshops. Two weeks of
-        afternoons and evenings, planned but never crammed. Here's
-        the day-by-day.
+        afternoons and evenings, planned but never crammed.
+        Here's the day-by-day.
       </p>
-
-      <ol class="activities__list">
-        {activities.map((a, i) => (
-          <li
-            class="activity-row"
-            data-activity-index={String(i)}
-            data-active={i === 0 ? "true" : undefined}
-          >
-            <p class="font-caption activity-row__day">Day {String(a.day).padStart(2, "0")}</p>
-            <h3 class="font-h3 activity-row__title">{a.title}</h3>
-            <p class="font-body activity-row__description">{a.description}</p>
-          </li>
-        ))}
-      </ol>
     </div>
+
+    <!-- Vertical centreline divider. -->
+    <div class="activities__divider" aria-hidden="true"></div>
+
+    <!-- RIGHT (50%): single stream of self-contained cards.
+         Each card has Day (top-left), Photo (centre), Title
+         (bottom-left), and a +/× cue (bottom-right). On click
+         the photo fades out and the description fades in at
+         the top-right; cue rotates from + to ×. Scrolls
+         naturally — no sticky text panel any more. -->
+    <ol class="activities__stream">
+      {activities.map((a, i) => (
+        <li class="activity-row" data-activity-index={String(i)}>
+          <button
+            type="button"
+            class="activity-card"
+            aria-expanded="false"
+            data-activity-card
+            aria-label={`Day ${a.day}: ${a.title} — tap to read description`}
+          >
+            <p class="font-body activity-card__day">
+              Day {String(a.day).padStart(2, "0")}
+            </p>
+            <p class="font-body activity-card__body">{a.description}</p>
+            <div class="activity-card__photo">
+              {photos[i] && (
+                <Image
+                  class="activity-card__img"
+                  src={photos[i]}
+                  alt={a.title}
+                  widths={[320, 480, 640]}
+                  sizes="(min-width: 768px) 25vw, 70vw"
+                  loading="lazy"
+                />
+              )}
+            </div>
+            <h3 class="font-h3 activity-card__title">{a.title}</h3>
+            <span class="activity-card__cue" aria-hidden="true"></span>
+          </button>
+        </li>
+      ))}
+    </ol>
     </div>
 
     <!-- MOBILE layout (<768px): title + intro stack vertically
@@ -302,6 +263,27 @@ const activities: Activity[] = [
 <style>
   .activities {
     align-items: start;
+  }
+
+  /* Centreline divider — hidden by default (mobile collapses to
+   * single column); revealed at ≥768px as its own grid track. */
+  .activities__divider {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    /* Half-and-half split with a divider between: 1fr | auto | 1fr. */
+    .activities {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--space-2xl);
+    }
+
+    .activities__divider {
+      display: block;
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
   }
 
   /* ── Desktop / mobile layout swap ───────────────────────────────
@@ -488,20 +470,188 @@ const activities: Activity[] = [
     transform: rotate(-45deg);
   }
 
-  /* LEFT — sticky title + image.
-   *
-   * `max-height` is sized so the column's bottom reaches the viewport
-   * bottom when stuck. This makes sticky release at exactly the same
-   * scroll position where the scene-stack pin engages (both keyed off
-   * "section bottom hits viewport bottom"). Any slack here would show
-   * as the left column scrolling off before the pin takes over. */
+  /* LEFT column — sticky title + intro. Same pattern as
+   * `.team__intro` in SectionTeam. The column itself is what's
+   * sticky; the right column's tall photo stream provides the
+   * scroll runway. */
   .activities__left {
     position: sticky;
     top: var(--sticky-top);
     align-self: start;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: var(--space-l);
-    max-height: calc(100svh - var(--sticky-top));
+    max-height: calc(100lvh - var(--sticky-top));
+  }
+
+  .activities__intro {
+    margin: 0;
+    max-width: 48ch;
+  }
+
+  /* Right column — single stream of self-contained click-to-
+   * expand cards. Scrolls naturally; no sticky text panel any
+   * more. */
+  .activities__stream {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    /* Cards are flush — separation comes from the per-card
+     * border-block-end rule below, not flex gap. */
+    gap: 0;
+  }
+
+  /* Each card has 4 corner regions positioned absolutely around
+   * a centred photo:
+   *   top-left:    Day label
+   *   top-right:   Description (hidden until [aria-expanded])
+   *   bottom-left: Title
+   *   bottom-right: + / × cue
+   *
+   * On click, the photo fades out and the description fades in.
+   * The other corners are static. */
+  .activity-card {
+    /* Button reset. */
+    appearance: none;
+    background: transparent;
+    color: var(--foreground);
+    border: 0;
+    margin: 0;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    display: block;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    padding: var(--space-l) 0;
+    /* Bottom rule between cards. The first card's :first-child
+     * rule below adds a top rule too so the row is framed. */
+    border-block-end: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .activity-row:first-child .activity-card {
+    border-block-start: 1px solid var(--border);
+  }
+
+  .activity-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+  }
+
+  /* Day label — top-left corner. */
+  .activity-card__day {
+    position: absolute;
+    top: var(--space-l);
+    left: 0;
+    margin: 0;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    z-index: 2;
+  }
+
+  /* Title — bottom-left corner. Always visible. */
+  .activity-card__title {
+    position: absolute;
+    bottom: var(--space-l);
+    left: 0;
+    right: var(--space-3xl);
+    margin: 0;
+    max-width: 12ch;
+    text-align: left;
+    text-wrap: balance;
+    line-height: 1.05;
+    z-index: 2;
+  }
+
+  /* Photo — centred, takes the middle of the card. Fades out
+   * when the card is expanded so the description has room. */
+  .activity-card__photo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Constrained to the centre — capped width AND height so
+     * the photo never grows past the card's middle band even
+     * on wide / tall cards. */
+    width: min(45%, 280px);
+    max-height: 70%;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 4px;
+    transition:
+      opacity 350ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1;
+  }
+
+  .activity-card[aria-expanded="true"] .activity-card__photo {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  .activity-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Body — top-right corner. Hidden until the card is expanded. */
+  .activity-card__body {
+    position: absolute;
+    top: var(--space-l);
+    right: 0;
+    bottom: auto;
+    left: auto;
+    max-width: 38ch;
+    margin: 0;
+    text-align: left;
+    opacity: 0;
+    transition: opacity 350ms cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+  }
+
+  .activity-card[aria-expanded="true"] .activity-card__body {
+    opacity: 1;
+    transition-delay: 120ms;
+  }
+
+  /* +/× cue — bottom-right corner, two-line cross that rotates
+   * 45° when the card is expanded. Same pattern as FAQ + team
+   * card cues. */
+  .activity-card__cue {
+    position: absolute;
+    bottom: var(--space-l);
+    right: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    pointer-events: none;
+    color: var(--card-foreground);
+    z-index: 2;
+  }
+  .activity-card__cue::before,
+  .activity-card__cue::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1.5px;
+    background: currentColor;
+    transform-origin: center;
+    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .activity-card__cue::after {
+    transform: rotate(90deg);
+  }
+  .activity-card[aria-expanded="true"] .activity-card__cue::before {
+    transform: rotate(45deg);
+  }
+  .activity-card[aria-expanded="true"] .activity-card__cue::after {
+    transform: rotate(-45deg);
   }
 
   /* Polaroid stack frame.
@@ -598,18 +748,10 @@ const activities: Activity[] = [
 
   .polaroid[data-active="true"] {
     opacity: 1;
-    /* Two stacked translates: the resting offset (in %, deterministic
-     * per index) and the mouse-driven nudge (in px, scaled by this
-     * card's own `--polaroid-mouse-mult` so each card shifts a
-     * different amount — the pile loosens like papers on a desk). */
-    transform:
-      translate(var(--polaroid-x, 0%), var(--polaroid-y, 0%))
-      translate(
-        calc(var(--mouse-dx, 0px) * var(--polaroid-mouse-mult, 1)),
-        calc(var(--mouse-dy, 0px) * var(--polaroid-mouse-mult, 1))
-      )
-      rotate(var(--polaroid-rotate, 0deg))
-      scale(1);
+    /* Single centred polaroid — no pile. Per-card offsets +
+     * mouse-shift removed so each active polaroid lands in the
+     * exact same spot, and the swap reads as a clean crossfade. */
+    transform: translate(0, 0) rotate(0deg) scale(1);
   }
 
   /* Photo area — square instant-photo crop. The placeholder gradient
@@ -689,14 +831,6 @@ const activities: Activity[] = [
     display: grid;
   }
 
-  /* Intro paragraph — body-l, max measure, scrolls with the
-   * column. Sits up top with generous padding below so the first
-   * activity row lands comfortably. */
-  .activities__intro {
-    margin: 0;
-    max-width: 52ch;
-    padding-block-end: 25vh;
-  }
 
   .activities__list {
     list-style: none;
@@ -705,197 +839,46 @@ const activities: Activity[] = [
     display: grid;
   }
 
+  /* Activity-row reset (mobile path uses HScrollMobile flip
+   * cards; desktop styling for the row triggers lives in the
+   * media query inside the right-column rules above). */
   .activity-row {
-    display: grid;
-    gap: var(--space-s);
-    padding-block: var(--space-l);
-    border-block-start: 1px solid var(--border);
-    /* Dim everything that isn't the currently-focused row. The
-     * centred row gets bumped back to full opacity (rule below).
-     * Long, soft easing so the focus shift feels like a slow
-     * cross-fade rather than a snap — the inactive state goes
-     * deep enough (0.2) that the active row clearly leads the
-     * eye. `cubic-bezier(0.22, 1, 0.36, 1)` is an "ease-out
-     * expo"-style curve: most of the change happens up front
-     * then settles, which reads as gracefully arriving at focus. */
-    opacity: 0.2;
-    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .activity-row[data-active="true"] {
-    opacity: 1;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .activity-row {
-      transition: none;
-    }
-  }
-
-  /* First row keeps its top border now that the intro paragraph
-   * provides the breathing room from the section start. */
-  .activity-row:first-child {
-    padding-block-start: var(--space-l);
-  }
-
-  .activity-row:last-child {
-    padding-block-end: var(--space-l);
-  }
-
-  .activity-row__day {
+    list-style: none;
     margin: 0;
-    opacity: 0.6;
+    padding: 0;
+    border: 0;
   }
 
-  .activity-row__title,
-  .activity-row__description {
-    margin: 0;
-  }
-
-  .activity-row__description {
-    opacity: 0.85;
-    max-width: 60ch;
-  }
 </style>
 
 <script>
   /**
-   * IntersectionObserver picks the activity row currently in the
-   * centre band of the viewport. Polaroids 0..currentIndex are
-   * shown (active), so the stack grows as the user scrolls down
-   * and shrinks as they scroll back up. Single observer per page;
-   * re-installs on Astro view transitions.
+   * Activity-card click toggle (desktop). Delegated from
+   * document so we don't need per-card listeners and the handler
+   * survives Astro view transitions. Same shape as the mobile
+   * `installApCard` below — just a different selector.
    */
-  function install() {
-    if ((window as any).__activitiesHooked) return;
-    (window as any).__activitiesHooked = true;
-
-    const rows = document.querySelectorAll<HTMLElement>('[data-activity-index]');
-    const polaroids = document.querySelectorAll<HTMLElement>(
-      '[data-activities-polaroid]',
-    );
-    if (rows.length === 0 || polaroids.length === 0) return;
-
-    const ratios = new Map<number, number>();
-    let currentIndex = 0;
-
-    function setStackTo(i: number) {
-      if (i === currentIndex) return;
-      currentIndex = i;
-      polaroids.forEach((poly) => {
-        const idx = Number(poly.dataset.activitiesPolaroid);
-        poly.setAttribute('data-active', idx <= i ? 'true' : 'false');
-      });
-      // Single active row — the one currently centred. CSS dims
-      // every other row to 0.7 with a smooth opacity transition.
-      rows.forEach((row) => {
-        const idx = Number(row.dataset.activityIndex);
-        row.setAttribute('data-active', idx === i ? 'true' : 'false');
-      });
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const idx = Number((entry.target as HTMLElement).dataset.activityIndex);
-          ratios.set(idx, entry.intersectionRatio);
-        }
-        // Pick the index with the highest current ratio in the
-        // centre band — that's the activity the user is "on".
-        let bestIdx = -1;
-        let bestRatio = -1;
-        ratios.forEach((r, i) => {
-          if (r > bestRatio) {
-            bestRatio = r;
-            bestIdx = i;
-          }
-        });
-        if (bestIdx >= 0 && bestRatio > 0) setStackTo(bestIdx);
-      },
-      {
-        // Activation zone: from 40% below the viewport top down to
-        // 5% above the bottom. Loose bottom so the last row
-        // activates even when its trailing room is small.
-        rootMargin: '-40% 0px -5% 0px',
-        threshold: [0, 0.5, 1],
-      },
-    );
-
-    rows.forEach((row) => io.observe(row));
-
-    /**
-     * Mouse-driven shift — cursor position nudges each polaroid by
-     * a small offset, scaled by that card's own multiplier so the
-     * pile loosens (papers on a desk being grazed by a hand) rather
-     * than tilting in 3D. Listens on window so the effect tracks
-     * even when the cursor is over the activity list.
-     *
-     * Skipped under reduced-motion preference.
-     */
-    const stack = document.querySelector<HTMLElement>('[data-activities-stack]');
-    const inner = stack?.querySelector<HTMLElement>('.activities__stack-inner');
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (stack && inner && !reduced) {
-      const MAX_PX = 18; // peak shift magnitude per axis
-      const LERP = 0.12; // how quickly current position chases target
-
-      let targetX = 0;
-      let targetY = 0;
-      let currentX = 0;
-      let currentY = 0;
-      let raf = 0;
-
-      // Continuous rAF that eases the displayed position toward
-      // the cursor target. Idles itself when close enough to the
-      // target so we're not burning frames at rest.
-      const loop = () => {
-        currentX += (targetX - currentX) * LERP;
-        currentY += (targetY - currentY) * LERP;
-        inner.style.setProperty('--mouse-dx', `${currentX.toFixed(2)}px`);
-        inner.style.setProperty('--mouse-dy', `${currentY.toFixed(2)}px`);
-        const settled =
-          Math.abs(targetX - currentX) < 0.05 &&
-          Math.abs(targetY - currentY) < 0.05;
-        raf = settled ? 0 : requestAnimationFrame(loop);
-      };
-
-      const start = () => {
-        if (!raf) raf = requestAnimationFrame(loop);
-      };
-
-      window.addEventListener('mousemove', (e) => {
-        // Centre of the stack as the reference point so the shift
-        // is symmetric around the polaroid no matter where it
-        // sits in layout.
-        const rect = stack.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        // Normalise to -1..1 over a generous range so the effect
-        // is felt across the whole viewport, not just on hover.
-        const range = Math.max(window.innerWidth, window.innerHeight) / 2;
-        const nx = Math.max(-1, Math.min(1, (e.clientX - cx) / range));
-        const ny = Math.max(-1, Math.min(1, (e.clientY - cy) / range));
-        targetX = nx * MAX_PX;
-        targetY = ny * MAX_PX;
-        start();
-      });
-
-      window.addEventListener('mouseleave', () => {
-        targetX = 0;
-        targetY = 0;
-        start();
-      });
-    }
+  function installActivityCard() {
+    if ((window as any).__activityCardHooked) return;
+    (window as any).__activityCardHooked = true;
+    document.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement | null)?.closest<HTMLButtonElement>(
+        '[data-activity-card]',
+      );
+      if (!card) return;
+      const open = card.getAttribute('aria-expanded') === 'true';
+      card.setAttribute('aria-expanded', String(!open));
+    });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', install, { once: true });
+    document.addEventListener('DOMContentLoaded', installActivityCard, { once: true });
   } else {
-    install();
+    installActivityCard();
   }
   document.addEventListener('astro:page-load', () => {
-    (window as any).__activitiesHooked = false;
-    install();
+    (window as any).__activityCardHooked = false;
+    installActivityCard();
   });
 
   /**

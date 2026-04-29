@@ -52,10 +52,13 @@ const { theme = 'blue' } = Astro.props;
     <div class="hero__wave">
       <HeroWaveCarousel />
     </div>
-    <p class="font-body-l hero__lede">
-      <span class="hero__lede-line">Two weeks of maths, code and ocean —</span>
-      <span class="hero__lede-line">the IOAI Spain training camp on the slopes of Mount Teide.</span>
-    </p>
+    <div class="hero__lede">
+      <p class="font-body-s hero__eyebrow">July 5th — 19th, 2026</p>
+      <p class="font-body-l hero__lede-copy">
+        <span class="hero__lede-line">Two weeks of maths, code and ocean —</span>
+        <span class="hero__lede-line">the IOAI Spain training camp on the slopes of Mount Teide.</span>
+      </p>
+    </div>
   </section>
 </div>
 
@@ -170,19 +173,29 @@ const { theme = 'blue' } = Astro.props;
      * `100svh - cta-clearance` from the section top, regardless of
      * its own intrinsic height. */
     position: absolute;
-    top: calc(100svh - var(--cta-clearance));
+    top: calc(100svh - max(var(--cta-clearance), var(--cta-inset)));
     transform: translateY(-100%);
     left: var(--section-inline);
     right: var(--section-inline);
   }
 
-  /* Lede is absolutely positioned so default browser <p> margin
-   * collapses against the section padding instead of the ledge,
-   * but explicitly zero it just so any cascade noise is gone. */
   .hero__lede {
-    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
     max-width: 48ch;
     opacity: 0.9;
+  }
+
+  .hero__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+  }
+
+  .hero__lede-copy {
+    margin: 0;
   }
 
   /* The two halves render inline on desktop so the paragraph reads

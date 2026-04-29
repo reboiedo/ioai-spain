@@ -65,13 +65,13 @@
 
 @media (max-width: 767.98px) {
   :root {
-    /* Just-enough clearance for the mobile sticky CTA:
-     *   2 × bottom margin (= `--cta-inset` on each side, top + bottom
-     *   of the button) + button intrinsic height (~3rem = label
-     *   line-height + vertical padding).
-     * Result lands ~80px tall on most phones — content stays clear
-     * of the button without inflating every section by 144px. */
-    --cta-clearance: calc(var(--cta-inset) * 2 + 3rem);
+    /* Mobile sticky CTA clearance. `--space-6xl` (8–12rem
+     * responsive) leaves bottom-anchored content with comfortable
+     * breathing room above the button's footprint. Earlier
+     * versions used a tighter calc — fine for plain paragraphs
+     * but cramped for sections that end with extra UI like the
+     * `HScrollMobile` progress rail. */
+    --cta-clearance: var(--space-6xl);
   }
 }
 
