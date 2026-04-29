@@ -126,6 +126,38 @@ const advancedTracks: Track[] = [
             <Course name={t.name} description={t.description} outcomes={t.outcomes} />
           ))}
         </TrackList>
+
+        <!-- Parent-facing fit-check card. Short and reassuring
+             — sits at the bottom of the right column after both
+             track lists. -->
+        <article class="tracks__fit">
+          <h3 class="font-h3 tracks__fit-title">
+            Not sure if it's the right camp?
+          </h3>
+          <p class="font-body tracks__fit-lede">
+            No prior experience, no clear passion, no plan needed
+            — just an openness to try something that might
+            surprise you. The camp is for kids who:
+          </p>
+          <ul class="tracks__fit-list">
+            <li class="tracks__fit-item">
+              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
+              <span class="font-body">Like figuring out how things work</span>
+            </li>
+            <li class="tracks__fit-item">
+              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
+              <span class="font-body">Are curious about AI</span>
+            </li>
+            <li class="tracks__fit-item">
+              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
+              <span class="font-body">Want to meet peers from around the world</span>
+            </li>
+            <li class="tracks__fit-item">
+              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
+              <span class="font-body">Are ready for a summer that counts</span>
+            </li>
+          </ul>
+        </article>
       </div>
     </div>
   </section>
@@ -164,5 +196,71 @@ const advancedTracks: Track[] = [
     display: grid;
     gap: var(--space-2xl);
     max-width: 680px;
+  }
+
+  /* Parent-facing fit-check card. Themed surface (`--surface`
+   * resolves to the section's brand tint per `data-theme` —
+   * orange-300 / blue-500 / yellow-300) so the card reads as
+   * a softer, on-brand anchor at the bottom of the column,
+   * distinct from the dark `TrackList` cards above. */
+  .tracks__fit {
+    background: var(--surface);
+    color: var(--foreground);
+    border-radius: 8px;
+    padding: clamp(var(--space-l), 4vw, var(--space-xl));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+  }
+
+  .tracks__fit-title {
+    margin: 0;
+    text-wrap: balance;
+    line-height: 1.1;
+  }
+
+  .tracks__fit-lede {
+    margin: 0;
+    max-width: 56ch;
+    opacity: 0.85;
+  }
+
+  .tracks__fit-label {
+    margin: 0;
+    margin-block-start: var(--space-s);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+  }
+
+  .tracks__fit-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+  }
+
+  /* Arrow + text grid — multi-line items wrap with their text
+   * indented past the arrow rather than under it. */
+  .tracks__fit-item {
+    display: grid;
+    grid-template-columns: 1.25rem 1fr;
+    column-gap: var(--space-s);
+    align-items: baseline;
+  }
+
+  .tracks__fit-bullet {
+    font-weight: 600;
+    opacity: 0.6;
+  }
+
+  .tracks__fit-footer {
+    margin: 0;
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid
+      color-mix(in oklab, var(--foreground) 14%, transparent);
+    opacity: 0.7;
   }
 </style>
