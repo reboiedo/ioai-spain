@@ -167,6 +167,31 @@ const {
   });
 
   /*
+   * Orientation-change refresh.
+   *
+   * `ignoreMobileResize: true` (set in tenerife-camp.astro) suppresses
+   * ScrollTrigger's automatic refresh on every resize so URL-bar
+   * collapse doesn't jump pins mid-scroll. The side effect: orientation
+   * flips on iPad don't auto-refresh either — pins keep their
+   * pre-rotation positions and sections sit misaligned.
+   *
+   * Listen explicitly for orientation transitions and wait long enough
+   * for iOS's rotation animation + reflow to land (~400ms) before
+   * refreshing. Function-based responsive values in the page's tweens
+   * (xPercent, y, etc.) re-evaluate via `invalidateOnRefresh: true`,
+   * so a single refresh re-fits everything.
+   */
+  const orientationMq = window.matchMedia('(orientation: portrait)');
+  let orientationTimer: number | null = null;
+  orientationMq.addEventListener('change', () => {
+    if (orientationTimer !== null) clearTimeout(orientationTimer);
+    orientationTimer = window.setTimeout(() => {
+      orientationTimer = null;
+      ScrollTrigger.refresh(true);
+    }, 400);
+  });
+
+  /*
    * Scroll-tied nav-bg driver (follow.art pattern, refined).
    *
    * Two layers in the nav:

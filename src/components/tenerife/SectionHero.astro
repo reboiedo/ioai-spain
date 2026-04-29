@@ -173,7 +173,12 @@ const { theme = 'blue' } = Astro.props;
      * `100svh - cta-clearance` from the section top, regardless of
      * its own intrinsic height. */
     position: absolute;
-    top: calc(100svh - max(var(--cta-clearance), var(--cta-inset)));
+    /* Desktop: clear the bottom-right floating Join CTA pill with a
+     * generous gap (`--space-l`). Mobile: `--cta-clearance` is the
+     * tall reserved bar (~8–12rem) and dominates via `max()`. The
+     * `--cta-inset` term keeps the gap at least the CTA's edge inset
+     * if anyone bumps it. */
+    top: calc(100svh - max(var(--cta-clearance), var(--cta-inset), var(--space-l)));
     transform: translateY(-100%);
     left: var(--section-inline);
     right: var(--section-inline);
@@ -206,14 +211,26 @@ const { theme = 'blue' } = Astro.props;
     display: inline;
   }
 
-  /* Mobile: lede right-aligns within its absolute box (already
-   * stretched to `left: section-inline; right: section-inline`),
-   * and the two halves stack as exactly two lines via the spans
-   * flipping to block. */
-  @media (max-width: 767.98px) {
+  /* Tablet portrait + mobile: anchor the 48ch box to the right inset
+   * and right-align the text. iPad Mini portrait (768px) sits just
+   * above the old 767.98 cutoff and would otherwise land in desktop
+   * styling (lede stranded mid-screen). 1023.98 covers every
+   * narrow / portrait-tablet form factor.
+   *
+   * Desktop (>= 1024) keeps the lede on the LEFT — iPad Mini
+   * landscape (~1133px) lands here so the lede doesn't overlap the
+   * floating Join CTA in the bottom-right corner. */
+  @media (max-width: 1023.98px) {
     .hero__lede {
+      margin-left: auto;
       text-align: right;
     }
+  }
+
+  /* Phone: stack the two halves as exactly two lines via the spans
+   * flipping to block. iPad portrait keeps inline flow — 48ch is
+   * plenty of width there for the natural wrap. */
+  @media (max-width: 767.98px) {
     .hero__lede-line {
       display: block;
     }
