@@ -1,29 +1,54 @@
 ---
 /**
- * SafetySection — the "SAFETY" scene.
+ * SafetySection — narrative scene mirroring SectionStory.
  *
- * Single split, 100lvh tall:
- *   LEFT  — title pinned to the top, intro paragraph vertically
- *           centred below it.
- *   RIGHT — 2×2 grid of dark cards, each with a number + label.
- *           Capped width so the 4 cards stay visually centred in
- *           the column.
+ * Layout (desktop):
+ *   ┌──────────────────────────────────────┬──────────────────────────┐
+ *   │  Intro lede                          │                          │
+ *   │  …                                   │   ╔══════════════╗        │
+ *   │  Pillar cards (2×2)                  │   ║  SAFETY       ║       │
+ *   │  …                                   │   ║              ║        │
+ *   │  Supervisors grid                    │   ║  ┌────────┐  ║        │
+ *   │                                      │   ║  │ photo  │  ║        │
+ *   │                                      │   ║  └────────┘  ║        │
+ *   │                                      │   ║  FIRST       ║        │
+ *   │                                      │   ╚══════════════╝        │
+ *   └──────────────────────────────────────┴──────────────────────────┘
  *
- * Mobile (<768px): title + intro stacked, then a horizontal-scroll
- * row of the same 4 cards via `HScrollMobile`.
+ * Right column is sticky — the giant 2-line title and the overlapping
+ * tilted safety photo stay in view while the user scrolls past the
+ * left column's intro / pillar cards / supervisors grid.
+ *
+ * Mobile: title + photo block on top, then intro lede, then pillar
+ * cards (2×2), then supervisors grid (2-up).
  */
 
-import { Image } from "astro:assets";
-import SectionTitle from "@/components/tenerife/SectionTitle.astro";
-import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
+import { Image, type ImageMetadata } from "astro:assets";
+import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import safetyImage from "@/assets/tenerife/safety/safety.jpg";
+
+// Eager-glob future supervisor portraits — same convention as
+// SectionTeam. Drop `name.jpg` (or .png/.webp) into
+// `src/assets/tenerife/safety/supervisors/` and reference by basename
+// via the `imageKey` field below; missing keys fall back to a
+// gradient placeholder with initials.
+const supervisorModules = import.meta.glob<{ default: ImageMetadata }>(
+  "@/assets/tenerife/safety/supervisors/*.{jpg,jpeg,png,webp,avif}",
+  { eager: true },
+);
+const supervisorPhotos: Record<string, ImageMetadata> = {};
+for (const [path, mod] of Object.entries(supervisorModules)) {
+  const filename = path.split("/").pop() ?? "";
+  const key = filename.replace(/\.[^.]+$/, "");
+  supervisorPhotos[key] = mod.default;
+}
 
 export interface Props {
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "blue" } = Astro.props;
+const { theme = "orange" } = Astro.props;
 
 interface Pillar {
   title: string;
@@ -52,424 +77,391 @@ const pillars: Pillar[] = [
       "Parents are kept in the loop with regular check-ins and a direct channel to the camp coordinator for anything urgent.",
   },
 ];
+
+interface Supervisor {
+  /** Full name, displayed under the portrait. */
+  name: string;
+  /** Two-letter initials shown when no portrait is available. */
+  initials: string;
+  /** Optional role / area of responsibility. */
+  role?: string;
+  /** Filename (no extension) in `src/assets/tenerife/safety/supervisors/`. */
+  imageKey?: string;
+}
+
+// Placeholder supervisor list — replace with real names + portraits
+// once available. Initials drive the gradient fallback tile.
+const supervisors: Supervisor[] = [
+  { name: "Supervisor 01", initials: "S1", role: "Day lead" },
+  { name: "Supervisor 02", initials: "S2", role: "Day lead" },
+  { name: "Supervisor 03", initials: "S3", role: "Activities" },
+  { name: "Supervisor 04", initials: "S4", role: "Activities" },
+  { name: "Supervisor 05", initials: "S5", role: "Evenings" },
+  { name: "Supervisor 06", initials: "S6", role: "Evenings" },
+  { name: "Supervisor 07", initials: "S7", role: "Excursions" },
+  { name: "Supervisor 08", initials: "S8", role: "Excursions" },
+];
 ---
 
 <div class="scene" data-scene>
   <section
-    class="section split scene__layer scene__layer--tilt safety"
+    class="section scene__layer scene__layer--tilt safety"
     data-theme={theme}
   >
-    <!-- DESKTOP layout (≥768px). Hidden on mobile via the
-         `.safety__desktop` rule below. -->
-    <div class="safety__desktop">
-      <!-- LEFT — title top, intro paragraph vertically centred,
-           supporting photograph anchored absolute against the
-           bottom-right of the column. -->
-      <div class="safety__text">
-        <SectionTitle lines={["SAFETY", "FIRST"]} eyebrow="always" eyebrowPosition="between" />
-        <p class="font-body section-copy safety__copy">
-          Your child is looked after at all times. Below is exactly
-          how we take care of every camper, from the moment they
-          land in Tenerife to the day they fly home.
-        </p>
+    <div class="safety__layout">
+      <!-- LEFT — scrolling content. Plain block flow on desktop so
+           it scrolls with the page; the right column is sticky and
+           stays in view as the user passes by. -->
+      <div class="safety__content">
+        <div class="safety__intro">
+          <p class="font-body-l safety__lede">
+            Your child is looked after at all times. Below is exactly
+            how we take care of every camper, from the moment they
+            land in Tenerife to the day they fly home.
+          </p>
+        </div>
 
-        <Image
-          class="safety__photo"
-          src={safetyImage}
-          alt="Camp staff supervising students during an outdoor activity"
-          widths={[240, 360, 480]}
-          sizes="(min-width: 768px) 16vw, 50vw"
-          loading="lazy"
-        />
-      </div>
-
-      <!-- RIGHT — 2×2 grid of pillar cards. Each card flips on
-           hover (desktop) / tap (mobile) to reveal a short
-           description on the back. -->
-      <div class="safety__grid-cell">
-        <ol class="safety__grid">
+        <!-- Pillar cards. 2×2 grid, surface cards with title + body
+             on each. No flip — the right column already gives the
+             section breathing room, so descriptions stay visible. -->
+        <ol class="safety__pillars">
           {pillars.map((p, i) => (
-            <li class="safety-card-cell">
-              <button
-                type="button"
-                class="safety-card"
-                aria-expanded="false"
-                data-safety-card
-                aria-label={`${p.title} — tap for more`}
-              >
-                <span class="safety-card__inner">
-                  <span class="safety-card__face safety-card__face--front">
-                    <span class="font-caption safety-card__num">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span class="font-h4 safety-card__title">
-                      {p.title}
-                    </span>
-                  </span>
-                  <span class="safety-card__face safety-card__face--back">
-                    <span class="font-body-s safety-card__desc">
-                      {p.description}
-                    </span>
-                  </span>
-                </span>
-              </button>
+            <li class="safety-pillar">
+              <span class="font-caption safety-pillar__num">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 class="font-h4 safety-pillar__title">{p.title}</h3>
+              <p class="font-body-s safety-pillar__desc">{p.description}</p>
             </li>
           ))}
         </ol>
+
+        <!-- Supervisors grid. Same card pattern as SectionTeam, but
+             with portrait-on-top + name underneath. Missing portraits
+             fall back to a gradient tile with initials. -->
+        <div class="safety__supervisors-block">
+          <h3 class="font-h3 safety__supervisors-title">
+            Camp supervisors
+          </h3>
+          <p class="font-body-s safety__supervisors-copy">
+            The team on the ground at every moment of the camp —
+            coordinating activities, walking with the group between
+            sessions, and on call through the night.
+          </p>
+          <ul class="safety__supervisors">
+            {supervisors.map((s) => (
+              <li class="supervisor-card">
+                <div class="supervisor-card__portrait">
+                  {s.imageKey && supervisorPhotos[s.imageKey] ? (
+                    <Image
+                      class="supervisor-card__photo"
+                      src={supervisorPhotos[s.imageKey]}
+                      alt={s.name}
+                      widths={[120, 180, 240]}
+                      sizes="(min-width: 768px) 12vw, 30vw"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span class="supervisor-card__initials" aria-hidden="true">
+                      {s.initials}
+                    </span>
+                  )}
+                </div>
+                <div class="supervisor-card__meta">
+                  <span class="font-body-s supervisor-card__name">{s.name}</span>
+                  {s.role && (
+                    <span class="font-caption supervisor-card__role">{s.role}</span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <!-- MOBILE layout (<768px). Title + intro stacked, then a
-         2×2 grid of the same flip cards. No 100svh height —
-         the section grows naturally with content. -->
-    <div class="safety__mobile">
-      <SectionTitle lines={["SAFETY", "FIRST"]} eyebrow="always" eyebrowPosition="between" />
-      <p class="font-body-l safety__mobile-intro">
-        Your child is looked after at all times. Below is how we
-        take care of every camper, from the moment they land in
-        Tenerife to the day they fly home.
-      </p>
+      <!-- Vertical centreline divider — own grid track between the
+           two content columns, `align-self: stretch` so it spans
+           the full section height regardless of the sticky right
+           column's max-height. -->
+      <div class="safety__divider" aria-hidden="true"></div>
 
-      <ol class="safety__mobile-grid">
-        {pillars.map((p, i) => (
-          <li class="safety-card-cell">
-            <button
-              type="button"
-              class="safety-card safety-card--mobile"
-              aria-expanded="false"
-              data-safety-card
-              aria-label={`${p.title} — tap for more`}
-            >
-              <span class="safety-card__inner">
-                <span class="safety-card__face safety-card__face--front">
-                  <span class="font-caption safety-card__num">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span class="font-h4 safety-card__title">{p.title}</span>
-                </span>
-                <span class="safety-card__face safety-card__face--back">
-                  <span class="font-body-s safety-card__desc">
-                    {p.description}
-                  </span>
-                </span>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ol>
+      <!-- RIGHT — sticky big-title stack + overlapping tilted safety
+           photo. `HeroTitleStack` sizes each line so the shorter
+           line's letters match the longer line's height. -->
+      <div class="safety__right">
+        <div class="safety__title">
+          <HeroTitleStack
+            lines={[
+              { text: "SAFETY", noStretch: true },
+              { text: "FIRST" },
+            ]}
+            defaultAlign="right"
+            gap="var(--space-s)"
+            maxWidth="80%"
+          />
+        </div>
+
+        <!-- Tilted photograph — sits between the two title lines
+             (overlapping both visually). Static image, no click. -->
+        <div class="safety__photo">
+          <Image
+            class="safety__photo-img"
+            src={safetyImage}
+            alt="Camp staff supervising students during an outdoor activity"
+            widths={[480, 720, 960]}
+            sizes="(min-width: 768px) 30vw, 70vw"
+            loading="lazy"
+          />
+        </div>
+      </div>
     </div>
   </section>
 </div>
 
 <style>
-  /* ── Desktop / mobile layout swap ────────────────────────────── */
-  .safety__desktop {
-    display: contents;
+  /* Section grows with the scrolling left column. Floor at one
+   * viewport so short copy doesn't make the right column's sticky
+   * window collapse to nothing. */
+  .safety {
+    min-height: 100lvh;
   }
 
-  .safety__mobile {
-    display: none;
+  /* Three-column grid on desktop; single-column stack on mobile.
+   * Mobile order is overridden so the title + photo block appears
+   * FIRST — DOM order has content first for desktop layout, but
+   * mobile flips it via grid order so the giant title leads. */
+  .safety__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2xl);
   }
 
   @media (max-width: 767.98px) {
-    .safety__desktop {
-      display: none;
+    .safety__content {
+      order: 2;
     }
-    .safety__mobile {
-      display: grid;
-      gap: var(--space-l);
+    .safety__divider {
+      order: 1;
     }
-    .safety {
-      display: block;
+    .safety__right {
+      order: 0;
     }
-    /* Constrain the SAFETY / FIRST title to 80% of the section
-     * width on mobile so it doesn't run cap-to-cap with the
-     * section padding, and add a touch of vertical breathing room
-     * between the two stacked SVG lines. */
-    .safety__mobile :global(.section-title) {
-      max-width: 80%;
-    }
-    .safety__mobile :global(.section-title__svg-line) + :global(.section-title__svg-line) {
-      margin-block-start: var(--space-xs);
-    }
-  }
-
-  .safety__mobile-intro {
-    margin: 0;
-    max-width: 52ch;
-  }
-
-  /* Mobile 2×2 grid — same shape as the desktop pillar grid,
-   * just inside the single-column mobile flow. */
-  .safety__mobile-grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-s);
-  }
-
-  /* Section frame.
-   *
-   * Desktop (≥768px): at least one viewport tall, grid row
-   * stretches both columns so the centreline divider runs the
-   * full section height and the centred paragraph + the cards
-   * grid have a tall parent to centre against.
-   *
-   * Mobile (<768px): the desktop row-stretch and `100lvh`
-   * floor are dropped — the section grows naturally with the
-   * mobile content (title + intro + 2×2 grid + CTA clearance
-   * from the base `.section` rule). */
-  .safety {
-    align-items: stretch;
   }
 
   @media (min-width: 768px) {
-    .safety {
-      min-height: 100lvh;
-      grid-template-rows: minmax(0, 1fr);
+    .safety__layout {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--space-2xl);
     }
   }
 
-  /* LEFT — flex column. Title pinned to the top in document
-   * order; paragraph centred via `margin-block: auto`.
-   * `position: relative` makes the column the containing block
-   * for the absolutely-positioned `.safety__photo`. */
-  .safety__text {
-    position: relative;
+  .safety__divider {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .safety__divider {
+      display: block;
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+  }
+
+  /* ── LEFT: scrolling content column ──────────────────────────── */
+  .safety__content {
     display: flex;
     flex-direction: column;
+    gap: var(--space-3xl);
   }
 
-  .safety__copy {
-    margin-block: auto;
-    margin-inline-start: auto;
-    margin-inline-end: 0;
-    max-width: 48ch;
+  .safety__intro {
+    max-width: 60ch;
   }
 
-  /* Supporting photograph — absolute, anchored bottom-LEFT of
-   * the sticky column with a slight tilt for a hand-placed feel.
-   * `height: auto` honours the source's true aspect ratio
-   * (~2:3 portrait — 2405×3600).
-   *
-   * Width is bounded with `clamp` so the photo can never grow
-   * tall enough to clip the centred paragraph above it: at the
-   * lower bound it's a comfortable 8rem regardless of column
-   * width; at the upper bound it caps at 11rem ≈ 176px so even
-   * on a short iPad Mini landscape (744px viewport, ~644px
-   * sticky column) the photo height (~16.5rem) leaves room for
-   * the title + copy. */
-  .safety__photo {
-    position: absolute;
-    width: clamp(8rem, 30%, 11rem);
-    height: auto;
-    bottom: var(--space-m);
-    left: var(--space-l);
-    border-radius: 4px;
-    transform: rotate(-3deg);
-    transform-origin: bottom left;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
-    /* Sit BELOW the title + paragraph in the stacking order on
-     * the off chance content overlaps. */
-    z-index: 0;
+  .safety__lede {
+    margin: 0;
   }
 
-  @media (max-width: 767.98px) {
-    /* Hide on mobile — the desktop layout is the only one with
-     * the left column to anchor against. */
-    .safety__photo {
-      display: none;
-    }
-  }
-
-  /* Narrow desktops / tablet portrait: the left column is too
-   * tight for the photo + the centred paragraph + the title to
-   * coexist comfortably. Hide the photo there and re-introduce
-   * it from a comfortable threshold up. */
-  @media (max-width: 1023.98px) and (min-width: 768px) {
-    .safety__photo {
-      display: none;
-    }
-  }
-
-  /* RIGHT — wrapper centres the GRID (not the cell) so the 2×2
-   * stays compact and visually centred even when the column
-   * grows wide. */
-  .safety__grid-cell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 0;
-  }
-
-  .safety__grid {
+  /* Pillars — 2×2 surface cards. Number top, title, description. */
+  .safety__pillars {
     list-style: none;
     margin: 0;
     padding: 0;
-    width: 100%;
-    max-width: 32rem;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-s);
   }
 
-  /* List-cell wrapper — kills the default bullet so the
-   * pillar grid reads as a clean 2×2. */
-  .safety-card-cell {
-    list-style: none;
-  }
-
-  /* ── Flip card ───────────────────────────────────────────────
-   *
-   * `.safety-card` is the perspective host (button reset baked in).
-   * `.safety-card__inner` carries the rotateY transition; each
-   * `.safety-card__face` is absolutely positioned with
-   * `backface-visibility: hidden` so the non-active face
-   * disappears mid-flip.
-   *
-   * Hover on pointer devices, tap toggle via `aria-expanded` on
-   * touch — both feed the same rotated state. */
-  .safety-card {
-    /* Button reset. */
-    appearance: none;
-    border: 0;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    text-align: left;
-    /* Layout. */
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    perspective: 1000px;
-  }
-
-  .safety-card--mobile {
-    width: 100%;
-    /* Mobile cards are 2:3 portrait — taller than the desktop
-     * 1:1 squares so the title + numeral feel anchored and the
-     * back face has comfortable room for the description copy. */
-    aspect-ratio: 2 / 3;
-  }
-
-  .safety-card:focus-visible {
-    outline: 2px solid var(--card);
-    outline-offset: 4px;
-  }
-
-  .safety-card__inner {
-    position: absolute;
-    inset: 0;
-    transform-style: preserve-3d;
-    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .safety-card[aria-expanded="true"] .safety-card__inner {
-    transform: rotateY(180deg);
-  }
-  @media (hover: hover) {
-    .safety-card:hover .safety-card__inner {
-      transform: rotateY(180deg);
-    }
-  }
-
-  /* Both faces share the dark surface (number+title front,
-   * description back). `--card` / `--card-foreground` tokens
-   * resolve to black-on-cream in every theme. Padding lives on
-   * the FACE (not the card) so the flip pivots cleanly around
-   * the centre without padding affecting the perspective. */
-  .safety-card__face {
-    position: absolute;
-    inset: 0;
-    background: var(--card);
-    color: var(--card-foreground);
+  .safety-pillar {
+    background: var(--surface);
+    color: var(--foreground);
+    padding: var(--space-l);
     border-radius: 4px;
-    padding: var(--space-s);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
   }
 
-  /* FRONT — number top-left, title pinned bottom-left via the
-   * auto / 1fr / auto grid rows. Same composition as the
-   * pre-flip version. */
-  .safety-card__face--front {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 0.25rem;
-  }
-
-  .safety-card__num {
+  .safety-pillar__num {
     margin: 0;
     opacity: 0.55;
     letter-spacing: 0.08em;
   }
 
-  .safety-card__title {
+  .safety-pillar__title {
     margin: 0;
-    grid-row: 3;
     line-height: 1.05;
     text-wrap: balance;
   }
 
-  /* BACK — full-bleed description, centred. Pre-rotated 180°
-   * so the text reads correctly once the inner element flips. */
-  .safety-card__face--back {
-    transform: rotateY(180deg);
-    display: grid;
-    place-items: center;
-  }
-
-  .safety-card__desc {
+  .safety-pillar__desc {
     margin: 0;
     opacity: 0.85;
-    text-wrap: balance;
+    text-wrap: pretty;
   }
 
-  /* Vertical divider between the halves (desktop only). */
+  /* Supervisors block — heading + copy + grid of cards. */
+  .safety__supervisors-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .safety__supervisors-title {
+    margin: 0;
+  }
+
+  .safety__supervisors-copy {
+    margin: 0;
+    opacity: 0.85;
+    max-width: 60ch;
+  }
+
+  /* Supervisor cards — portrait on top (1:1), name + role below.
+   * 2 columns on mobile, 3 columns ≥768, 4 columns ≥1280 so the
+   * thumbnails stay a comfortable size on the wide layout. */
+  .safety__supervisors {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-m);
+  }
+
   @media (min-width: 768px) {
-    .safety__grid-cell {
-      border-inline-start: 1px solid var(--border);
-      padding-inline-start: var(--space-2xl);
+    .safety__supervisors {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
-</style>
 
-<script>
-  /**
-   * Tap-to-flip toggle for the safety cards. Desktop already
-   * flips on `:hover` via CSS; this handler covers touch / tap
-   * by toggling `aria-expanded`, which the same CSS rule reads.
-   * Delegated from `document` so it survives Astro view
-   * transitions and doesn't need per-card listeners.
-   */
-  function installSafetyCard() {
-    if ((window as any).__safetyCardHooked) return;
-    (window as any).__safetyCardHooked = true;
-    document.addEventListener('click', (e) => {
-      const card = (e.target as HTMLElement | null)?.closest<HTMLButtonElement>(
-        '[data-safety-card]',
+  @media (min-width: 1280px) {
+    .safety__supervisors {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .supervisor-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .supervisor-card__portrait {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 4px;
+    overflow: hidden;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--foreground) 22%, transparent) 0%,
+        color-mix(in oklab, var(--foreground) 6%, transparent) 100%
       );
-      if (!card) return;
-      const open = card.getAttribute('aria-expanded') === 'true';
-      card.setAttribute('aria-expanded', String(!open));
-    });
+    display: grid;
+    place-items: center;
+    color: color-mix(in oklab, var(--foreground) 60%, transparent);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', installSafetyCard, {
-      once: true,
-    });
-  } else {
-    installSafetyCard();
+  .supervisor-card__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
-  document.addEventListener('astro:page-load', () => {
-    (window as any).__safetyCardHooked = false;
-    installSafetyCard();
-  });
-</script>
+
+  .supervisor-card__initials {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    letter-spacing: -0.02em;
+  }
+
+  .supervisor-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .supervisor-card__name {
+    margin: 0;
+  }
+
+  .supervisor-card__role {
+    margin: 0;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── RIGHT: sticky title + tilted photo ─────────────────────── */
+  .safety__right {
+    /* `position: relative` makes this the containing block for the
+     * absolutely-positioned photo below. Photo uses % units relative
+     * to this column so it scales proportionally. */
+    position: relative;
+  }
+
+  @media (min-width: 768px) {
+    .safety__right {
+      position: sticky;
+      top: var(--sticky-top);
+      align-self: start;
+      max-height: calc(100lvh - var(--sticky-top));
+    }
+  }
+
+  .safety__title {
+    display: block;
+  }
+
+  /* Tilted safety photo — fixed 4:5 aspect ratio, sized as a % of
+   * its containing block. `-8deg` tilt matches the Story video
+   * tile so the two scenes feel like a pair. Anchored absolute on
+   * every viewport (overlapping the title); falls back to natural
+   * flow on mobile via the order-swap above. */
+  .safety__photo {
+    display: block;
+    position: absolute;
+    width: 35%;
+    bottom: 6%;
+    left: 18%;
+    aspect-ratio: 4 / 5;
+    margin: 0;
+    transform: rotate(-8deg);
+    z-index: 2;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+    background: var(--card);
+  }
+
+  .safety__photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
