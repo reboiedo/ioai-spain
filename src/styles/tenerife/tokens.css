@@ -3,6 +3,12 @@
  */
 
 :root {
+  --alpha-14: 0.14;
+  --alpha-22: 0.22;
+  --alpha-60: 0.6;
+  --alpha-75: 0.75;
+  --alpha-04: 0.04;
+  --alpha-08: 0.08;
   --color-black: oklch(0 0 250);
   --color-blue-50: oklch(0.961 0.01 212.5);
   --color-blue-100: oklch(0.889 0.058 226);
@@ -215,58 +221,79 @@
 }
 
 :root, [data-theme="orange"] {
-  --accent-foreground: oklch(1 0 250);
   --input: oklch(0 0 250);
   --muted: oklch(0 0 250);
-  --muted-foreground: oklch(1 0 250);
   --ring: oklch(0 0 250);
   --accent: var(--color-black);
+  --accent-foreground: var(--color-white);
+  --accent-foreground-muted: var(--color-neutrals-200);
   --background: var(--color-orange-400);
   --border: var(--color-orange-300);
   --card: var(--color-black);
+  --card-border: var(--color-neutrals-800);
   --card-foreground: var(--color-white);
+  --card-foreground-muted: var(--color-neutrals-200);
   --foreground: var(--color-white);
+  --foreground-muted: var(--color-orange-50);
   --primary: var(--color-black);
+  --primary-border: var(--color-neutrals-700);
   --primary-foreground: var(--color-white);
+  --primary-foreground-muted: var(--color-neutrals-200);
   --secondary: var(--color-white);
+  --secondary-border: var(--color-neutrals-100);
   --secondary-foreground: var(--color-black);
+  --secondary-foreground-muted: var(--color-neutrals-700);
   --surface: var(--color-orange-300);
 }
 
 [data-theme="blue"] {
-  --accent-foreground: oklch(1 0 250);
   --input: oklch(0 0 250);
   --muted: oklch(0 0 250);
-  --muted-foreground: oklch(1 0 250);
   --ring: oklch(0 0 250);
   --accent: var(--color-black);
+  --accent-foreground: var(--color-white);
+  --accent-foreground-muted: var(--color-neutrals-200);
   --background: var(--color-blue-600);
   --border: var(--color-blue-500);
   --card: var(--color-black);
+  --card-border: var(--color-neutrals-800);
   --card-foreground: var(--color-white);
+  --card-foreground-muted: var(--color-neutrals-200);
   --foreground: var(--color-white);
+  --foreground-muted: var(--color-blue-50);
   --primary: var(--color-black);
+  --primary-border: var(--color-neutrals-700);
   --primary-foreground: var(--color-white);
+  --primary-foreground-muted: var(--color-neutrals-200);
   --secondary: var(--color-white);
+  --secondary-border: var(--color-neutrals-100);
   --secondary-foreground: var(--color-black);
+  --secondary-foreground-muted: var(--color-neutrals-700);
   --surface: var(--color-blue-500);
 }
 
 [data-theme="yellow"] {
-  --accent-foreground: oklch(1 0 250);
   --input: oklch(0 0 250);
   --muted: oklch(0 0 250);
   --ring: oklch(0 0 250);
   --accent: var(--color-black);
+  --accent-foreground: var(--color-white);
+  --accent-foreground-muted: var(--color-neutrals-200);
   --background: var(--color-yellow-400);
   --border: var(--color-yellow-300);
   --card: var(--color-black);
+  --card-border: var(--color-neutrals-800);
   --card-foreground: var(--color-white);
+  --card-foreground-muted: var(--color-neutrals-200);
   --foreground: var(--color-white);
-  --muted-foreground: var(--color-neutrals-800);
+  --foreground-muted: var(--color-yellow-50);
   --primary: var(--color-black);
+  --primary-border: var(--color-neutrals-700);
   --primary-foreground: var(--color-white);
+  --primary-foreground-muted: var(--color-neutrals-200);
   --secondary: var(--color-white);
+  --secondary-border: var(--color-neutrals-100);
   --secondary-foreground: var(--color-black);
+  --secondary-foreground-muted: var(--color-neutrals-700);
   --surface: var(--color-yellow-300);
 }

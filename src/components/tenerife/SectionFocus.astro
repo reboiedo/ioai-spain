@@ -203,7 +203,7 @@ const { theme = "orange" } = Astro.props;
   .focus__marquee-rule {
     margin: 0 calc(var(--section-inline) * -1);
     border: 0;
-    border-top: 1px solid color-mix(in oklab, var(--foreground) 25%, transparent);
+    border-top: 1px solid var(--foreground-muted);
   }
 
   .focus__marquee {
@@ -233,7 +233,7 @@ const { theme = "orange" } = Astro.props;
     aspect-ratio: 1 / 1;
     border-radius: 12px;
     overflow: hidden;
-    background: color-mix(in oklab, var(--foreground) 8%, transparent);
+    background: var(--foreground-muted);
     -webkit-user-drag: none;
   }
 

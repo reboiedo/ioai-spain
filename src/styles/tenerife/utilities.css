@@ -205,8 +205,8 @@
   overflow: hidden;
   background:
     linear-gradient(135deg,
-      color-mix(in oklab, var(--foreground) 12%, transparent) 0%,
-      color-mix(in oklab, var(--foreground) 4%, transparent) 100%);
+      var(--foreground-muted) 0%,
+      var(--foreground-muted) 100%);
   border: 1px solid var(--border);
   display: grid;
   place-items: center;

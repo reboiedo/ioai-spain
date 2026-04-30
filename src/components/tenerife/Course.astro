@@ -58,9 +58,11 @@ const {
 <style>
   .course {
     /* Border on top so adjacent courses read as a list. Parent drops
-     * the border on `:first-child` so the first row sits flush. */
-    border-block-start: 1px solid
-      color-mix(in oklab, var(--card-foreground) 20%, transparent);
+     * the border on `:first-child` so the first row sits flush.
+     * `--card-border` is the dedicated rule colour for the dark
+     * card surface (neutrals-800), keeping the divider readable
+     * against `--card`'s near-black fill. */
+    border-block-start: 1px solid var(--card-border);
   }
 
   .course__summary {

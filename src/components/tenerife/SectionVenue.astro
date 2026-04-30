@@ -197,12 +197,12 @@ const photoSlots: PhotoSlot[] = [
     background:
       linear-gradient(
         135deg,
-        color-mix(in oklab, var(--foreground) 14%, transparent) 0%,
-        color-mix(in oklab, var(--foreground) 6%, transparent) 100%
+        var(--foreground-muted) 0%,
+        var(--foreground-muted) 100%
       );
     display: grid;
     place-items: center;
-    color: color-mix(in oklab, var(--foreground) 60%, transparent);
+    color: var(--foreground-muted);
   }
 
   .venue-photo__img {

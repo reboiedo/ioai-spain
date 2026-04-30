@@ -415,9 +415,10 @@ const testimonials: Testimonial[] = [
     grid-template-columns: auto 1fr;
     align-items: center;
     column-gap: var(--space-m);
-    /* Divider tinted from the card's own foreground (black) so
-     * it reads as a soft rule on the white surface. */
-    border-block-start: 1px solid color-mix(in oklab, var(--secondary-foreground) 18%, transparent);
+    /* Divider on the card's white surface — uses the dedicated
+     * `--secondary-border` token which resolves to a soft neutral
+     * rule across all themes. */
+    border-block-start: 1px solid var(--secondary-border);
     padding-block-start: var(--space-m);
   }
 
@@ -425,7 +426,7 @@ const testimonials: Testimonial[] = [
     width: 4.25rem;
     height: 4.25rem;
     border-radius: 4px;
-    background: color-mix(in oklab, var(--secondary-foreground) 18%, transparent);
+    background: var(--secondary-foreground-muted);
   }
 
   .testi-card__meta {
