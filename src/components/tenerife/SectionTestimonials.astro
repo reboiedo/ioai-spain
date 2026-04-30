@@ -458,22 +458,23 @@ const testimonials: Testimonial[] = [
   .testi-nav-btn {
     appearance: none;
     border: 0;
-    background: transparent;
-    /* Paint icon + label in the section's primary brand colour
-     * (orange on the yellow theme, etc.) so they read as the
-     * dominant call-to-action in this section's chrome. */
-    color: var(--primary);
+    /* Solid primary pill: brand background, foreground text +
+     * icon stroke. Reads as the dominant action in this scene's
+     * chrome regardless of section theme. */
+    background: var(--primary);
+    color: var(--primary-foreground);
     font: inherit;
-    padding: 0;
+    padding: var(--space-2xs) var(--space-m);
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
     cursor: pointer;
-    transition: color 220ms ease;
+    border-radius: 999px;
+    transition: transform 220ms ease;
   }
 
   .testi-nav-btn:hover {
-    color: var(--primary);
+    transform: translateY(-1px);
   }
 
   .testi-nav-btn__icon {
