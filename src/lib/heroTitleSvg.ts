@@ -121,16 +121,18 @@ export function buildHeroTitleSvg({
       const zPick = (Math.sin(i * 17.913) * 43758.5453) % 1;
       const zIndex = zPick > 0 ? 3 : 1;
       const endAttr = noStretch ? '' : ` data-end-scale-y="${endScales[i].toFixed(3)}"`;
-      // Per-letter transform-origin: anchor scaleY at THIS glyph's
-      // own visible cap-line, expressed as a percentage of the
-      // viewBox height so it survives any CSS-pixel ↔ user-unit
-      // mismatch when the SVG is rendered responsively. Without
-      // this, glyphs whose tops differ from the line's vbY (an
-      // A-apex sets vbY higher than flat-top caps) scale around
-      // a y above their own ink and visibly drift.
-      const yPct = totalVbH > 0 ? ((cp.topY - vbY) / totalVbH) * 100 : 0;
-      const originStyle = `transform-origin: 0 ${yPct.toFixed(3)}%;`;
-      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex};${originStyle}"/>`;
+      // Pre-translate each glyph upward by (pathTopY − vbY) so its
+      // visible top coincides exactly with the line's cap-line
+      // (vbY). The CSS rule then applies the translate FIRST and
+      // scaleY SECOND, anchored at the shared origin (vbY), so:
+      //   - every letter's top stays welded to the cap-line
+      //   - per-letter scaleY only varies the BOTTOMS (sine wave)
+      // Without this pre-shift, letters whose ink top sits below
+      // vbY (flat-top caps when an A-apex defines vbY) would
+      // visibly drift down as scaleY grows.
+      const yShift = -(cp.topY - vbY);
+      const shiftStyle = `--y-shift: ${yShift.toFixed(3)}px;`;
+      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex};${shiftStyle}"/>`;
     })
     .join('');
 

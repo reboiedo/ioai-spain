@@ -169,22 +169,27 @@ const svgMarkup = slotText
     overflow: visible;
   }
 
-  /* Per-letter transform. Scale composes two sources:
+  /* Per-letter transform. Composes:
+   *   --y-shift    per-path translateY (set inline at build time)
+   *                that lifts each glyph so its visible top sits
+   *                exactly on the line's cap-line.
    *   --scroll-sy  one-shot grow-in: 1 → per-letter end (>= 1)
    *   --mouse-sy   mouse-proximity, 1 far → (1 − amplitude) at cursor
    *   final scaleY = --scroll-sy × --mouse-sy
    *
-   * `transform-box: view-box` makes transform-origin resolve
-   * against the SVG's viewBox (a single shared coordinate system
-   * for the whole row). The build-time SVG generator emits each
-   * path's transform-origin as a percentage matching THAT glyph's
-   * tight visible top, so scaling anchors at that letter's actual
-   * cap regardless of how Bezier control points sit relative to
-   * the ink — no sub-pixel drift, no per-letter top shift. */
+   * Origin (0, 0) of view-box reference = the line's cap-line.
+   * Transforms read right-to-left:
+   *   1. scaleY anchored at the cap-line — bottom stretches down,
+   *      top stays welded to the cap.
+   *   2. translateY then lifts each letter onto the cap.
+   * Combined, every letter's top is locked to a single shared
+   * line and the sine-wave variation only affects the bottoms. */
   .hero-title svg path {
     transform-box: view-box;
+    transform-origin: 0 0;
     fill: currentColor;
-    transform: scaleY(calc(var(--scroll-sy, 1) * var(--mouse-sy, 1)));
+    transform: translateY(var(--y-shift, 0px))
+      scaleY(calc(var(--scroll-sy, 1) * var(--mouse-sy, 1)));
     /* `position: relative` is necessary for z-index to take effect on
      * SVG path children in some browsers — the per-glyph inline
      * z-index in the generator places half of them in front of and
