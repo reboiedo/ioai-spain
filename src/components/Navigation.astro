@@ -234,6 +234,13 @@ const navItems = navItemsOverride ?? defaultNavItems;
       display: flex;
     }
 
+    /* Tenerife / transparent-theme: drop the language switcher
+     * from the mobile nav — it lives in the camp footer instead,
+     * leaving the mobile nav for the brand + the two CTAs. */
+    nav[data-theme="transparent"] :global(.dropdown) {
+      display: none;
+    }
+
     .nav-right {
       /* Keep language picker and CTA visible */
       display: flex;
