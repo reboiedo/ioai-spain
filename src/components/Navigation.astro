@@ -57,7 +57,7 @@ const defaultNavItems = [
 const navItems = navItemsOverride ?? defaultNavItems;
 ---
 
-<nav>
+<nav data-theme={theme}>
   <div class="nav-container">
     <!-- Logo/Brand -->
     <div class="nav-brand">
@@ -87,18 +87,10 @@ const navItems = navItemsOverride ?? defaultNavItems;
       </ul>
     )}
 
-    <!-- Right side: optional override nav items + Language switcher + CTA -->
+    <!-- Right side: language switcher on the LEFT, then a small
+         gap, then the CTA cluster (override links + primary CTA)
+         pinned to the right edge. -->
     <div class="nav-right">
-      {!hideNavItems && navItemsOverride && (
-        <ul class="nav-items nav-items--inline">
-          {navItems.map(item => (
-            <li>
-              <Button variant="text" size="small" href={item.href}>{item.label}</Button>
-            </li>
-          ))}
-        </ul>
-      )}
-
       <!-- Language switcher dropdown -->
       <Dropdown
         options={languageOptions}
@@ -107,10 +99,22 @@ const navItems = navItemsOverride ?? defaultNavItems;
         onChange="window.location.href = this.value"
       />
 
-      <!-- CTA Button -->
-      <Button variant="primary" size="small" href={ctaUrlOverride || t.ui.nav.joinNowUrl}>
-        {t.ui.nav.joinNow}
-      </Button>
+      <div class="nav-cta-group">
+        {!hideNavItems && navItemsOverride && (
+          <ul class="nav-items nav-items--inline">
+            {navItems.map(item => (
+              <li>
+                <Button variant="text" size="small" href={item.href}>{item.label}</Button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <!-- CTA Button -->
+        <Button variant="primary" size="small" href={ctaUrlOverride || t.ui.nav.joinNowUrl}>
+          {t.ui.nav.joinNow}
+        </Button>
+      </div>
     </div>
   </div>
 </nav>
@@ -165,16 +169,37 @@ const navItems = navItemsOverride ?? defaultNavItems;
   .nav-right {
     display: flex;
     align-items: center;
+    /* Wider gap between the language switcher and the CTA cluster
+     * so the dropdown reads as a separate widget from the
+     * Register/More Info/CTA group on the right edge. */
+    gap: var(--space-m);
+  }
+
+  .nav-cta-group {
+    display: flex;
+    align-items: center;
     gap: var(--space-2xs);
   }
 
-  /* Inline override variant: items render inside `.nav-right` so
-   * they sit on the right alongside the language switcher and CTA
-   * (rather than centred between brand and right cluster). */
+  /* Inline override variant: items render inside `.nav-cta-group`
+   * so they sit on the right edge alongside the primary CTA. */
   .nav-items--inline {
     flex: 0 0 auto;
     justify-content: flex-end;
     gap: var(--space-xs);
+  }
+
+  /* Transparent nav theme (Tenerife camp v2): drop the language
+   * switcher's border + its hover/focus chrome — the dark border
+   * doesn't sit well over coloured / dark section backgrounds. */
+  nav[data-theme="transparent"] :global(.dropdown) {
+    border-color: transparent;
+  }
+  nav[data-theme="transparent"] :global(.dropdown:hover) {
+    border-color: transparent;
+  }
+  nav[data-theme="transparent"] :global(.dropdown:focus-within) {
+    box-shadow: none;
   }
 
 
