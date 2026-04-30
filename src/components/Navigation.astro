@@ -195,17 +195,18 @@ const navItems = navItemsOverride ?? defaultNavItems;
   }
 
   /* Transparent nav theme (Tenerife camp v2): kill the language
-   * switcher's border + hover/focus chrome — the dark frame reads
-   * as noise over coloured / dark section backgrounds. Use `border:
-   * none` so the 2px reservation collapses too (border-color alone
-   * leaves a transparent gap of the same width). */
-  nav[data-theme="transparent"] :global(.dropdown) {
+   * switcher's border + hover/focus chrome. Scoped via the body
+   * marker because the page's nav-bg driver mutates `nav
+   * [data-theme]` per-section (blue / orange / yellow…), so
+   * targeting `nav[data-theme="transparent"]` would never match
+   * at runtime. Border resets repeated in the layout file too. */
+  :global(body:has(.tenerife-camp-v2)) nav :global(.dropdown) {
     border: none;
   }
-  nav[data-theme="transparent"] :global(.dropdown:hover) {
+  :global(body:has(.tenerife-camp-v2)) nav :global(.dropdown:hover) {
     border: none;
   }
-  nav[data-theme="transparent"] :global(.dropdown:focus-within) {
+  :global(body:has(.tenerife-camp-v2)) nav :global(.dropdown:focus-within) {
     box-shadow: none;
   }
 
@@ -234,10 +235,11 @@ const navItems = navItemsOverride ?? defaultNavItems;
       display: flex;
     }
 
-    /* Tenerife / transparent-theme: drop the language switcher
-     * from the mobile nav — it lives in the camp footer instead,
-     * leaving the mobile nav for the brand + the two CTAs. */
-    nav[data-theme="transparent"] :global(.dropdown) {
+    /* Tenerife camp v2: drop the language switcher from the mobile
+     * nav — it lives in the camp footer instead, leaving the mobile
+     * nav for the brand + the two CTAs. Scoped via the body marker
+     * because nav[data-theme] is rewritten per-section at runtime. */
+    :global(body:has(.tenerife-camp-v2)) nav :global(.dropdown) {
       display: none;
     }
 
