@@ -110,10 +110,15 @@ const navItems = navItemsOverride ?? defaultNavItems;
           </ul>
         )}
 
-        <!-- CTA Button -->
-        <Button variant="primary" size="small" href={ctaUrlOverride || t.ui.nav.joinNowUrl}>
-          {t.ui.nav.joinNow}
-        </Button>
+        <!-- Default homepage CTA. Suppressed when a nav-items
+             override is in play because that list already includes
+             a primary action (e.g. Register), and we don't want a
+             second redundant CTA pill. -->
+        {!navItemsOverride && (
+          <Button variant="primary" size="small" href={ctaUrlOverride || t.ui.nav.joinNowUrl}>
+            {t.ui.nav.joinNow}
+          </Button>
+        )}
       </div>
     </div>
   </div>
@@ -189,14 +194,16 @@ const navItems = navItemsOverride ?? defaultNavItems;
     gap: var(--space-xs);
   }
 
-  /* Transparent nav theme (Tenerife camp v2): drop the language
-   * switcher's border + its hover/focus chrome — the dark border
-   * doesn't sit well over coloured / dark section backgrounds. */
+  /* Transparent nav theme (Tenerife camp v2): kill the language
+   * switcher's border + hover/focus chrome — the dark frame reads
+   * as noise over coloured / dark section backgrounds. Use `border:
+   * none` so the 2px reservation collapses too (border-color alone
+   * leaves a transparent gap of the same width). */
   nav[data-theme="transparent"] :global(.dropdown) {
-    border-color: transparent;
+    border: none;
   }
   nav[data-theme="transparent"] :global(.dropdown:hover) {
-    border-color: transparent;
+    border: none;
   }
   nav[data-theme="transparent"] :global(.dropdown:focus-within) {
     box-shadow: none;
