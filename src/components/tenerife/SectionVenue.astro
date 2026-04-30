@@ -2,24 +2,35 @@
 /**
  * VenueSection — the "VENUE" scene.
  *
- * Layout:
- *   1. Split header on top — title on the left, intro sentence on
- *      the right (body-l). Same shape as the Coaches / Approach
- *      section headers.
- *   2. Two zig-zag rows below — Hotel (text left, photo right),
- *      Classrooms (photo left, text right). Each is a `.split`
- *      with the photo half forced to a specific column via
- *      `order` so the alternation reads as designed.
+ * Layout (desktop):
+ *   ┌──────────────────────────────────┬──────────────────────────────┐
+ *   │  VENUE (sticky title)            │  ┌──────────────────────┐    │
+ *   │                                  │  │ Hotel photo          │    │
+ *   │  Hotel description paragraph     │  └──────────────────────┘    │
+ *   │                                  │  ┌──────────────────────┐    │
+ *   │                                  │  │ Hotel photo          │    │
+ *   │                                  │  └──────────────────────┘    │
+ *   │                                  │  ┌──────────────────────┐    │
+ *   │                                  │  │ Hotel photo          │    │
+ *   │                                  │  └──────────────────────┘    │
+ *   └──────────────────────────────────┴──────────────────────────────┘
  *
- * Photo content is a placeholder asset frame for now; swap each
- * `.venue-row__media` for an `<img>` when photography lands.
+ * Left column is sticky — title + the hotel paragraph stay in view
+ * while the user scrolls past the vertical photo stack on the right.
+ *
+ * Mobile: title + paragraph stacked, then the photo stack flows
+ * underneath as a single column.
+ *
+ * Photo slots are named: drop `hotel.jpg`, `hotel-terrace.jpg`,
+ * `hotel-room.jpg`, etc. into `src/assets/tenerife/venue/` to fill
+ * the slots. Missing slots render as gradient placeholders so the
+ * layout reads as intentional even before all photos land.
  */
 
 import { Image, type ImageMetadata } from "astro:assets";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 
-// Eager-glob every venue photo. Each row references the desired file
-// by basename via the `imageKey` field below.
+// Eager-glob every venue photo so we can look one up by filename.
 const photoModules = import.meta.glob<{ default: ImageMetadata }>(
   "@/assets/tenerife/venue/*.{jpg,jpeg,png,webp,avif}",
   { eager: true },
@@ -38,28 +49,21 @@ export interface Props {
 
 const { theme = "yellow" } = Astro.props;
 
-interface Venue {
-  title: string;
-  body: string;
-  /** Where the photo sits in the split. */
-  side: "left" | "right";
-  /** Filename (no extension) of the photo in `src/assets/tenerife/venue/`. */
-  imageKey?: string;
+interface PhotoSlot {
+  /** Filename (no extension) inside `src/assets/tenerife/venue/`. */
+  key?: string;
+  /** Alt text — also used as the placeholder label when no photo. */
+  alt: string;
+  /** Aspect ratio for the slot. Varied per slot for rhythm. */
+  aspect: string;
 }
 
-const venues: Venue[] = [
-  {
-    title: "The hotel",
-    body: "Campers stay at a 4-star property in Puerto de la Cruz, two minutes on foot from Martiánez beach. Rooms are shared between three campers, with all meals — breakfast, lunch and dinner — included on site. The northern coast keeps a mild climate even at the height of summer, so the hotel terrace becomes a second living room.",
-    side: "right",
-    imageKey: "hotel",
-  },
-  {
-    title: "The classrooms",
-    body: "Teaching happens in a dedicated block of four classrooms plus a larger seminar hall — flexible enough for a morning lecture and an afternoon hackathon. Wi-fi is fast, wired desks are available for heavier workloads, and a small library and outdoor shaded terrace round out the spaces students gravitate to between sessions.",
-    side: "left",
-    imageKey: "school",
-  },
+const photoSlots: PhotoSlot[] = [
+  { key: "hotel", alt: "Hotel exterior", aspect: "4 / 5" },
+  { key: "hotel-terrace", alt: "Hotel terrace", aspect: "4 / 3" },
+  { key: "hotel-room", alt: "Shared room interior", aspect: "3 / 4" },
+  { key: "hotel-pool", alt: "Pool deck", aspect: "4 / 5" },
+  { key: "hotel-beach", alt: "Martiánez beach, two minutes away", aspect: "16 / 9" },
 ];
 ---
 
@@ -69,77 +73,125 @@ const venues: Venue[] = [
     data-theme={theme}
   >
     <div class="venue__layout">
-      <!-- Split header — title left, intro sentence right (body-l). -->
-      <div class="split venue__header">
+      <!-- LEFT — sticky title + hotel paragraph. Stays in view as
+           the user scrolls through the photo stack on the right. -->
+      <div class="venue__intro">
         <SectionTitle lines={["VENUE"]} />
-        <p class="font-body-l venue__header-copy">
-          Two weeks on the northern coast of Tenerife — a 4-star hotel
-          two minutes from the beach, dedicated classrooms a short walk
-          away, and the rest of the island within easy reach for the
-          afternoon programme.
+        <p class="font-body-l venue__intro-copy">
+          Campers stay at a 4-star property in Puerto de la Cruz, two
+          minutes on foot from Martiánez beach. Rooms are shared
+          between three campers, with all meals — breakfast, lunch
+          and dinner — included on site. The northern coast keeps a
+          mild climate even at the height of summer, so the hotel
+          terrace becomes a second living room.
         </p>
       </div>
 
-      <!-- Zig-zag rows. Each row is a `.split` with a media block on
-           one side and a text block on the other; `order` swaps the
-           sides per row so the layout reads as a zig-zag. -->
-      {venues.map((v) => (
-        <div class={`split venue-row venue-row--${v.side}`}>
-          <div class="venue-row__text stack-m">
-            <h3 class="font-h2 venue-row__title">{v.title}</h3>
-            <p class="font-body venue-row__body">{v.body}</p>
-          </div>
+      <!-- Vertical centreline divider — own grid track between the
+           two content columns, `align-self: stretch` so it spans
+           the full section height regardless of the sticky left
+           column's max-height. Same convention as Story / Team. -->
+      <div class="venue__divider" aria-hidden="true"></div>
 
-          <div class="venue-row__media">
-            {v.imageKey && photos[v.imageKey] ? (
+      <!-- RIGHT — vertical scrollable stack of hotel photos.
+           Each tile keeps its configured aspect ratio; the column
+           grows naturally with the photo count. -->
+      <ol class="venue__photos">
+        {photoSlots.map((slot) => (
+          <li class="venue-photo" style={`aspect-ratio: ${slot.aspect};`}>
+            {slot.key && photos[slot.key] ? (
               <Image
-                class="venue-row__photo"
-                src={photos[v.imageKey]}
-                alt={v.title}
+                class="venue-photo__img"
+                src={photos[slot.key]}
+                alt={slot.alt}
                 widths={[480, 720, 960, 1280]}
                 sizes="(min-width: 768px) 45vw, 90vw"
                 loading="lazy"
               />
             ) : (
-              <span class="venue-row__media-label">{v.title}</span>
+              <span class="venue-photo__label" aria-hidden="true">{slot.alt}</span>
             )}
-          </div>
-        </div>
-      ))}
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 </div>
 
 <style>
-  .venue__layout {
-    display: grid;
-    gap: var(--space-3xl);
+  /* Section grows with the scrolling photo column. Floor at one
+   * viewport so the sticky left column always has somewhere to
+   * stick to. */
+  .venue {
+    min-height: 100lvh;
   }
 
-  .venue__header-copy {
+  .venue__layout {
+    display: grid;
+    /* Mobile: single-column collapse — intro, divider (hidden),
+     * photos all stack. Desktop promotes to 3-column grid below. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+
+  @media (min-width: 768px) {
+    .venue__layout {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--space-2xl);
+    }
+  }
+
+  /* ── LEFT: sticky title + hotel paragraph ────────────────────── */
+  .venue__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+  }
+
+  .venue__intro-copy {
     margin: 0;
-    /* Cap the intro at a comfortable measure rather than letting
-     * it run the full half-column. */
     max-width: 48ch;
   }
 
-  .venue-row__title,
-  .venue-row__body {
+  @media (min-width: 768px) {
+    .venue__intro {
+      position: sticky;
+      top: var(--sticky-top);
+      align-self: start;
+      max-height: calc(100lvh - var(--sticky-top));
+    }
+  }
+
+  /* Vertical divider — same convention as Story / Team. */
+  .venue__divider {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .venue__divider {
+      display: block;
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+  }
+
+  /* ── RIGHT: vertical photo stack ─────────────────────────────── */
+  .venue__photos {
+    list-style: none;
     margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
   }
 
-  /* Body copy gets a measure too so it stays readable when the
-   * column gets wide on big viewports. */
-  .venue-row__body {
-    max-width: 44ch;
-  }
-
-  /* Photo cell. Wide-ish landscape aspect ratio holds the box even
-   * before the image loads (no CLS). The placeholder gradient + label
-   * still show through if a row has no `imageKey` wired. */
-  .venue-row__media {
+  /* Each photo cell holds its own aspect ratio (set inline via
+   * `style="aspect-ratio: …"`). Width fills the column; the cell
+   * crops the image so portrait + landscape entries can mix
+   * cleanly inside the stack. */
+  .venue-photo {
     width: 100%;
-    aspect-ratio: 4 / 3;
     border-radius: 8px;
     overflow: hidden;
     background:
@@ -153,7 +205,7 @@ const venues: Venue[] = [
     color: color-mix(in oklab, var(--foreground) 60%, transparent);
   }
 
-  .venue-row__photo {
+  .venue-photo__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -161,61 +213,12 @@ const venues: Venue[] = [
     display: block;
   }
 
-  .venue-row__media-label {
-    font-family: var(--font-headings);
+  .venue-photo__label {
+    font-family: var(--font-headings, var(--font-display));
     font-weight: 600;
-    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    font-size: clamp(1rem, 2vw, 1.5rem);
     letter-spacing: -0.02em;
-  }
-
-  /* Each row gets a top border. The very last row also gets a
-   * bottom border so the stack reads as a framed block — top and
-   * bottom rules wrapping the zig-zag. Padding gives the borders
-   * breathing room from the row content. */
-  .venue-row {
-    border-block-start: 1px solid var(--border);
-    padding-block: var(--space-2xl);
-  }
-
-  .venue-row:last-of-type {
-    border-block-end: 1px solid var(--border);
-  }
-
-  /* Zig-zag — `.split` already gives 1fr / 1fr at ≥768px. Only
-   * desktop needs the order swap; on narrow viewports the column
-   * collapses and we want text-then-photo regardless of `side`. */
-  @media (min-width: 768px) {
-    /* `--side: left` → photo in the left column. Text is the first
-     * DOM child (so screen-reader order is title first); we use
-     * `order` to put it on the right. */
-    .venue-row--left .venue-row__text {
-      order: 2;
-    }
-    .venue-row--left .venue-row__media {
-      order: 1;
-    }
-    /* `--side: right` is already the natural DOM order — text
-     * left, photo right. No overrides needed. */
-
-    /* Vertically centre text against the media block so titles
-     * sit beside the picture rather than stacking against the
-     * top edge. */
-    .venue-row {
-      align-items: center;
-    }
-
-    /* Push the text block to the centreline of the row so it
-     * always sits *next to* the photo rather than against the
-     * outer section edge.
-     *
-     *   side="right" (text in left cell, photo in right cell)
-     *     → text hugs the right side of its cell.
-     *   side="left"  (photo in left cell, text in right cell)
-     *     → text is already at the left of its cell, naturally
-     *       beside the photo. No override needed.
-     */
-    .venue-row--right .venue-row__text {
-      margin-inline-start: auto;
-    }
+    padding: var(--space-m);
+    text-align: center;
   }
 </style>
