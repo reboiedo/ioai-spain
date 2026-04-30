@@ -199,6 +199,12 @@ const supervisors: Supervisor[] = [
             gap="var(--space-s)"
             maxWidth="80%"
           />
+          <!-- Handwritten "always" eyebrow — absolutely positioned
+               between the two title lines, on the right side
+               (where the title is anchored). Same script font +
+               -6deg tilt + primary colour as the original
+               `eyebrowPosition="between"` SectionTitle variant. -->
+          <span class="safety__title-eyebrow" aria-hidden="true">always</span>
         </div>
 
         <!-- Tilted photograph — sits between the two title lines
@@ -435,6 +441,29 @@ const supervisors: Supervisor[] = [
 
   .safety__title {
     display: block;
+    /* Containing block for the absolutely-positioned eyebrow. */
+    position: relative;
+  }
+
+  /* Handwritten "always" eyebrow floating between SAFETY and FIRST.
+   * Anchored vertically at the midpoint of the title block (where
+   * the gap between the two HeroTitle SVG lines lives) and on the
+   * right edge of the title's `maxWidth` band. Sized with `clamp`
+   * so it scales gracefully across breakpoints — purely a visual
+   * accent, no layout impact (`pointer-events: none`). */
+  .safety__title-eyebrow {
+    position: absolute;
+    top: 50%;
+    right: 8%;
+    transform: translate(0, -50%) rotate(-6deg);
+    transform-origin: center;
+    font-family: var(--font-script);
+    font-weight: var(--weight-regular);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1;
+    color: var(--primary);
+    pointer-events: none;
+    z-index: 3;
   }
 
   /* Tilted safety photo — fixed 4:5 aspect ratio, sized as a % of
