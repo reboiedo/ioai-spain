@@ -95,6 +95,14 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
     // and scroll progress stay in sync with smooth-scrolled position.
     lenis.on('scroll', ScrollTrigger.update);
 
+    // Let ScrollTrigger own touch / wheel input alongside Lenis. This
+    // reconciles Lenis's interpolated scroll value with the browser's
+    // real scroll position — required when scene pins use
+    // `pinType: 'transform'` (see `initSceneStack`), otherwise the
+    // pin window engagement / release drifts and Firefox in
+    // particular paints the in-flow scene briefly during the swap.
+    ScrollTrigger.normalizeScroll(true);
+
     // Run Lenis's RAF from GSAP's ticker so both share one animation
     // loop. Multiplied by 1000 because GSAP ticker is in seconds,
     // Lenis expects ms.
@@ -146,6 +154,17 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
         end: '+=100%',
         pin: true,
         pinSpacing: false,
+        // Transform-based pinning: GSAP keeps the scene in flow and
+        // translates it during the pin window instead of switching
+        // the element to `position: fixed`. Critical because every
+        // scene contains `position: sticky` descendants (polaroid
+        // stack in Activities, sticky title columns in
+        // FAQ/Pricing/Safety, etc.). Firefox strictly requires a
+        // scrolling ancestor for sticky to work — a fixed-positioned
+        // ancestor doesn't qualify, so the default `pinType: 'fixed'`
+        // visually broke every sticky child the moment the scene
+        // engaged its pin.
+        pinType: 'transform',
         anticipatePin: 1,
         invalidateOnRefresh: true,
       });
