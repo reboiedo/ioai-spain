@@ -182,6 +182,16 @@ const pillars: Pillar[] = [
     .safety {
       display: block;
     }
+    /* Constrain the SAFETY / FIRST title to 80% of the section
+     * width on mobile so it doesn't run cap-to-cap with the
+     * section padding, and add a touch of vertical breathing room
+     * between the two stacked SVG lines. */
+    .safety__mobile :global(.section-title) {
+      max-width: 80%;
+    }
+    .safety__mobile :global(.section-title__svg-line) + :global(.section-title__svg-line) {
+      margin-block-start: var(--space-xs);
+    }
   }
 
   .safety__mobile-intro {
