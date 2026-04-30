@@ -92,29 +92,18 @@ export function buildHeroTitleSvg({
   const vbW = finite ? tightMaxX - tightMinX : cursor;
   const vbH = finite ? tightMaxY - tightMinY : ascender;
 
-  // Per-letter start / end scaleY — same deterministic sine + jitter
-  // formula as the original runtime generator so the visual result
-  // matches. `stretchScale === 1` triggers end-scale normalization to
-  // cap the row at natural height.
+  // Per-letter end scaleY — every letter ends at >= 1 so the
+  // reveal is grow-only, no glyph ever shrinks below its natural
+  // height. Sine + jitter + a `(sin*0.5 + 0.5)` shift keeps the
+  // wave's full amplitude in the positive half, so we always add
+  // height instead of subtracting.
   const count = charPaths.length;
-  const startScales = charPaths.map((_, i) => {
-    const t = count > 1 ? i / (count - 1) : 0.5;
-    const wave = Math.sin(t * Math.PI * 2.2) * 0.12 * stretchScale;
-    const jitter = (Math.sin(i * 12.9898) * 43758.5453) % 1;
-    return 0.6 + wave + jitter * 0.08 * stretchScale;
-  });
   const endScales = charPaths.map((_, i) => {
     const t = count > 1 ? i / (count - 1) : 0.5;
-    const wave = Math.sin(t * Math.PI * 2.2) * 0.08 * stretchScale;
-    const jitter = (Math.sin(i * 12.9898) * 43758.5453) % 1;
-    return (0.9 + wave + jitter * 0.05) * stretchScale;
+    const wave = (Math.sin(t * Math.PI * 2.2) * 0.5 + 0.5) * 0.3 * stretchScale;
+    const jitter = ((Math.sin(i * 12.9898) * 43758.5453) % 1) * 0.1 * stretchScale;
+    return 1 + wave + jitter;
   });
-  if (stretchScale === 1) {
-    const maxEndScale = Math.max(...endScales);
-    if (maxEndScale > 0) {
-      for (let i = 0; i < endScales.length; i++) endScales[i] /= maxEndScale;
-    }
-  }
 
   // viewBox padding: only when stretchScale > 1 (lines visibly grow
   // taller than cap height) — matches the post-render pad in the
@@ -125,9 +114,8 @@ export function buildHeroTitleSvg({
     .map((cp, i) => {
       const zPick = (Math.sin(i * 17.913) * 43758.5453) % 1;
       const zIndex = zPick > 0 ? 3 : 1;
-      const startAttr = noStretch ? '' : ` data-start-scale-y="${startScales[i].toFixed(3)}"`;
       const endAttr = noStretch ? '' : ` data-end-scale-y="${endScales[i].toFixed(3)}"`;
-      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${startAttr}${endAttr} style="z-index:${zIndex}"/>`;
+      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex}"/>`;
     })
     .join('');
 

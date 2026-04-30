@@ -170,17 +170,16 @@ const svgMarkup = slotText
   }
 
   /* Per-letter transform. Scale composes two sources:
-   *   --scroll-sy  scroll-driven, start (~0.6) → end (~1.5) with
-   *                sine-wave + jitter per letter
+   *   --scroll-sy  one-shot grow-in: 1 → per-letter end (>= 1)
    *   --mouse-sy   mouse-proximity, 1 far → (1 − amplitude) at cursor
    *   final scaleY = --scroll-sy × --mouse-sy
    * `transform-box: fill-box` makes `transform-origin` resolve to
-   * each glyph's own bbox; `0 100%` anchors at the baseline so
-   * glyphs stretch upward (caps grow toward the sky) and compress
-   * downward toward the baseline — the baseline never moves. */
+   * each glyph's own bbox; `0 0` anchors at the cap-line (top) so
+   * scaling > 1 extends each glyph DOWNWARD from a fixed top edge
+   * — the row appears to grow taller without the cap-line moving. */
   .hero-title svg path {
     transform-box: fill-box;
-    transform-origin: 0 100%;
+    transform-origin: 0 0;
     fill: currentColor;
     transform: scaleY(calc(var(--scroll-sy, 1) * var(--mouse-sy, 1)));
     /* `position: relative` is necessary for z-index to take effect on
@@ -193,17 +192,12 @@ const svgMarkup = slotText
 
 <script>
   import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   // SVGs are inlined at build time by `src/lib/heroTitleSvg.ts`. This
   // script only wires up:
-  //   - per-letter scroll-driven scaleY (`--scroll-sy`)
+  //   - one-shot grow-in: scaleY 1 → per-letter end (>= 1) over 250ms
   //   - mouse-proximity shrink (`--mouse-sy`)
   // No font load, no DOM construction — paths exist on first paint.
-
-  let stretchTweens: gsap.core.Tween[] = [];
 
   // Mouse tracking shared across all HeroTitles on the page.
   let mouseX: number | null = null;
@@ -237,24 +231,9 @@ const svgMarkup = slotText
     }
   }
 
-  function attachScrollStretch(container: HTMLElement, paths: SVGPathElement[]) {
-    const commonTrigger = {
-      trigger: container,
-      start: 'top bottom',
-      end: 'center center',
-      scrub: true,
-      invalidateOnRefresh: true,
-    } as const;
-
-    // Entry: paths sit at natural height (scaleY = 1) on first paint
-    // so the LCP isn't held back by an animated stretch. Once we
-    // attach the scroll behaviour we play a quick compress from 1 →
-    // start over a few hundred ms, *then* ScrollTrigger takes over
-    // and scrubs from start → end. The user sees the title appear
-    // clean, then "settle in" to the stretched layout.
+  function animateGrowIn(paths: SVGPathElement[]) {
     paths.forEach((path) => {
-      const start = parseFloat(path.dataset.startScaleY || '0.6');
-      const end = parseFloat(path.dataset.endScaleY || '1.5');
+      const end = parseFloat(path.dataset.endScaleY || '1');
       path.style.setProperty('--mouse-sy', '1');
       mouseTrackedPaths.push(path);
 
@@ -266,40 +245,19 @@ const svgMarkup = slotText
         }),
       );
 
+      // Grow-only reveal: scaleY 1 → end (always >= 1) over 600ms.
+      // No compress phase, no scroll scrub — every letter stays
+      // anchored at its cap-line and only extends downward, so the
+      // row reads as growing taller in unison.
       gsap.fromTo(
         path,
         { '--scroll-sy': 1 },
-        {
-          '--scroll-sy': start,
-          duration: 0.6,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            stretchTweens.push(
-              gsap.fromTo(
-                path,
-                { '--scroll-sy': start },
-                {
-                  '--scroll-sy': end,
-                  ease: 'none',
-                  immediateRender: true,
-                  scrollTrigger: commonTrigger,
-                },
-              ),
-            );
-          },
-        },
+        { '--scroll-sy': end, duration: 0.6, ease: 'power2.out' },
       );
     });
-
-    // Refresh once the entry is done so ScrollTrigger picks up the
-    // current scroll position.
-    gsap.delayedCall(0.7, () => ScrollTrigger.refresh());
   }
 
   function renderAll() {
-    stretchTweens.forEach((t) => t.scrollTrigger?.kill());
-    stretchTweens.forEach((t) => t.kill());
-    stretchTweens = [];
     mouseTrackedPaths.length = 0;
     mouseQuickTos.clear();
     window.removeEventListener('mousemove', onMouseMove);
@@ -311,9 +269,9 @@ const svgMarkup = slotText
       const paths = Array.from(title.querySelectorAll<SVGPathElement>('svg path'));
       if (!paths.length) return;
       // `data-no-stretch` titles ship without scaleY data attrs — skip
-      // ScrollTrigger wiring, paths render at natural height.
+      // the grow-in, paths render at natural height.
       if (title.dataset.noStretch !== '1') {
-        attachScrollStretch(title, paths);
+        animateGrowIn(paths);
       }
     });
 
