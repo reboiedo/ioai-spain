@@ -451,20 +451,18 @@ const {
     display: none;
   }
 
-  /* Language dropdown — recolour for the v2 page. Border matches
-   * the nav's own bottom rule (the `rgba(255, 255, 255, 0.25)`
-   * underline on the nav element above), so the dropdown reads as
-   * part of the same chrome system. Text + chevron stay
-   * `--foreground` (white) for legibility on the coloured section
-   * backgrounds. */
+  /* Language dropdown — recolour for the v2 page. No border on the
+   * v2 nav: the dropdown reads as a plain inline label. Text +
+   * chevron stay `--foreground` (white) for legibility on the
+   * coloured section backgrounds. */
   body:has(.tenerife-camp-v2) nav .dropdown {
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: none;
   }
-  /* Override the shared Dropdown's `:hover { border-color:
-   * --color-primary }` rule so hover stays in our subtle white-25%
-   * tone instead of jumping to a different brand colour. */
   body:has(.tenerife-camp-v2) nav .dropdown:hover {
-    border-color: rgba(255, 255, 255, 0.25);
+    border: none;
+  }
+  body:has(.tenerife-camp-v2) nav .dropdown:focus-within {
+    box-shadow: none;
   }
   body:has(.tenerife-camp-v2) nav .dropdown__text {
     color: var(--foreground);
