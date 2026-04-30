@@ -459,7 +459,10 @@ const supervisors: Supervisor[] = [
     transform-origin: center;
     font-family: var(--font-script);
     font-weight: var(--weight-regular);
-    font-size: clamp(2rem, 4vw, 3.5rem);
+    /* Shared script-eyebrow size — matches SectionActivities's
+     * "Daily" eyebrow and SectionTitle's overlap/between
+     * eyebrows so all script accents read at the same scale. */
+    font-size: clamp(1.75rem, 3.5vw, 3rem);
     line-height: 1;
     color: var(--primary);
     pointer-events: none;
