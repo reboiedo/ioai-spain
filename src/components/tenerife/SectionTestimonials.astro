@@ -459,19 +459,21 @@ const testimonials: Testimonial[] = [
     appearance: none;
     border: 0;
     background: transparent;
-    color: inherit;
+    /* Paint icon + label in the section's primary brand colour
+     * (orange on the yellow theme, etc.) so they read as the
+     * dominant call-to-action in this section's chrome. */
+    color: var(--primary);
     font: inherit;
     padding: 0;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
     cursor: pointer;
-    opacity: 0.85;
-    transition: opacity 220ms ease;
+    transition: color 220ms ease;
   }
 
   .testi-nav-btn:hover {
-    opacity: 1;
+    color: var(--primary);
   }
 
   .testi-nav-btn__icon {
