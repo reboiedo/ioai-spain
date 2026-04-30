@@ -351,6 +351,10 @@ const pillars: Pillar[] = [
 
   .safety-card--mobile {
     width: 100%;
+    /* Mobile cards are 2:3 portrait — taller than the desktop
+     * 1:1 squares so the title + numeral feel anchored and the
+     * back face has comfortable room for the description copy. */
+    aspect-ratio: 2 / 3;
   }
 
   .safety-card:focus-visible {
