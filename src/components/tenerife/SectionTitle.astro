@@ -24,6 +24,7 @@
  */
 
 import HeroTitle from '@/components/tenerife/HeroTitle.astro';
+import { measureHeroTitleWidth } from '@/lib/heroTitleSvg';
 
 export interface Props {
   as?: 'h1' | 'h2' | 'h3' | 'div';
@@ -84,11 +85,13 @@ const mobile: string[] | null =
 // same `lines` as desktop.
 const mobileSvgLines = mobile ?? lines;
 
-// Glyph-size matching across stacked mobile lines: each line's
-// wrapper gets a width proportional to its char count vs. the
-// longest line, so the shorter word renders at the same per-letter
-// height as the longest. Mirrors `HeroTitleStack`'s approach.
-const mobileMaxLen = Math.max(...mobileSvgLines.map((l) => l.length), 1);
+// Glyph-size matching across stacked mobile lines: measure each
+// line's natural visual width via `measureHeroTitleWidth` (uses the
+// same opentype + svg-path-bounds pipeline as the SVG generator),
+// then size each line's wrapper proportionally so glyph height is
+// shared across the stack.
+const mobileLineWidths = mobileSvgLines.map((l) => measureHeroTitleWidth(l));
+const mobileMaxWidth = Math.max(...mobileLineWidths, 1);
 ---
 
 <Tag
@@ -160,12 +163,11 @@ const mobileMaxLen = Math.max(...mobileSvgLines.map((l) => l.length), 1);
   <span
     class="section-title__lines section-title__lines--mobile-svg"
     aria-hidden="true"
-    data-stl-mobile
   >
-    {mobileSvgLines.map((line) => (
+    {mobileSvgLines.map((line, i) => (
       <span
         class="section-title__svg-line"
-        style={`width: ${((line.length / mobileMaxLen) * 100).toFixed(2)}%;`}
+        style={`width: ${((mobileLineWidths[i] / mobileMaxWidth) * 100).toFixed(2)}%;`}
       >
         <HeroTitle as="span" noStretch>{line}</HeroTitle>
       </span>
@@ -354,60 +356,11 @@ const mobileMaxLen = Math.max(...mobileSvgLines.map((l) => l.length), 1);
     ScrollTrigger.refresh();
   }
 
-  // Match glyph height across stacked mobile lines: char count is too
-  // coarse for narrow glyphs ("I", "F"), so once HeroTitle has rendered
-  // each line's SVG we re-set wrapper widths from the SVGs' actual
-  // viewBox widths. Wrapper width becomes
-  // `naturalWidth(line) / max(naturalWidth) × 100%`, which makes every
-  // line's per-glyph height match the longest line.
-  function syncMobileLineWidths() {
-    const containers = document.querySelectorAll<HTMLElement>('[data-stl-mobile]');
-    containers.forEach((container) => {
-      const wrappers = Array.from(
-        container.querySelectorAll<HTMLElement>('.section-title__svg-line'),
-      );
-      if (wrappers.length < 2) return;
-      const widths = wrappers.map((w) => {
-        const svg = w.querySelector('svg');
-        if (!svg) return null;
-        const vb = (svg as SVGSVGElement).viewBox?.baseVal;
-        return vb && vb.width > 0 ? vb.width : null;
-      });
-      if (widths.some((w) => w === null)) return; // not all rendered yet
-      const max = Math.max(...(widths as number[]));
-      wrappers.forEach((w, i) => {
-        const pct = ((widths[i] as number) / max) * 100;
-        w.style.width = `${pct.toFixed(2)}%`;
-      });
-    });
-  }
-
-  function watchForMobileSvgs() {
-    syncMobileLineWidths();
-    const containers = document.querySelectorAll<HTMLElement>('[data-stl-mobile]');
-    containers.forEach((container) => {
-      const obs = new MutationObserver(() => syncMobileLineWidths());
-      obs.observe(container, {
-        subtree: true,
-        childList: true,
-        attributes: true,
-        attributeFilter: ['data-rendered'],
-      });
-    });
-  }
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      renderAll();
-      watchForMobileSvgs();
-    }, { once: true });
+    document.addEventListener('DOMContentLoaded', renderAll, { once: true });
   } else {
     renderAll();
-    watchForMobileSvgs();
   }
 
-  document.addEventListener('astro:page-load', () => {
-    renderAll();
-    watchForMobileSvgs();
-  });
+  document.addEventListener('astro:page-load', renderAll);
 </script>

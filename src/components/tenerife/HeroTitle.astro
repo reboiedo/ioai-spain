@@ -45,6 +45,8 @@
  * for stacked titles.
  */
 
+import { buildHeroTitleSvg } from '@/lib/heroTitleSvg';
+
 export interface Props {
   as?: 'h1' | 'h2' | 'h3' | 'div';
   class?: string;
@@ -73,19 +75,40 @@ const {
   noStretch = false,
   stretchScale = 1,
 } = Astro.props;
+
+// Build the SVG at request/build time. The slot's text content drives
+// glyph generation, so we render the slot to a string first.
+const slotText = (await Astro.slots.render('default'))
+  .replace(/<[^>]*>/g, '')
+  .trim();
+const svgMarkup = slotText
+  ? buildHeroTitleSvg({ text: slotText, noStretch, stretchScale })
+  : '';
 ---
 
 {eyebrow ? (
   <div class:list={['hero-title-group', extraClass]}>
     <h3 class="hero-title__eyebrow font-h4">{eyebrow}</h3>
-    <Tag class="hero-title" data-hero-title data-no-stretch={noStretch ? '1' : undefined} data-stretch-scale={stretchScale !== 1 ? String(stretchScale) : undefined}>
-      <span class="hero-title__text"><slot /></span>
-    </Tag>
+    <Tag
+      class="hero-title"
+      data-hero-title
+      data-rendered="1"
+      data-no-stretch={noStretch ? '1' : undefined}
+      data-stretch-scale={stretchScale !== 1 ? String(stretchScale) : undefined}
+      aria-label={slotText}
+      set:html={svgMarkup}
+    />
   </div>
 ) : (
-  <Tag class:list={['hero-title', extraClass]} data-hero-title data-no-stretch={noStretch ? '1' : undefined} data-stretch-scale={stretchScale !== 1 ? String(stretchScale) : undefined}>
-    <span class="hero-title__text"><slot /></span>
-  </Tag>
+  <Tag
+    class:list={['hero-title', extraClass]}
+    data-hero-title
+    data-rendered="1"
+    data-no-stretch={noStretch ? '1' : undefined}
+    data-stretch-scale={stretchScale !== 1 ? String(stretchScale) : undefined}
+    aria-label={slotText}
+    set:html={svgMarkup}
+  />
 )}
 
 <style is:global>
@@ -132,24 +155,6 @@ const {
     line-height: 0;
   }
 
-  /* Fallback text shown until opentype.js renders the SVG. Styled
-   * close to the SVG result so SSR / no-JS still looks intentional.
-   * Once SVG is injected, `data-rendered="1"` hides this. */
-  .hero-title__text {
-    font-family: 'PP Neue Corp Condensed', var(--font-inter-tight), sans-serif;
-    font-weight: 800;
-    line-height: 0.85;
-    letter-spacing: -0.04em;
-    font-size: clamp(3rem, 14vw, 16rem);
-    white-space: nowrap;
-    display: inline-block;
-    max-width: 100%;
-  }
-
-  .hero-title[data-rendered="1"] .hero-title__text {
-    display: none;
-  }
-
   /* SVG fills container width at natural aspect ratio — glyphs are
    * NOT distorted. The condensed font has a naturally wide aspect
    * for a full word like TENERIFE (~3–4:1), so width: 100% + height:
@@ -162,12 +167,6 @@ const {
     height: auto;
     transform-origin: 0 0;
     overflow: visible;
-  }
-
-  .hero-title {
-    /* Only used for the pre-render fallback text; the SVG ignores
-     * font-size and sizes off container width. */
-    font-size: clamp(4rem, 16vw, 18rem);
   }
 
   /* Per-letter transform. Scale composes two sources:
@@ -191,29 +190,27 @@ const {
 </style>
 
 <script>
-  import opentype from 'opentype.js';
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
   gsap.registerPlugin(ScrollTrigger);
 
-  const FONT_URL = '/fonts/PPNeueCorp-CondensedUltrabold.woff';
-  const SVG_NS = 'http://www.w3.org/2000/svg';
+  // SVGs are inlined at build time by `src/lib/heroTitleSvg.ts`. This
+  // script only wires up:
+  //   - per-letter scroll-driven scaleY (`--scroll-sy`)
+  //   - mouse-proximity shrink (`--mouse-sy`)
+  // No font load, no DOM construction — paths exist on first paint.
 
-  let fontPromise: Promise<opentype.Font> | null = null;
   let stretchTweens: gsap.core.Tween[] = [];
 
-  // Mouse tracking is shared across all HeroTitles on the page: one
-  // listener feeds a rAF loop, each path gets a `gsap.quickTo` that
-  // eases --mouse-sy toward the latest proximity value. Eased tween
-  // prevents the twitchy, frame-perfect following of raw mousemove.
+  // Mouse tracking shared across all HeroTitles on the page.
   let mouseX: number | null = null;
   let mouseRafId: number | null = null;
   const mouseTrackedPaths: SVGPathElement[] = [];
   const mouseQuickTos: Map<SVGPathElement, (value: number) => void> = new Map();
-  const MOUSE_REACH = 0.4;      // influence radius as % of viewport width
-  const MOUSE_AMPLITUDE = 0.25; // up to 25% shrink at the cursor
-  const MOUSE_EASE_DURATION = 0.5; // seconds of smoothing lag
+  const MOUSE_REACH = 0.4;
+  const MOUSE_AMPLITUDE = 0.25;
+  const MOUSE_EASE_DURATION = 0.5;
 
   function onMouseMove(e: MouseEvent) {
     mouseX = e.clientX;
@@ -231,9 +228,6 @@ const {
       const center = rect.left + rect.width / 2;
       const distance = Math.abs(mouseX - center);
       const normalized = Math.min(distance / reach, 1);
-      // INVERTED: letters near the cursor SHRINK; far letters stay at 1.
-      //   normalized 0 (at cursor) → 1 - MOUSE_AMPLITUDE
-      //   normalized 1 (far away)  → 1
       const effect = 1 - (1 - normalized) * MOUSE_AMPLITUDE;
       const qto = mouseQuickTos.get(path);
       if (qto) qto(effect);
@@ -241,128 +235,7 @@ const {
     }
   }
 
-  function loadFont(url: string): Promise<opentype.Font> {
-    if (!fontPromise) {
-      fontPromise = new Promise((resolve, reject) => {
-        opentype.load(url, (err, font) => {
-          if (err || !font) reject(err ?? new Error('Font load returned null'));
-          else resolve(font);
-        });
-      });
-    }
-    return fontPromise;
-  }
-
-  /**
-   * Build the inline SVG for a single title.
-   *
-   *   1. For each character, lay out its glyph at the running x cursor.
-   *      Advance by the glyph's `advanceWidth` (in font units → px).
-   *   2. Compute total width/height from the font metrics so viewBox
-   *      contains the full line including ascenders/descenders.
-   *   3. Generate per-letter start/end scaleY from a sine wave + jitter
-   *      so the row has organic variation at the scroll end.
-   *   4. Extend viewBox height by the worst-case stretch (end × mouse
-   *      amplifier + margin) so no letter ever clips.
-   */
-  function buildTitleSvg(font: opentype.Font, text: string, stretchScale = 1): SVGSVGElement {
-    const fontSize = 100; // reference size; SVG scales to container via viewBox
-    const unitsPerEm = font.unitsPerEm;
-    const ascender = (font.ascender / unitsPerEm) * fontSize;
-    const descender = Math.abs((font.descender / unitsPerEm) * fontSize);
-    const totalHeight = ascender + descender;
-
-    let cursor = 0;
-    const charPaths: Array<{ d: string; advance: number; char: string }> = [];
-    // Union bounding box of actual drawn glyphs — used to tighten the
-    // viewBox so the font's ascender/descender slack (wasted space
-    // above caps and below baseline) doesn't inflate the SVG's height.
-    let bboxMinY = Infinity;
-    let bboxMaxY = -Infinity;
-
-    for (const char of text) {
-      const glyph = font.charToGlyph(char);
-      const path = glyph.getPath(cursor, ascender, fontSize);
-      const bb = path.getBoundingBox();
-      if (bb.y1 < bboxMinY) bboxMinY = bb.y1;
-      if (bb.y2 > bboxMaxY) bboxMaxY = bb.y2;
-      const advance = (glyph.advanceWidth / unitsPerEm) * fontSize;
-      charPaths.push({ d: path.toPathData(3), advance, char });
-      cursor += advance;
-    }
-    const totalWidth = cursor;
-    // Tight visual bounds of the row. Fall back to the full em box if
-    // the text is empty / all whitespace.
-    const tightTop = Number.isFinite(bboxMinY) ? bboxMinY : 0;
-    const tightHeight = Number.isFinite(bboxMaxY) ? bboxMaxY - bboxMinY : totalHeight;
-
-    // Per-letter start / end scales: sine wave for coherent wobble,
-    // plus a deterministic pseudo-random jitter for organic variation.
-    // `stretchScale` multiplies the wave + jitter amplitude so callers
-    // can dial up "wildness". When `stretchScale > 1` the end-scale
-    // normalization (which caps max at 1.0) is skipped so letters can
-    // grow visibly taller than their natural cap-height.
-    const count = charPaths.length;
-    const startScales = charPaths.map((_, i) => {
-      const t = count > 1 ? i / (count - 1) : 0.5;
-      const wave = Math.sin(t * Math.PI * 2.2) * 0.12 * stretchScale;
-      const jitter = (Math.sin(i * 12.9898) * 43758.5453) % 1;
-      return 0.6 + wave + jitter * 0.08 * stretchScale;
-    });
-    const endScales = charPaths.map((_, i) => {
-      const t = count > 1 ? i / (count - 1) : 0.5;
-      const wave = Math.sin(t * Math.PI * 2.2) * 0.08 * stretchScale;
-      const jitter = (Math.sin(i * 12.9898) * 43758.5453) % 1;
-      // Base end at 0.9 + wave + jitter, multiplied by stretchScale
-      // so the whole row scales up. At stretchScale=1 the values
-      // hover around 0.9–1.0 and we normalise to 1.0 below; at
-      // larger values we keep the absolute heights so the line
-      // visibly stretches taller.
-      return (0.9 + wave + jitter * 0.05) * stretchScale;
-    });
-    if (stretchScale === 1) {
-      const maxEndScale = Math.max(...endScales);
-      if (maxEndScale > 0) {
-        for (let i = 0; i < endScales.length; i++) {
-          endScales[i] /= maxEndScale;
-        }
-      }
-    }
-
-    // viewBox matches the natural text box so the SVG element keeps
-    // the font's true aspect ratio when width:100% + height:auto size
-    // it off the container. Scaled-up letters paint outside this box
-    // via CSS `overflow: visible` — no viewBox padding needed.
-    const svg = document.createElementNS(SVG_NS, 'svg');
-    svg.setAttribute('xmlns', SVG_NS);
-    svg.setAttribute('viewBox', `0 ${tightTop} ${totalWidth} ${tightHeight}`);
-    svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', text);
-
-    charPaths.forEach((cp, i) => {
-      const path = document.createElementNS(SVG_NS, 'path');
-      path.setAttribute('d', cp.d);
-      path.setAttribute('data-char', cp.char);
-      path.setAttribute('data-start-scale-y', startScales[i].toFixed(3));
-      path.setAttribute('data-end-scale-y', endScales[i].toFixed(3));
-      // Per-letter z-index. Half the letters end up IN FRONT of the
-      // hero wave strip (z-index 3) and half BEHIND (z-index 1) —
-      // strip itself is z-index 2. The choice is deterministic per
-      // index so the layout stays stable across renders.
-      const zPick = (Math.sin(i * 17.913) * 43758.5453) % 1;
-      const zIndex = zPick > 0 ? 3 : 1;
-      path.style.zIndex = String(zIndex);
-      svg.appendChild(path);
-    });
-
-    return svg;
-  }
-
-  function attachScrollStretch(container: HTMLElement, svg: SVGSVGElement) {
-    const paths = Array.from(svg.querySelectorAll('path'));
-
-    // Scroll window: title entering viewport → title centre at viewport
-    // centre (~one viewport of scroll for the growth to play out).
+  function attachScrollStretch(container: HTMLElement, paths: SVGPathElement[]) {
     const commonTrigger = {
       trigger: container,
       start: 'top bottom',
@@ -374,8 +247,6 @@ const {
     paths.forEach((path) => {
       const start = parseFloat(path.dataset.startScaleY || '0.6');
       const end = parseFloat(path.dataset.endScaleY || '1.5');
-      // Seed the initial values so the first paint looks right before
-      // ScrollTrigger's first tick.
       path.style.setProperty('--scroll-sy', start.toFixed(3));
       path.style.setProperty('--mouse-sy', '1');
       mouseTrackedPaths.push(path);
@@ -403,8 +274,7 @@ const {
     });
   }
 
-  async function renderAll() {
-    // Tear down previous tweens & mouse tracking (Astro view transitions).
+  function renderAll() {
     stretchTweens.forEach((t) => t.scrollTrigger?.kill());
     stretchTweens.forEach((t) => t.kill());
     stretchTweens = [];
@@ -415,66 +285,15 @@ const {
     const titles = document.querySelectorAll<HTMLElement>('[data-hero-title]');
     if (!titles.length) return;
 
-    let font: opentype.Font;
-    try {
-      font = await loadFont(FONT_URL);
-    } catch (err) {
-      console.error('[HeroTitle] Failed to load font:', err);
-      return;
-    }
-
-    for (const title of titles) {
-      // Idempotent — skip titles that already have their SVG.
-      if (title.dataset.rendered === '1') continue;
-
-      const text = title.textContent?.trim() ?? '';
-      if (!text) continue;
-
-      const stretchScale = Number(title.dataset.stretchScale ?? '1') || 1;
-      const svg = buildTitleSvg(font, text, stretchScale);
-      title.replaceChildren(svg);
-      title.dataset.rendered = '1';
-
-      // Tighten the viewBox to the actual rendered glyph geometry.
-      // Why this is needed: opentype's `getBoundingBox()` (used in
-      // `buildTitleSvg`) includes Bezier control points that can sit
-      // above the visible cap-line, so the loose viewBox leaves
-      // ~30% empty space above the letters inside the SVG element.
-      // The browser's `SVGGraphicsElement.getBBox()` returns the
-      // true visual geometry — much tighter.
-      //
-      // CRUCIAL: measure NOW, before `attachScrollStretch` writes a
-      // sub-1 `--scroll-sy` onto each path. Once that runs, the
-      // scaled-down paths produce a smaller bbox, the tight viewBox
-      // matches that smaller render, and when `--scroll-sy` later
-      // animates back to 1, letters grow past the viewBox bounds.
-      try {
-        const bbox = (svg as unknown as SVGGraphicsElement).getBBox();
-        if (bbox.width > 0 && bbox.height > 0) {
-          // Pad vertically by the maximum stretch factor (top stays
-          // at glyph natural top because of `transform-origin: 0 0`,
-          // bottom can extend by `(stretchScale - 1) × height` when
-          // `stretchScale > 1`). For `stretchScale = 1` the pad is
-          // a nudge to avoid edge anti-alias clipping.
-          const stretchPad = Math.max(0.005, stretchScale - 1) * bbox.height;
-          svg.setAttribute(
-            'viewBox',
-            `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height + stretchPad}`,
-          );
-        }
-      } catch {
-        // getBBox throws on detached / zero-size SVGs in some
-        // browsers — leave the original viewBox in place.
-      }
-
-      // `data-no-stretch` opts out of the scroll-driven per-letter
-      // scaleY randomization. Every glyph keeps its natural cap-height
-      // — useful for stacked multi-line titles where varying heights
-      // read as noise instead of intent.
+    titles.forEach((title) => {
+      const paths = Array.from(title.querySelectorAll<SVGPathElement>('svg path'));
+      if (!paths.length) return;
+      // `data-no-stretch` titles ship without scaleY data attrs — skip
+      // ScrollTrigger wiring, paths render at natural height.
       if (title.dataset.noStretch !== '1') {
-        attachScrollStretch(title, svg);
+        attachScrollStretch(title, paths);
       }
-    }
+    });
 
     if (mouseTrackedPaths.length > 0) {
       window.addEventListener('mousemove', onMouseMove, { passive: true });
