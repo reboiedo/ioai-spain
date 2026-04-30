@@ -80,23 +80,28 @@ const tiles = [...images, ...images];
   }
 
   /* Static CSS marquee fallback. Used as the source surface for
-   * texture loading AND as the visible content when WebGL fails.
-   * Hidden once the canvas reports it's running. */
+   * texture loading AND as the visible content during the LCP
+   * window — three.js is dynamic-imported and initialised after
+   * idle, so the static <img>s paint immediately on first frame
+   * and the canvas takes over a beat later. Also the only thing
+   * visible if WebGL init fails or reduced-motion is set. */
   .hero-wave__fallback {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    /* Hidden by default — JS reveals it if WebGL init fails or
-     * reduced-motion is set. */
-    opacity: 0;
+    opacity: 1;
     pointer-events: none;
+    transition: opacity 320ms ease;
+  }
+
+  /* Once three.js is rendering, fade out the static strip and let
+   * the canvas show through. */
+  .hero-wave[data-canvas-active="1"] .hero-wave__fallback {
+    opacity: 0;
   }
 
   .hero-wave[data-fallback="1"] .hero-wave__canvas {
     display: none;
-  }
-  .hero-wave[data-fallback="1"] .hero-wave__fallback {
-    opacity: 1;
   }
 
   .hero-wave__track {
@@ -149,17 +154,23 @@ const tiles = [...images, ...images];
    * uniforms (kept in sync with the shared `wave` store) and shifts
    * each vertex's y by `amp * sin(worldX * freq + phase + time*speed)`.
    */
-  import * as THREE from 'three';
+  // `three` is dynamic-imported inside init() so it's code-split into
+  // its own chunk and never blocks the main thread during LCP. Type
+  // imports are erased at compile time → no runtime cost.
+  import type * as THREE_NS from 'three';
   import { wave } from '@/components/tenerife/wave';
+
+  type THREE = typeof THREE_NS;
 
   type WaveCtx = {
     container: HTMLElement;
     canvas: HTMLCanvasElement;
     fallback: HTMLElement;
-    renderer: THREE.WebGLRenderer;
-    scene: THREE.Scene;
-    camera: THREE.OrthographicCamera;
-    planes: THREE.Mesh[];
+    THREE: typeof THREE_NS;
+    renderer: THREE_NS.WebGLRenderer;
+    scene: THREE_NS.Scene;
+    camera: THREE_NS.OrthographicCamera;
+    planes: THREE_NS.Mesh[];
     uniforms: {
       uTime: { value: number };
       uPhase: { value: number };
@@ -213,7 +224,16 @@ const tiles = [...images, ...images];
 
   const ctxRegistry = new WeakMap<HTMLElement, WaveCtx>();
 
-  function init(container: HTMLElement) {
+  // Module-level singleton — only fetched/parsed when at least one
+  // hero-wave instance actually needs it (post-LCP, behind idle
+  // scheduling).
+  let threePromise: Promise<typeof THREE_NS> | null = null;
+  function loadThree(): Promise<typeof THREE_NS> {
+    if (!threePromise) threePromise = import('three');
+    return threePromise;
+  }
+
+  async function init(container: HTMLElement) {
     if (ctxRegistry.has(container)) return;
 
     const canvas = container.querySelector<HTMLCanvasElement>(
@@ -230,7 +250,9 @@ const tiles = [...images, ...images];
       return;
     }
 
-    let renderer: THREE.WebGLRenderer;
+    const THREE = await loadThree();
+
+    let renderer: THREE_NS.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
         canvas,
@@ -299,7 +321,7 @@ const tiles = [...images, ...images];
     const tileWidth = tileHeight * tileAspect;
     const gap = 24;
 
-    const planes: THREE.Mesh[] = [];
+    const planes: THREE_NS.Mesh[] = [];
     // Use enough copies so the strip always fills the widest viewport
     // even when scrolled mid-tile.
     const copies = 3;
@@ -322,6 +344,7 @@ const tiles = [...images, ...images];
       container,
       canvas,
       fallback,
+      THREE,
       renderer,
       scene,
       camera,
@@ -375,6 +398,15 @@ const tiles = [...images, ...images];
 
       renderer.render(scene, camera);
     });
+
+    // Fade the static fallback out now that the canvas is rendering.
+    // A double rAF gives Three's first render a chance to land before
+    // we start the cross-fade.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        container.dataset.canvasActive = '1';
+      }),
+    );
   }
 
   function layout(ctx: WaveCtx) {
@@ -403,9 +435,9 @@ const tiles = [...images, ...images];
       ctx.tileHeight = newTileHeight;
       ctx.tileWidth = newTileWidth;
       ctx.planes.forEach((mesh) => {
-        const old = mesh.geometry as THREE.PlaneGeometry;
+        const old = mesh.geometry as THREE_NS.PlaneGeometry;
         old.dispose();
-        mesh.geometry = new THREE.PlaneGeometry(newTileWidth, newTileHeight, 32, 1);
+        mesh.geometry = new ctx.THREE.PlaneGeometry(newTileWidth, newTileHeight, 32, 1);
       });
     }
     ctx.uniforms.uViewWidth.value = w;
@@ -418,7 +450,7 @@ const tiles = [...images, ...images];
     ctx.resizeObs.disconnect();
     ctx.planes.forEach((mesh) => {
       mesh.geometry.dispose();
-      (mesh.material as THREE.Material).dispose();
+      (mesh.material as THREE_NS.Material).dispose();
     });
     ctx.renderer.dispose();
     ctxRegistry.delete(container);
@@ -430,16 +462,28 @@ const tiles = [...images, ...images];
       .forEach((el) => init(el));
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAll, { once: true });
+  // Defer init to idle time so the three.js chunk download + parse
+  // doesn't block the LCP. The static fallback marquee paints in the
+  // meantime; the canvas takes over once the wave is live.
+  type IdleCb = (cb: () => void, opts?: { timeout?: number }) => number;
+  const ric: IdleCb =
+    (window as unknown as { requestIdleCallback?: IdleCb }).requestIdleCallback ??
+    ((cb) => window.setTimeout(cb, 1) as unknown as number);
+
+  function scheduleInit() {
+    ric(() => initAll(), { timeout: 2000 });
+  }
+
+  if (document.readyState === 'complete') {
+    scheduleInit();
   } else {
-    initAll();
+    window.addEventListener('load', scheduleInit, { once: true });
   }
 
   document.addEventListener('astro:page-load', () => {
     document
       .querySelectorAll<HTMLElement>('[data-hero-wave]')
       .forEach(destroy);
-    initAll();
+    scheduleInit();
   });
 </script>
