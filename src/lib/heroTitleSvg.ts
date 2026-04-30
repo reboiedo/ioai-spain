@@ -59,7 +59,7 @@ export function buildHeroTitleSvg({
   const ascender = (font.ascender / unitsPerEm) * fontSize;
 
   let cursor = 0;
-  const charPaths: Array<{ d: string; char: string; topY: number }> = [];
+  const charPaths: Array<{ d: string; char: string }> = [];
   // Tight visual bbox accumulated across all glyphs via svg-path-bounds.
   let tightMinX = Infinity;
   let tightMinY = Infinity;
@@ -70,17 +70,15 @@ export function buildHeroTitleSvg({
     const glyph = font.charToGlyph(char);
     const p = glyph.getPath(cursor, ascender, fontSize);
     const d = p.toPathData(3);
-    let topY = 0;
     if (d) {
       const [x1, y1, x2, y2] = svgPathBounds(d) as [number, number, number, number];
       if (x1 < tightMinX) tightMinX = x1;
       if (y1 < tightMinY) tightMinY = y1;
       if (x2 > tightMaxX) tightMaxX = x2;
       if (y2 > tightMaxY) tightMaxY = y2;
-      topY = y1;
     }
     const advance = (glyph.advanceWidth / unitsPerEm) * fontSize;
-    charPaths.push({ d, char, topY });
+    charPaths.push({ d, char });
     cursor += advance;
   }
 
@@ -108,36 +106,22 @@ export function buildHeroTitleSvg({
   });
 
   // Reserve enough viewBox height to fit the worst-case stretched
-  // glyph entirely inside the SVG box. Without this, scaled paths
-  // paint outside the box (overflow: visible) and some browsers
-  // include the overflow in subsequent layout passes — which is
-  // exactly the few-pixel layout shift we want to avoid.
+  // glyph entirely inside the SVG box, so paths never paint outside
+  // and the SVG element height doesn't shift on layout passes.
   const maxEnd = noStretch ? 1 : endScales.length ? Math.max(...endScales, 1) : 1;
   const stretchPad = (maxEnd - 1) * vbH;
-  const totalVbH = vbH + stretchPad;
 
   const pathEls = charPaths
     .map((cp, i) => {
       const zPick = (Math.sin(i * 17.913) * 43758.5453) % 1;
       const zIndex = zPick > 0 ? 3 : 1;
       const endAttr = noStretch ? '' : ` data-end-scale-y="${endScales[i].toFixed(3)}"`;
-      // Pre-translate each glyph upward by (pathTopY − vbY) so its
-      // visible top coincides exactly with the line's cap-line
-      // (vbY). The CSS rule then applies the translate FIRST and
-      // scaleY SECOND, anchored at the shared origin (vbY), so:
-      //   - every letter's top stays welded to the cap-line
-      //   - per-letter scaleY only varies the BOTTOMS (sine wave)
-      // Without this pre-shift, letters whose ink top sits below
-      // vbY (flat-top caps when an A-apex defines vbY) would
-      // visibly drift down as scaleY grows.
-      const yShift = -(cp.topY - vbY);
-      const shiftStyle = `--y-shift: ${yShift.toFixed(3)}px;`;
-      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex};${shiftStyle}"/>`;
+      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex}"/>`;
     })
     .join('');
 
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vbX} ${vbY} ${vbW} ${totalVbH}" role="img" aria-label="${escapeAttr(text)}">` +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vbX} ${vbY} ${vbW} ${vbH + stretchPad}" role="img" aria-label="${escapeAttr(text)}">` +
     pathEls +
     `</svg>`
   );
