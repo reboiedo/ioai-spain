@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - banner [ref=e6]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - link "FOLLOW. ART" [ref=e10] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e12]: FOLLOW. ART
+          - paragraph: Nexus of Curators and Artists
+        - generic [ref=e13]:
+          - link "About" [ref=e14] [cursor=pointer]:
+            - /url: /about
+            - generic [ref=e16]: About
+          - link "Nexus Card" [ref=e17] [cursor=pointer]:
+            - /url: /nexus-card
+            - generic [ref=e19]: Nexus Card
+          - link "Community Board" [ref=e20] [cursor=pointer]:
+            - /url: /community-board
+            - generic [ref=e22]: Community Board
+          - link "Pricing" [ref=e23] [cursor=pointer]:
+            - /url: /pricing
+            - generic [ref=e25]: Pricing
+          - link "FAQ" [ref=e26] [cursor=pointer]:
+            - /url: /faq
+            - generic [ref=e28]: FAQ
+        - generic [ref=e30]:
+          - link "Login" [ref=e31] [cursor=pointer]:
+            - /url: /signin
+            - generic [ref=e33]: Login
+          - link "Join" [ref=e34] [cursor=pointer]:
+            - /url: /signup
+            - generic [ref=e36]: Join
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - heading "FAQ" [level=1] [ref=e43]:
+          - text: FAQ
+          - img [ref=e44]
+          - img [ref=e45]
+        - paragraph [ref=e47]:
+          - text: Need to talk through something specific? Reach out anytime at
+          - link "help@follow.art" [ref=e48] [cursor=pointer]:
+            - /url: mailto:help@follow.art
+      - generic [ref=e49]:
+        - img [ref=e51]
+        - generic [ref=e52]:
+          - article [ref=e53]:
+            - paragraph [ref=e54]: For Artists
+            - list [ref=e55]:
+              - listitem [ref=e56]:
+                - paragraph [ref=e59] [cursor=pointer]: Getting Started
+              - listitem [ref=e61]:
+                - paragraph [ref=e64] [cursor=pointer]: Nexus Card
+              - listitem [ref=e66]:
+                - paragraph [ref=e69] [cursor=pointer]: Connectory
+          - article [ref=e71]:
+            - paragraph [ref=e72]: For Curators
+            - list [ref=e73]:
+              - listitem [ref=e74]:
+                - paragraph [ref=e77] [cursor=pointer]: Getting Started
+              - listitem [ref=e79]:
+                - paragraph [ref=e82] [cursor=pointer]: Nexus Card
+              - listitem [ref=e84]:
+                - paragraph [ref=e87] [cursor=pointer]: Connectory
+          - article [ref=e89]:
+            - paragraph [ref=e90]: What’s Unique About FOLLOW.ART
+            - list [ref=e91]:
+              - listitem [ref=e92]:
+                - paragraph [ref=e95] [cursor=pointer]: Support My Practice
+              - listitem [ref=e97]:
+                - paragraph [ref=e100] [cursor=pointer]: Referral Program
+              - listitem [ref=e102]:
+                - paragraph [ref=e105] [cursor=pointer]: Gift Card
+              - listitem [ref=e107]:
+                - paragraph [ref=e110] [cursor=pointer]: Collaborations & Partnerships
+              - listitem [ref=e112]:
+                - paragraph [ref=e115] [cursor=pointer]: Community Standards
+              - listitem [ref=e117]:
+                - paragraph [ref=e120] [cursor=pointer]: Engagement & Growth
+          - article [ref=e122]:
+            - paragraph [ref=e123]: Account Management & Legal Framework
+            - list [ref=e124]:
+              - listitem [ref=e125]:
+                - paragraph [ref=e128] [cursor=pointer]: Username & Identity
+              - listitem [ref=e130]:
+                - paragraph [ref=e133] [cursor=pointer]: Content & Rights
+              - listitem [ref=e135]:
+                - paragraph [ref=e138] [cursor=pointer]: Subscriptions & Pricing
+              - listitem [ref=e140]:
+                - paragraph [ref=e143] [cursor=pointer]: Trust & Security
+              - listitem [ref=e145]:
+                - paragraph [ref=e148] [cursor=pointer]: Legal & Terms
+    - contentinfo [ref=e150]:
+      - separator [ref=e151]
+      - generic [ref=e152]:
+        - generic [ref=e154]:
+          - link "Brand Kit" [ref=e155] [cursor=pointer]:
+            - /url: https://drive.google.com/file/d/1TRkafTTsg9FOyLTzmTkNSRsd5lD0kx3X/view?usp=sharing
+            - generic [ref=e157]: Brand Kit
+          - link "Buy Gift Card" [ref=e158] [cursor=pointer]:
+            - /url: /gift-card
+            - generic [ref=e160]: Buy Gift Card
+          - link "Terms & Conditions" [ref=e161] [cursor=pointer]:
+            - /url: /terms-and-conditions
+            - generic [ref=e163]: Terms & Conditions
+          - link "Privacy Policy" [ref=e164] [cursor=pointer]:
+            - /url: /privacy-policy
+            - generic [ref=e166]: Privacy Policy
+          - link "Cookie Policy" [ref=e167] [cursor=pointer]:
+            - /url: /cookies-policy
+            - generic [ref=e169]: Cookie Policy
+        - paragraph [ref=e171]: 2026 © FOLLOW. ART
+        - generic [ref=e172]:
+          - link "Digital product development by Vide Infra" [ref=e173] [cursor=pointer]:
+            - /url: https://videinfra.com/
+            - generic [ref=e175]: Digital product development by Vide Infra
+          - img "Website by Vide Infra" [ref=e176]
+  - generic [ref=e181]:
+    - paragraph [ref=e182]:
+      - generic [ref=e183]: This website uses
+      - link "cookies" [ref=e184] [cursor=pointer]:
+        - /url: /cookies-policy
+        - generic [ref=e186]: cookies
+    - generic [ref=e187]:
+      - button "Deny" [ref=e188] [cursor=pointer]:
+        - generic [ref=e190]: Deny
+      - button "Accept" [ref=e191] [cursor=pointer]:
+        - generic [ref=e193]: Accept

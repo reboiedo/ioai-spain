@@ -1,0 +1,20 @@
+[      85ms] [LOG] 🎯 preserveUTM.js script loaded @ http://localhost:4321/scripts/preserveUTM.js:118
+[     165ms] [LOG] 🎯 DOMContentLoaded - running addUtmsToLinks @ http://localhost:4321/scripts/preserveUTM.js:142
+[     165ms] [LOG] Original button text:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:16
+[     166ms] [LOG] Manual split chars: 10 @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:32
+[     166ms] [LOG] After manual split:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:33
+[  325401ms] [LOG] 🎯 preserveUTM.js script loaded @ http://localhost:4321/scripts/preserveUTM.js:118
+[  325628ms] [LOG] 🎯 DOMContentLoaded - running addUtmsToLinks @ http://localhost:4321/scripts/preserveUTM.js:142
+[  325629ms] [LOG] Original button text:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:16
+[  325629ms] [LOG] Manual split chars: 10 @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:32
+[  325629ms] [LOG] After manual split:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:33
+[  358260ms] [LOG] 🎯 preserveUTM.js script loaded @ http://localhost:4321/scripts/preserveUTM.js:118
+[  358460ms] [LOG] 🎯 DOMContentLoaded - running addUtmsToLinks @ http://localhost:4321/scripts/preserveUTM.js:142
+[  358461ms] [LOG] Original button text:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:16
+[  358461ms] [LOG] Manual split chars: 10 @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:32
+[  358461ms] [LOG] After manual split:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:33
+[  380725ms] [LOG] 🎯 preserveUTM.js script loaded @ http://localhost:4321/scripts/preserveUTM.js:118
+[  380896ms] [LOG] 🎯 DOMContentLoaded - running addUtmsToLinks @ http://localhost:4321/scripts/preserveUTM.js:142
+[  380897ms] [LOG] Original button text:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:16
+[  380897ms] [LOG] Manual split chars: 10 @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:32
+[  380897ms] [LOG] After manual split:  Join Now  @ http://localhost:4321/src/components/ui/Button.astro?astro&type=script&index=0&lang.ts:33

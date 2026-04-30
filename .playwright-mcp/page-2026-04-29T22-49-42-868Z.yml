@@ -1,0 +1,486 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "IOAI Spain" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "IOAI Spain" [ref=e6]
+      - generic [ref=e8]:
+        - combobox "Select language" [ref=e9] [cursor=pointer]:
+          - option "EN" [selected]
+          - option "ES"
+        - generic:
+          - generic: EN
+          - img
+  - main [ref=e10]:
+    - generic [ref=e11]:
+      - generic [ref=e14]:
+        - generic [ref=e16]:
+          - heading "TENERIFE" [level=1] [ref=e18]:
+            - img "TENERIFE" [ref=e19]
+          - heading "CAMP" [level=1] [ref=e29]:
+            - img "CAMP" [ref=e30]
+        - generic [ref=e35]:
+          - paragraph [ref=e36]: July 5th — 19th, 2026
+          - paragraph [ref=e37]:
+            - generic [ref=e38]: Two weeks of maths, code and ocean —
+            - generic [ref=e39]: the IOAI Spain training camp on the slopes of Mount Teide.
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - paragraph [ref=e46]: For over a decade behind the scenes of olympiad coaching and AI research, we've watched ambitious students chase the same handful of opportunities — and noticed how rarely those opportunities reach beyond a familiar inner circle. The Tenerife camp exists to widen that circle.
+            - generic [ref=e47]:
+              - paragraph [ref=e48]: Powered by
+              - link "Harbour.Space" [ref=e49] [cursor=pointer]:
+                - /url: https://harbour.space
+                - img "Harbour.Space" [ref=e50]
+              - link "Leagues of Code" [ref=e51] [cursor=pointer]:
+                - /url: https://leaguesofcodes.com
+                - img "Leagues of Code" [ref=e52]
+          - list [ref=e53]:
+            - listitem [ref=e54]:
+              - generic [ref=e55]: Language
+              - generic [ref=e56]: English
+            - listitem [ref=e57]:
+              - generic [ref=e58]: Ages
+              - generic [ref=e59]: 14–18
+            - listitem [ref=e60]:
+              - generic [ref=e61]: Dates
+              - generic [ref=e62]: TBD
+          - generic [ref=e64]:
+            - article [ref=e65]:
+              - heading "The academics and the summer are both real" [level=3] [ref=e66]
+              - paragraph [ref=e67]: The learning program and the extracurricular program are built with equal care. Mornings go deep into AI. Afternoons go to Tenerife's beaches, trails, and historic towns. Neither half is filler, and you don't have to sacrifice one to get the other.
+            - article [ref=e68]:
+              - heading "Two tracks, one community" [level=3] [ref=e69]
+              - paragraph [ref=e70]: Foundations and applied ML run in parallel, plus a team research sprint that cuts across both. Mornings you're in your track; afternoons and evenings the whole cohort is together — meals, labs, problem sets, hikes.
+            - article [ref=e71]:
+              - heading "The highest level is in the room" [level=3] [ref=e72]
+              - paragraph [ref=e73]: Students selected from the IOAI Spain qualifier, taught by researchers who publish at NeurIPS and ICML, with industry mentors from Barcelona's AI labs. Ambition is the baseline.
+        - generic [ref=e76]:
+          - generic [ref=e78]:
+            - heading "ABOUT" [level=1] [ref=e80]:
+              - img "ABOUT" [ref=e81]
+            - heading "US" [level=1] [ref=e88]:
+              - img "US" [ref=e89]
+          - link "Play story video" [ref=e92] [cursor=pointer]:
+            - /url: "#"
+            - generic: ▶
+      - generic [ref=e96]:
+        - generic [ref=e97]:
+          - heading [level=2] [ref=e98]:
+            - img [ref=e101]
+          - paragraph [ref=e108]: Every camper picks one track — beginner or advanced — and goes deep into it. Ten sessions, 35 hours in total, hands-on and project-based, led by experienced educators and industry professionals in small groups. By the end of the camp, every student has something real to show for it.
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - heading "Beginner" [level=3] [ref=e112]
+              - paragraph [ref=e113]: For students curious about AI with little or no prior experience. The goal isn't to overwhelm — it's to open a door, build real intuition, and make the subject feel exciting rather than intimidating.
+            - generic [ref=e114]:
+              - group [ref=e115]:
+                - generic "Python" [ref=e116] [cursor=pointer]:
+                  - generic [ref=e117]: Python
+              - group [ref=e119]:
+                - generic "Artificial Intelligence" [ref=e120] [cursor=pointer]:
+                  - generic [ref=e121]: Artificial Intelligence
+              - group [ref=e123]:
+                - generic "Game Development" [ref=e124] [cursor=pointer]:
+                  - generic [ref=e125]: Game Development
+              - group [ref=e127]:
+                - generic "Design" [ref=e128] [cursor=pointer]:
+                  - generic [ref=e129]: Design
+          - generic [ref=e131]:
+            - generic [ref=e132]:
+              - heading "Advanced" [level=3] [ref=e133]
+              - paragraph [ref=e134]: For students ready for a serious challenge. Structured, rigorous training for those who want to push well past school-level material and into the kind of work done at olympiad and research level.
+            - generic [ref=e135]:
+              - group [ref=e136]:
+                - generic "Mathematics" [ref=e137] [cursor=pointer]:
+                  - generic [ref=e138]: Mathematics
+              - group [ref=e140]:
+                - generic "Algorithms" [ref=e141] [cursor=pointer]:
+                  - generic [ref=e142]: Algorithms
+              - group [ref=e144]:
+                - generic "Artificial Intelligence" [ref=e145] [cursor=pointer]:
+                  - generic [ref=e146]: Artificial Intelligence
+          - article [ref=e148]:
+            - heading "Not sure if it's the right camp?" [level=3] [ref=e149]
+            - paragraph [ref=e150]: "No prior experience, no clear passion, no plan needed — just an openness to try something that might surprise you. The camp is for kids who:"
+            - list [ref=e151]:
+              - listitem [ref=e152]:
+                - generic [ref=e153]: →
+                - generic [ref=e154]: Like figuring out how things work
+              - listitem [ref=e155]:
+                - generic [ref=e156]: →
+                - generic [ref=e157]: Are curious about AI
+              - listitem [ref=e158]:
+                - generic [ref=e159]: →
+                - generic [ref=e160]: Want to meet peers from around the world
+              - listitem [ref=e161]:
+                - generic [ref=e162]: →
+                - generic [ref=e163]: Are ready for a summer that counts
+      - generic [ref=e167]:
+        - generic [ref=e168]:
+          - heading [level=2] [ref=e169]:
+            - img [ref=e172]
+          - paragraph [ref=e180]: Every track is led by someone who works in the field, not just teaches it. The team includes research engineers from leading AI institutes, competitive programming coaches, olympiad winners, PhD researchers, and industry professionals with experience at major tech companies. Several instructors have coached or competed at international level themselves.
+        - generic [ref=e183]:
+          - button "Portrait of Vladimir Arkhipov Vladimir has won over 10 machine learning competitions and hackathons, and helped design the final round of the national AI olympiad. He spent time as an ML Engineer at PIK Digital before moving into teaching, where he's been helping students crack AI for over two years. Vladimir Arkhipov 10+ ML competitions won" [ref=e184] [cursor=pointer]:
+            - generic [ref=e185]:
+              - img "Portrait of Vladimir Arkhipov" [ref=e187]
+              - generic:
+                - paragraph: Vladimir has won over 10 machine learning competitions and hackathons, and helped design the final round of the national AI olympiad. He spent time as an ML Engineer at PIK Digital before moving into teaching, where he's been helping students crack AI for over two years.
+            - heading "Vladimir Arkhipov" [level=3] [ref=e188]:
+              - generic [ref=e189]: Vladimir
+              - generic [ref=e190]: Arkhipov
+            - paragraph [ref=e191]: 10+ ML competitions won
+          - button "Portrait of Alberto Leyva Guerra Alberto represented his country at the International Olympiad in Informatics (IOI) — the world championship of competitive programming — three years in a row. He earned medals at the Ibero-American computing competition across all three years, and holds Candidate Master rank on Codeforces, a global platform where only the top few percent of competitive programmers reach that level. Alberto Leyva Guerra 3× IOI finalist" [ref=e192] [cursor=pointer]:
+            - generic [ref=e193]:
+              - img "Portrait of Alberto Leyva Guerra" [ref=e195]
+              - generic:
+                - paragraph: Alberto represented his country at the International Olympiad in Informatics (IOI) — the world championship of competitive programming — three years in a row. He earned medals at the Ibero-American computing competition across all three years, and holds Candidate Master rank on Codeforces, a global platform where only the top few percent of competitive programmers reach that level.
+            - heading "Alberto Leyva Guerra" [level=3] [ref=e196]:
+              - generic [ref=e197]: Alberto
+              - generic [ref=e198]: Leyva Guerra
+            - paragraph [ref=e199]: 3× IOI finalist
+          - button "Portrait of Artem Seleznev Artem is a research engineer at AIRI, one of the top AI research institutes in the field. He's won the National Technology AI Olympiad and the AI Challenge twice (2023 and 2024), and was chosen to mentor the national-level team at the 2025 International Olympiad in Artificial Intelligence — the global championship for AI students. He's also spoken at major tech events including Skolkovo. Artem Seleznev 2025 IOAI team mentor" [ref=e200] [cursor=pointer]:
+            - generic [ref=e201]:
+              - img "Portrait of Artem Seleznev" [ref=e203]
+              - generic:
+                - paragraph: Artem is a research engineer at AIRI, one of the top AI research institutes in the field. He's won the National Technology AI Olympiad and the AI Challenge twice (2023 and 2024), and was chosen to mentor the national-level team at the 2025 International Olympiad in Artificial Intelligence — the global championship for AI students. He's also spoken at major tech events including Skolkovo.
+            - heading "Artem Seleznev" [level=3] [ref=e204]:
+              - generic [ref=e205]: Artem
+              - generic [ref=e206]: Seleznev
+            - paragraph [ref=e207]: 2025 IOAI team mentor
+          - 'button "Portrait of Artem Plotkin Artem is a software engineer and mathematician with industry experience at Yandex, currently completing a PhD in Computational Mathematics. He coaches competitive programming teams at ICPC and IOI level — two of the most prestigious competitions in the field — and teaches algorithms and nonlinear programming. His own competitive record speaks for itself: 1st place at the 2018 International Data Analysis Olympiad and 5th place at the 2024 CodeRun Backend Championship. Artem Plotkin PhD, Computational Maths" [ref=e208] [cursor=pointer]':
+            - generic [ref=e209]:
+              - img "Portrait of Artem Plotkin" [ref=e211]
+              - generic:
+                - paragraph: "Artem is a software engineer and mathematician with industry experience at Yandex, currently completing a PhD in Computational Mathematics. He coaches competitive programming teams at ICPC and IOI level — two of the most prestigious competitions in the field — and teaches algorithms and nonlinear programming. His own competitive record speaks for itself: 1st place at the 2018 International Data Analysis Olympiad and 5th place at the 2024 CodeRun Backend Championship."
+            - heading "Artem Plotkin" [level=3] [ref=e212]:
+              - generic [ref=e213]: Artem
+              - generic [ref=e214]: Plotkin
+            - paragraph [ref=e215]: PhD, Computational Maths
+          - button "Portrait of Ivan Zagorulko Ivan is a research engineer at AIRI and a three-time winner of the AI Challenge (2022, 2023, 2024). He mentored the national-level team at the 2025 International Olympiad in AI, and recently published a research paper accepted at AAAI — one of the most prestigious conferences in the field. Ivan Zagorulko 3× AI Challenge winner" [ref=e216] [cursor=pointer]:
+            - generic [ref=e217]:
+              - img "Portrait of Ivan Zagorulko" [ref=e219]
+              - generic:
+                - paragraph: Ivan is a research engineer at AIRI and a three-time winner of the AI Challenge (2022, 2023, 2024). He mentored the national-level team at the 2025 International Olympiad in AI, and recently published a research paper accepted at AAAI — one of the most prestigious conferences in the field.
+            - heading "Ivan Zagorulko" [level=3] [ref=e220]:
+              - generic [ref=e221]: Ivan
+              - generic [ref=e222]: Zagorulko
+            - paragraph [ref=e223]: 3× AI Challenge winner
+          - button "Portrait of Ilia Mogilev Ilia has spent 8+ years designing education programs at scale. He's built over 50 learning products, trained more than 10,000 CS teachers nationwide, developed curriculum content for Yandex, and created materials for Hour of Code Kazakhstan that reached 20,000+ students. He also ran a nationwide AI hackathon for 8,000 schoolchildren. Ilia Mogilev 10,000+ CS teachers trained" [ref=e224] [cursor=pointer]:
+            - generic [ref=e225]:
+              - img "Portrait of Ilia Mogilev" [ref=e227]
+              - generic:
+                - paragraph: Ilia has spent 8+ years designing education programs at scale. He's built over 50 learning products, trained more than 10,000 CS teachers nationwide, developed curriculum content for Yandex, and created materials for Hour of Code Kazakhstan that reached 20,000+ students. He also ran a nationwide AI hackathon for 8,000 schoolchildren.
+            - heading "Ilia Mogilev" [level=3] [ref=e228]:
+              - generic [ref=e229]: Ilia
+              - generic [ref=e230]: Mogilev
+            - paragraph [ref=e231]: 10,000+ CS teachers trained
+          - button "Portrait of Ogabek Masharipov Ogabek has taught Computer Science and Robotics at both school and university level across Europe. He's a lecturer in Algorithms and Data Structures at a leading state university, and has taught the IB Computer Science curriculum at a top international gymnasium. His focus is on building structured, efficient lessons that actually stick. Ogabek Masharipov Algorithms lecturer" [ref=e232] [cursor=pointer]:
+            - generic [ref=e233]:
+              - img "Portrait of Ogabek Masharipov" [ref=e235]
+              - generic:
+                - paragraph: Ogabek has taught Computer Science and Robotics at both school and university level across Europe. He's a lecturer in Algorithms and Data Structures at a leading state university, and has taught the IB Computer Science curriculum at a top international gymnasium. His focus is on building structured, efficient lessons that actually stick.
+            - heading "Ogabek Masharipov" [level=3] [ref=e236]:
+              - generic [ref=e237]: Ogabek
+              - generic [ref=e238]: Masharipov
+            - paragraph [ref=e239]: Algorithms lecturer
+          - button "Portrait of Anier Velasco Anier is a researcher and educator specialising in the theory behind machine learning. He studied Computer Science and Data Science at Harbour.Space University, won a gold medal at the National Olympiad in Informatics, and has contributed to Aya — an open-source multilingual AI project backed by Cohere for AI, involving researchers from over 100 countries. Anier Velasco Contributor, Cohere Aya" [ref=e240] [cursor=pointer]:
+            - generic [ref=e241]:
+              - img "Portrait of Anier Velasco" [ref=e243]
+              - generic:
+                - paragraph: Anier is a researcher and educator specialising in the theory behind machine learning. He studied Computer Science and Data Science at Harbour.Space University, won a gold medal at the National Olympiad in Informatics, and has contributed to Aya — an open-source multilingual AI project backed by Cohere for AI, involving researchers from over 100 countries.
+            - heading "Anier Velasco" [level=3] [ref=e244]:
+              - generic [ref=e245]: Anier
+              - generic [ref=e246]: Velasco
+            - paragraph [ref=e247]: Contributor, Cohere Aya
+      - generic [ref=e253]:
+        - heading [level=2] [ref=e254]:
+          - img [ref=e257]
+        - paragraph [ref=e268]: Outside of study hours, campers have a full schedule of activities across Tenerife — beaches, national parks, historic towns, and cultural workshops. Tap a polaroid to read what's on for that day.
+        - generic [ref=e270]:
+          - 'button "Day 1: Welcome & getting to know each other — tap to read description" [ref=e271] [cursor=pointer]':
+            - img "Welcome & getting to know each other" [ref=e273]
+            - generic [ref=e274]:
+              - paragraph [ref=e275]: Day 1
+              - heading "Welcome & getting to know each other" [level=3] [ref=e276]
+            - paragraph [ref=e278]: The camp kicks off with a walk along the seafront of Puerto de la Cruz, finishing at the historic Plaza del Charco. Along the way, campers take part in a simple but effective icebreaker — sharing their name, something they love, and their plans for the future. By the end of the evening, the group already feels like a group.
+          - 'button "Day 2: Historic Puerto de la Cruz — tap to read description" [ref=e279] [cursor=pointer]':
+            - img "Historic Puerto de la Cruz" [ref=e281]
+            - generic [ref=e282]:
+              - paragraph [ref=e283]: Day 2
+              - heading "Historic Puerto de la Cruz" [level=3] [ref=e284]
+            - paragraph [ref=e286]: Campers explore the old town on a guided cultural walk that brings local history to life. Highlights include the 17th-century Church of Nuestra Señora de la Peña de Francia, the town's historic fishing pier — once used to export Malvasia wine — Playa Jardín designed by celebrated Canarian artist César Manrique, and the Castle of San Felipe, a coastal fortress built to defend against pirates. The walk ends back at the iconic Lago Martiánez pool complex.
+          - 'button "Day 3: Beach sports — tap to read description" [ref=e287] [cursor=pointer]':
+            - img "Beach sports" [ref=e289]
+            - generic [ref=e290]:
+              - paragraph [ref=e291]: Day 3
+              - heading "Beach sports" [level=3] [ref=e292]
+            - paragraph [ref=e294]: A full afternoon at Playa Jardín with volleyball, football, tennis and frisbee. Campers rotate through activities in small groups, keeping it social, competitive and fun.
+          - 'button "Day 4: Yoga workshop & beach — tap to read description" [ref=e295] [cursor=pointer]':
+            - img "Yoga workshop & beach" [ref=e297]
+            - generic [ref=e298]:
+              - paragraph [ref=e299]: Day 4
+              - heading "Yoga workshop & beach" [level=3] [ref=e300]
+            - paragraph [ref=e302]: A more mindful afternoon. While some campers enjoy the beach, others take part in a yoga workshop designed to balance the physical intensity of the week with self-care and reflection. Every camper gets their session.
+          - 'button "Day 5: Rambla de Castro coastal trail — tap to read description" [ref=e303] [cursor=pointer]':
+            - img "Rambla de Castro coastal trail" [ref=e305]
+            - generic [ref=e306]:
+              - paragraph [ref=e307]: Day 5
+              - heading "Rambla de Castro coastal trail" [level=3] [ref=e308]
+            - paragraph [ref=e310]: A scenic coastal hike through one of Tenerife's most beautiful natural routes. The group passes black-sand coves, a historic 1903 steam-engine pumping station, a wooden bridge over a ravine, an 18th-century coastal fort, and arrives at Mirador de San Pedro — a clifftop viewpoint with sweeping ocean views.
+          - 'button "Day 6: Traditional Canarian games — tap to read description" [ref=e311] [cursor=pointer]':
+            - img "Traditional Canarian games" [ref=e313]
+            - generic [ref=e314]:
+              - paragraph [ref=e315]: Day 6
+              - heading "Traditional Canarian games" [level=3] [ref=e316]
+            - paragraph [ref=e318]: "Back at Playa Jardín for an afternoon of traditional games from the Canary Islands: crab races, tug-of-war and the handkerchief game. Loud, fun, and a genuine window into local culture."
+          - 'button "Day 7: Zip-line park at Forestal Park — tap to read description" [ref=e319] [cursor=pointer]':
+            - img "Zip-line park at Forestal Park" [ref=e321]
+            - generic [ref=e322]:
+              - paragraph [ref=e323]: Day 7
+              - heading "Zip-line park at Forestal Park" [level=3] [ref=e324]
+            - paragraph [ref=e326]: A special day at Forestal Park Tenerife, a high-altitude adventure park in the forests of Monte de La Esperanza. Before heading in, the group takes part in a short session on emotions — naming them, noticing them, and letting go of the negative ones through a dreamcatcher activity afterward. Lunch is a picnic in the forest.
+          - 'button "Day 8: Teide National Park & Observatory — tap to read description" [ref=e327] [cursor=pointer]':
+            - img "Teide National Park & Observatory" [ref=e329]
+            - generic [ref=e330]:
+              - paragraph [ref=e331]: Day 8
+              - heading "Teide National Park & Observatory" [level=3] [ref=e332]
+            - paragraph [ref=e334]: A full-day excursion to the top of Tenerife. One group visits the Teide Observatory, home to leading European solar telescopes. The other explores the El Portillo Visitor Centre, with exhibitions on volcanic geology, a botanical garden of native species and a simulated volcanic tube. Both groups then meet at Roques de García for lunch and a breathing and nature connection activity, surrounded by one of the most dramatic landscapes in Europe.
+          - 'button "Day 9: La Orotava cultural walk — tap to read description" [ref=e335] [cursor=pointer]':
+            - img "La Orotava cultural walk" [ref=e337]
+            - generic [ref=e338]:
+              - paragraph [ref=e339]: Day 9
+              - heading "La Orotava cultural walk" [level=3] [ref=e340]
+            - paragraph [ref=e342]: A guided tour through the beautifully preserved historic town of La Orotava. Campers visit a neo-Gothic chapel, a 19th-century French garden with panoramic views, the iconic Casa de los Balcones with its carved wooden architecture, and a traditional gofio mill — a staple of Canarian food culture.
+          - 'button "Day 10: Surfing at Playa Martiánez — tap to read description" [ref=e343] [cursor=pointer]':
+            - img "Surfing at Playa Martiánez" [ref=e345]
+            - generic [ref=e346]:
+              - paragraph [ref=e347]: Day 10
+              - heading "Surfing at Playa Martiánez" [level=3] [ref=e348]
+            - paragraph [ref=e350]: Just five minutes from the hotel, campers try surfing for the first time (or build on what they know) in small groups with professional instructors. While half surf, the other half enjoy the beach or the hotel pool.
+          - 'button "Day 11: Painting workshop & beach — tap to read description" [ref=e351] [cursor=pointer]':
+            - img "Painting workshop & beach" [ref=e353]
+            - generic [ref=e354]:
+              - paragraph [ref=e355]: Day 11
+              - heading "Painting workshop & beach" [level=3] [ref=e356]
+            - paragraph [ref=e358]: An afternoon combining creativity with sunshine. Campers take a guided painting workshop on the beach, turning their impressions of the trip into their own artwork. A quieter, more reflective counterpoint to the more active days.
+          - 'button "Day 12: Surfing, round two — tap to read description" [ref=e359] [cursor=pointer]':
+            - img "Surfing, round two" [ref=e361]
+            - generic [ref=e362]:
+              - paragraph [ref=e363]: Day 12
+              - heading "Surfing, round two" [level=3] [ref=e364]
+            - paragraph [ref=e366]: Another session in the water, with extended surf classes for all participants. More time in the sea, more time to progress.
+          - 'button "Day 13: Farewell beach games — tap to read description" [ref=e367] [cursor=pointer]':
+            - img "Farewell beach games" [ref=e369]
+            - generic [ref=e370]:
+              - paragraph [ref=e371]: Day 13
+              - heading "Farewell beach games" [level=3] [ref=e372]
+            - paragraph [ref=e374]: "The last beach afternoon: handball, beach paddles, gymkhana obstacle courses and relay races. Before leaving, the whole group gathers in a circle to share their favourite memory of Tenerife."
+          - 'button "Day 14: Loro Parque — tap to read description" [ref=e375] [cursor=pointer]':
+            - img "Loro Parque" [ref=e377]
+            - generic [ref=e378]:
+              - paragraph [ref=e379]: Day 14
+              - heading "Loro Parque" [level=3] [ref=e380]
+            - paragraph [ref=e382]: The final special-day excursion takes campers to Loro Parque, one of Europe's most celebrated wildlife parks. The visit is designed not just as a fun day out, but as a meaningful encounter with animal welfare and biodiversity conservation — themes that connect to the broader values of the camp.
+          - 'button "Day 15: Farewell & the jar of messages — tap to read description" [ref=e383] [cursor=pointer]':
+            - img "Farewell & the jar of messages" [ref=e385]
+            - generic [ref=e386]:
+              - paragraph [ref=e387]: Day 15
+              - heading "Farewell & the jar of messages" [level=3] [ref=e388]
+            - paragraph [ref=e390]: "The last day brings the group together for a final activity: the jar of messages. Each camper writes a note — a reflection, an encouragement, a memory — folds it up and adds it to a shared jar. It's a simple, powerful way to close two weeks of shared experience. The day ends with a collective farewell discussion and the kind of goodbyes that usually involve promises to stay in touch."
+      - generic [ref=e396]:
+        - generic [ref=e397]:
+          - heading [level=2] [ref=e398]:
+            - img [ref=e401]
+          - paragraph [ref=e407]: Two weeks on the northern coast of Tenerife — a 4-star hotel two minutes from the beach, dedicated classrooms a short walk away, and the rest of the island within easy reach for the afternoon programme.
+        - generic [ref=e408]:
+          - generic [ref=e409]:
+            - heading "The hotel" [level=3] [ref=e410]
+            - paragraph [ref=e411]: Campers stay at a 4-star property in Puerto de la Cruz, two minutes on foot from Martiánez beach. Rooms are shared between three campers, with all meals — breakfast, lunch and dinner — included on site. The northern coast keeps a mild climate even at the height of summer, so the hotel terrace becomes a second living room.
+          - img "The hotel" [ref=e413]
+        - generic [ref=e414]:
+          - generic [ref=e415]:
+            - heading "The classrooms" [level=3] [ref=e416]
+            - paragraph [ref=e417]: Teaching happens in a dedicated block of four classrooms plus a larger seminar hall — flexible enough for a morning lecture and an afternoon hackathon. Wi-fi is fast, wired desks are available for heavier workloads, and a small library and outdoor shaded terrace round out the spaces students gravitate to between sessions.
+          - img "The classrooms" [ref=e419]
+      - generic [ref=e423]:
+        - heading [level=2] [ref=e424]:
+          - img [ref=e427]
+        - paragraph [ref=e434]: Your child is looked after at all times. Below is how we take care of every camper, from the moment they land in Tenerife to the day they fly home.
+        - list [ref=e435]:
+          - listitem [ref=e436]:
+            - button "24/7 supervision — tap for more" [ref=e437] [cursor=pointer]:
+              - generic [ref=e438]:
+                - generic [ref=e439]:
+                  - generic [ref=e440]: "01"
+                  - generic [ref=e441]: 24/7 supervision
+                - generic [ref=e443]: Nineteen dedicated supervisors on the ground plus eight coaches always accessible — day, night, on every activity.
+          - listitem [ref=e444]:
+            - button "Trained mentors — tap for more" [ref=e445] [cursor=pointer]:
+              - generic [ref=e446]:
+                - generic [ref=e447]:
+                  - generic [ref=e448]: "02"
+                  - generic [ref=e449]: Trained mentors
+                - generic [ref=e451]: Every staff member carries extensive experience working with children and is trained to age group and individual needs.
+          - listitem [ref=e452]:
+            - button "Insurance & medical — tap for more" [ref=e453] [cursor=pointer]:
+              - generic [ref=e454]:
+                - generic [ref=e455]:
+                  - generic [ref=e456]: "03"
+                  - generic [ref=e457]: Insurance & medical
+                - generic [ref=e459]: Camp insurance is included; on-site first aid plus a clear escalation path to local medical services for anything more.
+          - listitem [ref=e460]:
+            - button "Daily updates — tap for more" [ref=e461] [cursor=pointer]:
+              - generic [ref=e462]:
+                - generic [ref=e463]:
+                  - generic [ref=e464]: "04"
+                  - generic [ref=e465]: Daily updates
+                - generic [ref=e467]: Parents are kept in the loop with regular check-ins and a direct channel to the camp coordinator for anything urgent.
+      - generic [ref=e471]:
+        - heading [level=2] [ref=e472]:
+          - img [ref=e475]
+        - paragraph [ref=e490]: Every day at the camp follows the same rhythm — morning learning blocks, an unhurried lunch, the afternoon programme on the island, dinner together, and a deliberately quiet evening before the next early start. Here's how a typical day breaks down.
+        - generic [ref=e492]:
+          - article [ref=e493]:
+            - paragraph [ref=e494]: 7:00am – 9:00am
+            - heading "Early rise" [level=3] [ref=e495]
+            - paragraph [ref=e496]: The day starts with a morning workout, a quick clean-up, and the day's announcements. Then a generous breakfast to power through the first lecture block.
+          - article [ref=e497]:
+            - paragraph [ref=e498]: 9:30am – 11:00am
+            - heading "1st period" [level=3] [ref=e499]
+            - paragraph [ref=e500]: Students pick up the day's coding skills through a mix of lectures, hands-on practice, and short quizzes that keep the room awake and accountable.
+          - article [ref=e501]:
+            - paragraph [ref=e502]: 11:00am – 11:30am
+            - heading "Snack time" [level=3] [ref=e503]
+            - paragraph [ref=e504]: A short break to recharge with something nutritious. Energy back up, attention reset, ready for the next block.
+          - article [ref=e505]:
+            - paragraph [ref=e506]: 11:30am – 1:00pm
+            - heading "2nd period" [level=3] [ref=e507]
+            - paragraph [ref=e508]: The second teaching block leans into individual practice — the instructor circulates while students build their own small projects from the morning's material.
+          - article [ref=e509]:
+            - paragraph [ref=e510]: 1:30pm – 4:00pm
+            - heading "Lunch" [level=3] [ref=e511]
+            - paragraph [ref=e512]: A long, well-balanced lunch on site. Time to eat, talk, and rest before the afternoon programme picks up.
+          - article [ref=e513]:
+            - paragraph [ref=e514]: 4:00pm – 7:00pm
+            - heading "Activities" [level=3] [ref=e515]
+            - paragraph [ref=e516]: The full afternoon goes to the extracurricular programme — beach sports, hikes, cultural walks, surfing, the workshops, the day trips. See the previous section for the day-by-day plan.
+          - article [ref=e517]:
+            - paragraph [ref=e518]: 7:00pm – 8:00pm
+            - heading "Dinner" [level=3] [ref=e519]
+            - paragraph [ref=e520]: Dinner together as a cohort — fresh seafood, Mediterranean staples, and locally-sourced produce on a rotating menu.
+          - article [ref=e521]:
+            - paragraph [ref=e522]: 8:00pm – 10:00pm
+            - heading "Wind down" [level=3] [ref=e523]
+            - paragraph [ref=e524]: The last hours of the day are deliberately unstructured — chill time, an optional movie, occasional quizzes or stargazing on the terrace, then lights out for an early start.
+      - generic [ref=e530]:
+        - heading [level=2] [ref=e531]:
+          - img [ref=e534]
+        - generic [ref=e548]:
+          - article [ref=e549]:
+            - blockquote [ref=e550]:
+              - paragraph [ref=e551]: I won Spain's first-ever gold medal at the 2024 International Olympiad in Informatics, after training at the Harbour.Space Menorca Camp 2023.
+            - generic [ref=e554]:
+              - paragraph [ref=e555]: Alejandro Vivero
+              - paragraph [ref=e556]: Gold winner student
+              - paragraph [ref=e557]: IOI 2024
+          - article [ref=e558]:
+            - blockquote [ref=e559]:
+              - paragraph [ref=e560]: The experience was truly eye-opening. Learning advanced math and programming alongside talented students from around the world in Barcelona pushed my skills forward and gave me a strong foundation.
+            - generic [ref=e563]:
+              - paragraph [ref=e564]: Maxim Oboznyi
+              - paragraph [ref=e565]: Silver Medalist
+              - paragraph [ref=e566]: Southwestern European Regional Contest 2022
+          - article [ref=e567]:
+            - blockquote [ref=e568]:
+              - paragraph [ref=e569]: My daughter arrived unsure about STEM, but the projects and mentors helped her see it differently. It genuinely helped her find her direction. She's now studying programming at university. We're really grateful!!
+            - generic [ref=e572]:
+              - paragraph [ref=e573]: Anna
+              - paragraph [ref=e574]: Parent
+              - paragraph [ref=e575]: Barcelona Summer Camp 2019
+          - article [ref=e576]:
+            - blockquote [ref=e577]:
+              - paragraph [ref=e578]: The Menorca camp was honestly incredible. The activities were hands-on, so it never felt like school, and the mentors were super friendly and helped whenever you got stuck. I'd 100% do it again.
+            - generic [ref=e581]:
+              - paragraph [ref=e582]: Jaime
+              - paragraph [ref=e583]: Participant
+              - paragraph [ref=e584]: Menorca Summer Camp 2023
+      - generic [ref=e590]:
+        - generic [ref=e591]:
+          - heading [level=2] [ref=e592]:
+            - img [ref=e595]
+          - paragraph [ref=e608]: Two ways in. Both include the full academic programme and the afternoon activities; the Full pass adds accommodation, all meals and round-the-clock supervision. Pick the one that fits your travel plans.
+        - generic [ref=e609]:
+          - article [ref=e610]:
+            - generic [ref=e615]:
+              - heading "With accommodation" [level=3] [ref=e616]
+              - paragraph [ref=e617]: €1,800
+            - list [ref=e621]:
+              - listitem [ref=e622]: Two-week academic programme
+              - listitem [ref=e623]: Full extracurricular schedule
+              - listitem [ref=e624]: 4-star hotel + all meals
+              - listitem [ref=e625]: 24-hour supervision + insurance
+            - link "Apply now" [ref=e626] [cursor=pointer]:
+              - /url: "#apply"
+              - generic [ref=e627]: Apply now
+              - generic [ref=e628]: →
+          - article [ref=e629]:
+            - generic [ref=e634]:
+              - heading "Without accommodation" [level=3] [ref=e635]
+              - paragraph [ref=e636]: €1,200
+            - list [ref=e640]:
+              - listitem [ref=e641]: Two-week academic programme
+              - listitem [ref=e642]: Full extracurricular schedule
+              - listitem [ref=e643]: Daily lunch on site
+              - listitem [ref=e644]: Accommodation arranged separately
+            - link "Apply now" [ref=e645] [cursor=pointer]:
+              - /url: "#apply"
+              - generic [ref=e646]: Apply now
+              - generic [ref=e647]: →
+      - generic [ref=e650]:
+        - generic [ref=e651]:
+          - heading [level=2] [ref=e653]:
+            - img [ref=e656]
+          - paragraph [ref=e660]:
+            - text: Need to talk through something specific? Reach out anytime at
+            - link "ioai.spain@harbour.space" [ref=e661] [cursor=pointer]:
+              - /url: mailto:ioai.spain@harbour.space
+            - link "+34 671 498 303" [ref=e662] [cursor=pointer]:
+              - /url: tel:+34671498303
+        - generic [ref=e663]:
+          - group [ref=e664]:
+            - generic "Who is the camp for?" [ref=e665] [cursor=pointer]:
+              - generic [ref=e666]: Who is the camp for?
+          - group [ref=e668]:
+            - generic "Do you need prior coding experience?" [ref=e669] [cursor=pointer]:
+              - generic [ref=e670]: Do you need prior coding experience?
+          - group [ref=e672]:
+            - generic "What's included in the price?" [ref=e673] [cursor=pointer]:
+              - generic [ref=e674]: What's included in the price?
+          - group [ref=e676]:
+            - generic "What language is the camp in?" [ref=e677] [cursor=pointer]:
+              - generic [ref=e678]: What language is the camp in?
+          - group [ref=e680]:
+            - generic "Where do students stay?" [ref=e681] [cursor=pointer]:
+              - generic [ref=e682]: Where do students stay?
+          - group [ref=e684]:
+            - generic "How is supervision handled?" [ref=e685] [cursor=pointer]:
+              - generic [ref=e686]: How is supervision handled?
+          - group [ref=e688]:
+            - generic "What do students need to bring?" [ref=e689] [cursor=pointer]:
+              - generic [ref=e690]: What do students need to bring?
+          - group [ref=e692]:
+            - generic "How does travel work?" [ref=e693] [cursor=pointer]:
+              - generic [ref=e694]: How does travel work?
+      - generic [ref=e697]:
+        - heading "JOIN" [level=1] [ref=e700]:
+          - img "JOIN" [ref=e701]
+        - paragraph [ref=e708]: Ready to take part in the IOAI Spain training camp? Applications open with the national qualifier round in February — shortlisted students are invited directly to camp.
+      - paragraph [ref=e710]: © 2026 IOAI Spain · Tenerife Camp
+    - link "Join now" [ref=e711] [cursor=pointer]:
+      - /url: /form/tenerife-camp/
+      - generic [ref=e712]: Join now
+      - generic [ref=e713]: →

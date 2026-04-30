@@ -788,22 +788,35 @@ const total = activities.length;
   const FILM_VERT = /* glsl */ `
     uniform float uOffset;
     uniform float uStripLen;
-    uniform float uHelixR;
-    uniform float uTurns;
-    uniform float uTwistFactor;
+    uniform float uPathAmp;
+    uniform float uPathFreq;
+    uniform float uPathPhase;
     varying vec2 vUv;
     void main() {
       vUv = uv;
       float t = position.y / uStripLen + uOffset;
-      float theta = t * 6.2831853 * uTurns;
+
+      // Centerline lives on a fixed planar S-curve in world space:
+      // x = sin(worldY * freq) * amp, with a small z bulge for
+      // depth. The path is keyed off worldY (= t * stripLen), NOT
+      // off the strip-local position.y. That distinction is the
+      // whole point: as uOffset slides, the strip's vertices flow
+      // *through* the fixed shape — the path doesn't move with
+      // them. The active frame (t = 0 → worldY = 0) always sits
+      // at the path's origin node.
+      float worldY = t * uStripLen;
+      float pathPhase = worldY * uPathFreq + uPathPhase;
       vec3 center = vec3(
-        uHelixR * sin(theta),
-        t * uStripLen,
-        -uHelixR * (1.0 - cos(theta))
+        sin(pathPhase) * uPathAmp,
+        worldY,
+        cos(pathPhase * 0.7) * uPathAmp * 0.4
       );
-      float twist = theta * uTwistFactor;
-      vec3 right = vec3(cos(twist), 0.0, sin(twist));
+
+      // Strip width runs along world X — the strip is a flat
+      // planar ribbon, no twist, no axial rotation.
+      vec3 right = vec3(1.0, 0.0, 0.0);
       vec3 wp = center + right * position.x;
+
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(wp, 1.0);
     }
   `;
@@ -921,9 +934,12 @@ const total = activities.length;
       const photoY = yBase + Math.round((tileH - photoH) / 2);
       const img = imgs[f];
 
-      // Cover-crop the photo into a 2:3 portrait box, with a
-      // gentle brightness/contrast lift so it doesn't read as a
-      // dim, crushed-shadow mini-thumbnail on the strip.
+      // Cover-crop the photo into the frame box. NO ctx.filter —
+      // any brightness/contrast/saturate bakes a colour shift into
+      // the texture that the GPU pipeline cannot undo. We want the
+      // raw sRGB pixels passed through; Three.js's colorSpace
+      // round-trip (set on the texture + renderer) handles the
+      // sRGB→linear→sRGB conversion losslessly.
       if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
         const targetAspect = photoW / photoH;
         const imgAspect = img.naturalWidth / img.naturalHeight;
@@ -935,17 +951,15 @@ const total = activities.length;
           sh = img.naturalWidth / targetAspect;
           sy = (img.naturalHeight - sh) / 2;
         }
-        ctx.save();
-        ctx.filter = 'brightness(1.12) contrast(0.92) saturate(1.05)';
         ctx.drawImage(img, sx, sy, sw, sh, photoX, photoY, photoW, photoH);
-        ctx.restore();
       }
 
       // Frame number — drawn on BOTH outer edges of the strip,
       // rotated so the TOP of the glyph touches the outer edge
       // and the digits read inward (toward the photo). Positioned
-      // vertically between holes 5 and 6 from the top.
-      const slotIdx = 5;
+      // vertically in the middle of the frame, between holes 4
+      // and 5 from the top (0-indexed slotIdx = 3).
+      const slotIdx = 3;
       const slotYTop =
         yBase + sideMargin + (usable * slotIdx) / (holesPerSide - 1) + holeH;
       const slotYBot =
@@ -1003,7 +1017,8 @@ const total = activities.length;
     tex.magFilter = THREE.LinearFilter;
     tex.generateMipmaps = true;
     tex.anisotropy = 4;
-    tex.colorSpace = THREE.SRGBColorSpace;
+    // No colorSpace tag — see ColorManagement.enabled = false in
+    // initFilm. We pass canvas pixels straight through.
     return tex;
   }
 
@@ -1027,7 +1042,17 @@ const total = activities.length;
       return null;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Color management OFF. Three.js's automatic linear<->sRGB
+    // conversions interact badly with custom ShaderMaterials and
+    // canvas-2D textures — depending on the codepath you can get
+    // double-decode (washed out) or double-encode (cooked). For a
+    // pure photo pass-through, the cleanest answer is to disable
+    // colour management entirely. Bytes from the 2D canvas land
+    // unchanged in the framebuffer; the browser displays them as
+    // sRGB (the canvas default). No transforms, no precision loss.
+    THREE.ColorManagement.enabled = false;
+    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.toneMappingExposure = 1.0;
     renderer.setClearColor(0x000000, 0);
 
     let { w, h } = sizeOf(container);
@@ -1041,7 +1066,7 @@ const total = activities.length;
     // sprocket-hole columns can flank it. `gutter` is the slim
     // black bar between consecutive photos — minimal, like real
     // 35mm stock.
-    const PHOTO_ASPECT = 1.5; // height / width
+    const PHOTO_ASPECT = 1.25; // height / width — 4:5 portrait
     const STRIP_FACTOR = 0.62; // strip width as fraction of column width
     const PHOTO_WITHIN_STRIP = 0.78; // photo width as fraction of strip width
     const GUTTER_FRACTION = 0.04; // gutter as fraction of frameH
@@ -1099,18 +1124,27 @@ const total = activities.length;
     //               vector (the ribbon's flat-face orientation).
     //               1 = ribbon twists 1× along with the helix
     //               position.
-    let HELIX_R = stripW * 0.55;
-    const HELIX_TURNS = 1.25;
-    const HELIX_TWIST = 1.0;
     const STRIP_LEN = frameH * total;
+    // Path parameters — fixed wavy plane in world space. The
+    // strip's vertices flow through this shape as uOffset shifts.
+    // - PATH_AMP: peak sideways bulge (world-px). Larger = more
+    //   pronounced wave.
+    // - PATH_FREQ: spatial frequency (radians per world-y px).
+    //   Tuned so ~2 humps span the full strip — gentle, not busy.
+    // - PATH_PHASE = 0 puts the active frame (worldY = 0) right at
+    //   a wave node, so it sits unshifted at world origin while
+    //   adjacent frames bulge to either side.
+    let PATH_AMP = stripW * 0.18;
+    let PATH_FREQ = (Math.PI * 2 * 2.0) / STRIP_LEN;
+    const PATH_PHASE = 0;
 
     const sharedUniforms = {
       uTex: { value: null as THREE_NS.Texture | null },
       uOffset: { value: 0 },
       uStripLen: { value: STRIP_LEN },
-      uHelixR: { value: HELIX_R },
-      uTurns: { value: HELIX_TURNS },
-      uTwistFactor: { value: HELIX_TWIST },
+      uPathAmp: { value: PATH_AMP },
+      uPathFreq: { value: PATH_FREQ },
+      uPathPhase: { value: PATH_PHASE },
     };
 
     // ── Single mesh: strip body + holes + photos baked together ─
@@ -1185,9 +1219,11 @@ const total = activities.length;
       const newStripLen = frameH * total;
       strip.geometry.dispose();
       strip.geometry = new THREE.PlaneGeometry(stripW, newStripLen, 1, total * 24);
-      HELIX_R = stripW * 0.55;
+      PATH_AMP = stripW * 0.18;
+      PATH_FREQ = (Math.PI * 2 * 2.0) / newStripLen;
       sharedUniforms.uStripLen.value = newStripLen;
-      sharedUniforms.uHelixR.value = HELIX_R;
+      sharedUniforms.uPathAmp.value = PATH_AMP;
+      sharedUniforms.uPathFreq.value = PATH_FREQ;
       render();
     });
     resizeObs.observe(container);
@@ -1196,6 +1232,9 @@ const total = activities.length;
     let currentTween: gsap.core.Tween | null = null;
     let rafId = 0;
 
+    // RAF loop runs only while a tween is active — the path itself
+    // is fixed (no time-based uniform), so at rest one render is
+    // enough.
     function startRaf() {
       cancelAnimationFrame(rafId);
       const tick = () => {
@@ -1224,7 +1263,6 @@ const total = activities.length;
           cancelAnimationFrame(rafId);
         },
       });
-
       startRaf();
     }
 
@@ -1270,9 +1308,9 @@ const total = activities.length;
       try { canvas.setPointerCapture(e.pointerId); } catch {}
       canvas.style.cursor = 'grabbing';
       e.preventDefault();
+      // Keep RAF ticking for the duration of the drag — set a
+      // sentinel tween so startRaf doesn't bail.
       startRaf();
-      // Force the RAF to keep ticking while dragging even though
-      // currentTween is null — set a sentinel.
       currentTween = { kill() {}, progress() { return 0; } } as unknown as gsap.core.Tween;
     }
     function onPointerMove(e: PointerEvent) {

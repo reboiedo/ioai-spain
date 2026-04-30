@@ -86,9 +86,13 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
   function initLenis() {
     if (lenis) return;
     lenis = new Lenis({
-      // Default easing with mild lerp — the "buttery" feel without being
-      // so slow that sticky-reveal transitions feel delayed.
-      lerp: 0.1,
+      // Slightly slower lerp than the default (0.1) — gives scroll
+      // velocity a longer momentum tail so the binary pin moments
+      // feel less abrupt. With Lenis smoothing wheel input but
+      // ScrollTrigger.pin still being a discrete state change, a
+      // longer momentum decay is the only way to soften the
+      // perceived "thump" when content goes from scrolling to fixed.
+      lerp: 0.075,
     });
 
     // Drive ScrollTrigger updates from Lenis's scroll event so pins

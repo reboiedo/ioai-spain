@@ -1,0 +1,381 @@
+- generic [ref=e5]:
+  - banner [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - link "FOLLOW. ART" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e12]: FOLLOW. ART
+        - paragraph: Nexus of Curators and Artists
+      - generic [ref=e13]:
+        - link "About" [ref=e14] [cursor=pointer]:
+          - /url: /about
+          - generic [ref=e16]: About
+        - link "Nexus Card" [ref=e17] [cursor=pointer]:
+          - /url: /nexus-card
+          - generic [ref=e19]: Nexus Card
+        - link "Community Board" [ref=e20] [cursor=pointer]:
+          - /url: /community-board
+          - generic [ref=e22]: Community Board
+        - link "Pricing" [ref=e23] [cursor=pointer]:
+          - /url: /pricing
+          - generic [ref=e25]: Pricing
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+          - generic [ref=e28]: FAQ
+      - generic [ref=e30]:
+        - link "Login" [ref=e31] [cursor=pointer]:
+          - /url: /signin
+          - generic [ref=e33]: Login
+        - link "Join" [ref=e34] [cursor=pointer]:
+          - /url: /signup
+          - generic [ref=e36]: Join
+  - generic [ref=e37]:
+    - generic [ref=e38]:
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - heading "FollowArt" [level=1] [ref=e43]
+          - generic [ref=e44]:
+            - img
+        - img [ref=e46]
+      - paragraph [ref=e53]:
+        - text: Nexus of
+        - text: Curators and
+        - generic [ref=e54]: Artists
+    - generic [ref=e58]:
+      - img [ref=e59]
+      - img [ref=e60]
+      - img [ref=e61]
+      - img [ref=e62]
+      - img [ref=e63]
+  - generic [ref=e68]:
+    - generic [ref=e71]:
+      - generic [ref=e75]:
+        - button [ref=e76] [cursor=pointer]:
+          - img [ref=e79]
+        - paragraph [ref=e80]:
+          - text: How
+          - text: FOLLOW. ART
+          - text: works?
+      - img [ref=e83]
+    - generic [ref=e84]:
+      - heading "Your Nexus" [level=2] [ref=e87]:
+        - generic [ref=e88]: Your
+        - generic [ref=e89]:
+          - generic [ref=e90]: Nexus
+          - img [ref=e91]
+          - img [ref=e93]
+      - separator [ref=e95]
+      - paragraph [ref=e97]:
+        - text: Join Nexus of Curators & Artists, built on
+        - generic [ref=e98]:
+          - img [ref=e99]
+          - generic [ref=e101]: collaboration.
+        - text: No gatekeeping and competition.
+  - generic [ref=e107]:
+    - generic [ref=e108]:
+      - heading "FOLLOW. ART" [level=2] [ref=e109]:
+        - generic [ref=e110]: FOLLOW.
+        - generic [ref=e111]:
+          - generic [ref=e112]: ART
+          - img [ref=e113]
+      - paragraph [ref=e115]:
+        - text: FOLLOW.ART is the
+        - generic [ref=e116]:
+          - img [ref=e117]
+          - generic [ref=e119]: first
+        - text: and only
+        - generic [ref=e120]:
+          - img [ref=e121]
+          - generic [ref=e123]: network
+        - text: made for curators and artists, combining tools for professional presentation, visibility, connection and knowledge sharing.
+    - generic [ref=e124]:
+      - img [ref=e126]
+      - list [ref=e127]:
+        - listitem [ref=e128]:
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - generic [ref=e131]: "1"
+              - paragraph [ref=e132]:
+                - text: Professional
+                - text: presentation
+            - generic [ref=e134]:
+              - generic [ref=e135]: "1"
+              - paragraph [ref=e136]: Share your creative identity via the Nexus Card
+        - listitem [ref=e137]:
+          - generic [ref=e138]:
+            - generic [ref=e139]:
+              - generic [ref=e140]: "2"
+              - paragraph [ref=e141]: Visibility
+            - generic [ref=e142]:
+              - generic [ref=e143]: "2"
+              - paragraph [ref=e144]: Get discovered easily and without algorithms
+        - listitem [ref=e145]:
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - generic [ref=e148]: "3"
+              - paragraph [ref=e149]: Connection
+            - generic [ref=e150]:
+              - generic [ref=e151]: "3"
+              - paragraph [ref=e152]: Build a network for collaborations with fellow creatives in the Connectory
+        - listitem [ref=e153]:
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e156]: "4"
+              - paragraph [ref=e157]:
+                - text: Knowledge
+                - text: exchange
+            - generic [ref=e159]:
+              - generic [ref=e160]: "4"
+              - paragraph [ref=e161]: Give and get – support, skills, guidance, and good vibes
+  - generic [ref=e165]:
+    - generic [ref=e167]:
+      - heading "Nexus card" [level=2] [ref=e168]
+      - generic [ref=e169]:
+        - img [ref=e170]
+        - img "Nexus Card for artists — share your portfolio, bio, exhibitions, and awards with one professional tool." [ref=e180]
+    - separator [ref=e184]
+    - generic [ref=e185]:
+      - paragraph [ref=e187]:
+        - text: Your
+        - generic [ref=e188]:
+          - img [ref=e189]
+          - generic [ref=e191]: Digital Portfolio
+        - text: Evolved. A new standard for professional art presentation and discoverability.
+      - generic [ref=e192]:
+        - paragraph [ref=e193]:
+          - text: Comprehensive, shareable snapshot of your
+          - generic [ref=e194]:
+            - img [ref=e195]
+            - generic [ref=e197]: creative Identity.
+          - text: No more "find me on Insta". Add it your to your Wallet app and share with one click. Let your Nexus Card do the talking while you focus on creating.
+        - img [ref=e201]
+  - generic [ref=e206]:
+    - generic [ref=e207]:
+      - paragraph [ref=e208]:
+        - text: Nexus Card Users Are
+        - text: Creating the Connectory
+      - generic [ref=e210]:
+        - heading "Connectory" [level=2] [ref=e211]
+        - generic [ref=e212]:
+          - img [ref=e213]
+          - img [ref=e224]
+    - separator [ref=e227]
+    - generic [ref=e228]:
+      - paragraph [ref=e230]:
+        - text: A
+        - generic [ref=e231]:
+          - img [ref=e232]
+          - generic [ref=e234]: dynamic directory
+        - text: to find who you need and get found by those who matter.
+      - generic [ref=e235]:
+        - paragraph [ref=e236]:
+          - text: Think of it as the Yellow Pages for curators and artists. No algorithms, no paywalls, no limits. It’s an
+          - generic [ref=e237]:
+            - img [ref=e238]
+            - generic [ref=e240]: open space
+          - text: for organic, community-driven networking.
+        - img [ref=e244]
+  - generic [ref=e249]:
+    - paragraph [ref=e250]:
+      - text: Curators & Artists
+      - text: About Us
+    - generic [ref=e252]:
+      - generic [ref=e253]:
+        - heading "Testimonials" [level=2] [ref=e254]
+        - generic [ref=e255]:
+          - img [ref=e256]
+          - img [ref=e269]
+      - generic [ref=e272]:
+        - button "Prev":
+          - generic:
+            - generic: Prev
+        - button "Next" [ref=e273] [cursor=pointer]:
+          - generic [ref=e275]: Next
+  - generic [ref=e281]:
+    - generic [ref=e282]:
+      - generic [ref=e284]:
+        - heading "art world" [level=2] [ref=e285]
+        - img [ref=e286]
+      - paragraph [ref=e288]:
+        - text: The Art World
+        - text: wasn't made for us —
+        - text: we're
+        - generic [ref=e291]:
+          - img [ref=e292]
+          - generic [ref=e294]: building our own.
+        - text: No hierarchies. No algorithms. Just curators and artists connecting and growing together.
+    - separator [ref=e295]
+    - generic [ref=e296]:
+      - list [ref=e297]:
+        - listitem [ref=e298]:
+          - generic [ref=e299]:
+            - paragraph [ref=e301]: Teona Toderel
+            - paragraph [ref=e304]: Artist
+          - img [ref=e309]
+        - listitem [ref=e310]:
+          - generic [ref=e311]:
+            - paragraph [ref=e313]: Erin J Coholan
+            - paragraph [ref=e316]: Artist
+          - img [ref=e321]
+        - listitem [ref=e322]:
+          - generic [ref=e323]:
+            - paragraph [ref=e325]: Baimba Kamara
+            - paragraph [ref=e328]: Curator
+          - img [ref=e333]
+        - listitem [ref=e334]:
+          - generic [ref=e335]:
+            - paragraph [ref=e337]: Alberto Balocca
+            - paragraph [ref=e340]: Artist
+          - img [ref=e345]
+        - listitem [ref=e346]:
+          - generic [ref=e347]:
+            - paragraph [ref=e349]: Thomas Oosterhof
+            - paragraph [ref=e352]: Curator
+          - img [ref=e357]
+        - listitem [ref=e358]:
+          - generic [ref=e359]:
+            - paragraph [ref=e361]: Isabela Galeano
+            - paragraph [ref=e364]: Curator
+          - img [ref=e369]
+        - listitem [ref=e370]:
+          - generic [ref=e371]:
+            - paragraph [ref=e373]: Danny Van der Elst
+            - paragraph [ref=e376]: Artist
+          - img [ref=e381]
+        - listitem [ref=e382]:
+          - generic [ref=e383]:
+            - paragraph [ref=e385]: Sophie Wratzfeld
+            - paragraph [ref=e388]: Curator
+          - img [ref=e393]
+        - listitem [ref=e394]:
+          - generic [ref=e395]:
+            - paragraph [ref=e397]: Farouk Alao
+            - paragraph [ref=e400]: Artist
+          - img [ref=e405]
+        - listitem [ref=e406]:
+          - generic [ref=e407]:
+            - paragraph [ref=e409]: Keita Melle
+            - paragraph [ref=e412]: Artist
+          - img [ref=e417]
+      - list [ref=e418]:
+        - listitem [ref=e419]:
+          - generic [ref=e420]:
+            - paragraph [ref=e422]: Teona Toderel
+            - paragraph [ref=e425]: Artist
+          - img [ref=e430]
+        - listitem [ref=e431]:
+          - generic [ref=e432]:
+            - paragraph [ref=e434]: Erin J Coholan
+            - paragraph [ref=e437]: Artist
+          - img [ref=e442]
+        - listitem [ref=e443]:
+          - generic [ref=e444]:
+            - paragraph [ref=e446]: Baimba Kamara
+            - paragraph [ref=e449]: Curator
+          - img [ref=e454]
+        - listitem [ref=e455]:
+          - generic [ref=e456]:
+            - paragraph [ref=e458]: Alberto Balocca
+            - paragraph [ref=e461]: Artist
+          - img [ref=e466]
+        - listitem [ref=e467]:
+          - generic [ref=e468]:
+            - paragraph [ref=e470]: Thomas Oosterhof
+            - paragraph [ref=e473]: Curator
+          - img [ref=e478]
+        - listitem [ref=e479]:
+          - generic [ref=e480]:
+            - paragraph [ref=e482]: Isabela Galeano
+            - paragraph [ref=e485]: Curator
+          - img [ref=e490]
+        - listitem [ref=e491]:
+          - generic [ref=e492]:
+            - paragraph [ref=e494]: Danny Van der Elst
+            - paragraph [ref=e497]: Artist
+          - img [ref=e502]
+        - listitem [ref=e503]:
+          - generic [ref=e504]:
+            - paragraph [ref=e506]: Sophie Wratzfeld
+            - paragraph [ref=e509]: Curator
+          - img [ref=e514]
+        - listitem [ref=e515]:
+          - generic [ref=e516]:
+            - paragraph [ref=e518]: Farouk Alao
+            - paragraph [ref=e521]: Artist
+          - img [ref=e526]
+        - listitem [ref=e527]:
+          - generic [ref=e528]:
+            - paragraph [ref=e530]: Keita Melle
+            - paragraph [ref=e533]: Artist
+          - img [ref=e538]
+  - generic [ref=e543]:
+    - generic [ref=e544]:
+      - generic [ref=e545]:
+        - generic [ref=e546]:
+          - heading "Join Us" [level=2] [ref=e547]
+          - generic [ref=e548]:
+            - img [ref=e549]
+            - img [ref=e554]
+        - generic [ref=e555]:
+          - img [ref=e560]
+          - img [ref=e565]
+          - img [ref=e570]
+          - img [ref=e575]
+          - img [ref=e580]
+          - img [ref=e585]
+          - img [ref=e590]
+          - img [ref=e595]
+          - img [ref=e600]
+          - img [ref=e605]
+          - img [ref=e610]
+          - img [ref=e615]
+          - img [ref=e620]
+          - img [ref=e625]
+          - img [ref=e630]
+          - img [ref=e635]
+          - img [ref=e640]
+          - img [ref=e645]
+      - generic [ref=e646]:
+        - paragraph [ref=e647]:
+          - text: Ready to take control of your creative journey?
+          - generic [ref=e648]:
+            - img [ref=e649]
+            - generic [ref=e651]: Join now
+          - text: and let’s shape the future of the art world together!
+        - generic [ref=e653]:
+          - img [ref=e655]
+          - link "Join" [ref=e657] [cursor=pointer]:
+            - /url: /signup
+            - generic [ref=e659]: Join
+    - separator [ref=e661]
+    - generic [ref=e662]:
+      - generic [ref=e663]:
+        - navigation [ref=e664]:
+          - list [ref=e665]:
+            - listitem [ref=e666]:
+              - link "Brand Kit" [ref=e667] [cursor=pointer]:
+                - /url: https://drive.google.com/file/d/1TRkafTTsg9FOyLTzmTkNSRsd5lD0kx3X/view?usp=sharing
+                - generic [ref=e669]: Brand Kit
+            - listitem [ref=e670]:
+              - link "Buy Gift Card" [ref=e671] [cursor=pointer]:
+                - /url: /gift-card
+                - generic [ref=e673]: Buy Gift Card
+            - listitem [ref=e674]:
+              - link "Terms & Conditions" [ref=e675] [cursor=pointer]:
+                - /url: /terms-and-conditions
+                - generic [ref=e677]: Terms & Conditions
+            - listitem [ref=e678]:
+              - link "Privacy Policy" [ref=e679] [cursor=pointer]:
+                - /url: /privacy-policy
+                - generic [ref=e681]: Privacy Policy
+            - listitem [ref=e682]:
+              - link "Cookie Policy" [ref=e683] [cursor=pointer]:
+                - /url: /cookies-policy
+                - generic [ref=e685]: Cookie Policy
+        - link "Digital product development by Vide Infra" [ref=e687] [cursor=pointer]:
+          - /url: https://videinfra.com/
+          - generic [ref=e689]: Digital product development by Vide Infra
+      - paragraph [ref=e692]: 2026 © FOLLOW.ART
+  - link "Join" [ref=e694] [cursor=pointer]:
+    - /url: /signup
+    - generic [ref=e696]: Join

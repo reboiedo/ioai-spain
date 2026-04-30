@@ -1,0 +1,2 @@
+[ 1862373ms] [WARNING] [Meta Pixel] - Duplicate Pixel ID: 663534659843459. @ https://connect.facebook.net/en_US/fbevents.js:181
+[11985759ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://follow.art/_nuxt/builds/latest.json?1777388795056:0
