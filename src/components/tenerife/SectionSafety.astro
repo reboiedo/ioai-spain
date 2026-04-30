@@ -439,15 +439,16 @@ const supervisors: Supervisor[] = [
 
   /* Tilted safety photo — fixed 4:5 aspect ratio, sized as a % of
    * its containing block. `-8deg` tilt matches the Story video
-   * tile so the two scenes feel like a pair. Anchored absolute on
-   * every viewport (overlapping the title); falls back to natural
-   * flow on mobile via the order-swap above. */
+   * tile so the two scenes feel like a pair. Anchored absolute
+   * over the upper-left of the column so it sits BETWEEN SAFETY
+   * (top, right-aligned) and FIRST (bottom, right-aligned)
+   * without overlapping the FIRST glyphs. */
   .safety__photo {
     display: block;
     position: absolute;
-    width: 35%;
-    bottom: 6%;
-    left: 18%;
+    width: 28%;
+    bottom: 28%;
+    left: 6%;
     aspect-ratio: 4 / 5;
     margin: 0;
     transform: rotate(-8deg);
