@@ -9,6 +9,8 @@ export interface Props {
   showNavigation?: boolean;
   hideNavItems?: boolean;
   ctaUrlOverride?: string;
+  /** Forwarded to Navigation. Replaces the default nav items list. */
+  navItems?: { label: string; href: string }[];
   /** Forwarded to Navigation. `'transparent'` swaps in the white wordmark. */
   navTheme?: 'default' | 'transparent';
   ogImage?: string;
@@ -22,6 +24,7 @@ const {
   showNavigation = true,
   hideNavItems = false,
   ctaUrlOverride,
+  navItems,
   navTheme = 'default',
   ogImage,
   ogType,
@@ -44,7 +47,7 @@ const locale = Astro.currentLocale || 'en';
     <slot name="head" />
   </Head>
   <body>
-    {showNavigation && <Navigation hideNavItems={hideNavItems} ctaUrlOverride={ctaUrlOverride} theme={navTheme} />}
+    {showNavigation && <Navigation hideNavItems={hideNavItems} ctaUrlOverride={ctaUrlOverride} navItems={navItems} theme={navTheme} />}
     <main>
       <slot />
     </main>

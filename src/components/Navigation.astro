@@ -11,6 +11,8 @@ import logoWhiteSvg from '@/assets/ioai-logo-white.svg';
 export interface Props {
   hideNavItems?: boolean;
   ctaUrlOverride?: string;
+  /** Override the default nav items list. */
+  navItems?: { label: string; href: string }[];
   /**
    * Visual theme for the nav. `'default'` is the standard light
    * nav. `'transparent'` swaps in the white wordmark for use on
@@ -19,7 +21,12 @@ export interface Props {
   theme?: 'default' | 'transparent';
 }
 
-const { hideNavItems = false, ctaUrlOverride, theme = 'default' } = Astro.props;
+const {
+  hideNavItems = false,
+  ctaUrlOverride,
+  navItems: navItemsOverride,
+  theme = 'default',
+} = Astro.props;
 const logoSrc = theme === 'transparent' ? logoWhiteSvg : logoSvg;
 
 // Get current locale from Astro's i18n
@@ -40,13 +47,14 @@ const languageOptions = LANGUAGES.map(code => ({
 }));
 
 // Define navigation items with proper section IDs
-const navItems = [
+const defaultNavItems = [
   { label: t.ui.nav.aboutIOAI, href: '#about' },
   { label: t.ui.nav.whyJoin, href: '#why-join' },
   { label: t.ui.nav.eligibility, href: '#eligibility' },
   { label: t.ui.nav.programme, href: '#how-it-works' },
   { label: t.ui.nav.faq, href: '#faq' }
 ];
+const navItems = navItemsOverride ?? defaultNavItems;
 ---
 
 <nav>
@@ -66,8 +74,10 @@ const navItems = [
       </a>
     </div>
 
-    <!-- Navigation items -->
-    {!hideNavItems && (
+    <!-- Centered nav items — used by the homepage. The override
+         path renders the items inside `.nav-right` instead so they
+         sit alongside the language switcher / CTA. -->
+    {!hideNavItems && !navItemsOverride && (
       <ul class="nav-items">
         {navItems.map(item => (
           <li>
@@ -77,8 +87,18 @@ const navItems = [
       </ul>
     )}
 
-    <!-- Right side: Language switcher and CTA -->
+    <!-- Right side: optional override nav items + Language switcher + CTA -->
     <div class="nav-right">
+      {!hideNavItems && navItemsOverride && (
+        <ul class="nav-items nav-items--inline">
+          {navItems.map(item => (
+            <li>
+              <Button variant="text" size="small" href={item.href}>{item.label}</Button>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <!-- Language switcher dropdown -->
       <Dropdown
         options={languageOptions}
@@ -146,6 +166,15 @@ const navItems = [
     display: flex;
     align-items: center;
     gap: var(--space-2xs);
+  }
+
+  /* Inline override variant: items render inside `.nav-right` so
+   * they sit on the right alongside the language switcher and CTA
+   * (rather than centred between brand and right cluster). */
+  .nav-items--inline {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    gap: var(--space-xs);
   }
 
 
