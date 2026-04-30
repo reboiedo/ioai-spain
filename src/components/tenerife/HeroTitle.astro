@@ -244,10 +244,15 @@ const svgMarkup = slotText
       invalidateOnRefresh: true,
     } as const;
 
+    // Entry: paths sit at natural height (scaleY = 1) on first paint
+    // so the LCP isn't held back by an animated stretch. Once we
+    // attach the scroll behaviour we play a quick compress from 1 →
+    // start over a few hundred ms, *then* ScrollTrigger takes over
+    // and scrubs from start → end. The user sees the title appear
+    // clean, then "settle in" to the stretched layout.
     paths.forEach((path) => {
       const start = parseFloat(path.dataset.startScaleY || '0.6');
       const end = parseFloat(path.dataset.endScaleY || '1.5');
-      path.style.setProperty('--scroll-sy', start.toFixed(3));
       path.style.setProperty('--mouse-sy', '1');
       mouseTrackedPaths.push(path);
 
@@ -259,19 +264,34 @@ const svgMarkup = slotText
         }),
       );
 
-      stretchTweens.push(
-        gsap.fromTo(
-          path,
-          { '--scroll-sy': start },
-          {
-            '--scroll-sy': end,
-            ease: 'none',
-            immediateRender: true,
-            scrollTrigger: commonTrigger,
+      gsap.fromTo(
+        path,
+        { '--scroll-sy': 1 },
+        {
+          '--scroll-sy': start,
+          duration: 0.6,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            stretchTweens.push(
+              gsap.fromTo(
+                path,
+                { '--scroll-sy': start },
+                {
+                  '--scroll-sy': end,
+                  ease: 'none',
+                  immediateRender: true,
+                  scrollTrigger: commonTrigger,
+                },
+              ),
+            );
           },
-        ),
+        },
       );
     });
+
+    // Refresh once the entry is done so ScrollTrigger picks up the
+    // current scroll position.
+    gsap.delayedCall(0.7, () => ScrollTrigger.refresh());
   }
 
   function renderAll() {
@@ -298,15 +318,26 @@ const svgMarkup = slotText
     if (mouseTrackedPaths.length > 0) {
       window.addEventListener('mousemove', onMouseMove, { passive: true });
     }
-
-    ScrollTrigger.refresh();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderAll, { once: true });
+  // Defer the stretch + mouse wiring until after the page has loaded
+  // and the browser has reported idle, so the LCP element (the
+  // unstretched title text) paints without ScrollTrigger / tween
+  // setup blocking the main thread.
+  type IdleCb = (cb: () => void, opts?: { timeout?: number }) => number;
+  const ric: IdleCb =
+    (window as unknown as { requestIdleCallback?: IdleCb }).requestIdleCallback ??
+    ((cb) => window.setTimeout(cb, 1) as unknown as number);
+
+  function scheduleRender() {
+    ric(() => renderAll(), { timeout: 2000 });
+  }
+
+  if (document.readyState === 'complete') {
+    scheduleRender();
   } else {
-    renderAll();
+    window.addEventListener('load', scheduleRender, { once: true });
   }
 
-  document.addEventListener('astro:page-load', renderAll);
+  document.addEventListener('astro:page-load', scheduleRender);
 </script>
