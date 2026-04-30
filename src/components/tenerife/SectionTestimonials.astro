@@ -122,9 +122,9 @@ const testimonials: Testimonial[] = [
           aria-label="Previous testimonial"
         >
           <span class="testi-nav-btn__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10.5" />
-              <path d="M14 8 L10 12 L14 16" />
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <circle class="testi-nav-btn__icon-bg" cx="12" cy="12" r="11" />
+              <path class="testi-nav-btn__icon-arrow" d="M14 8 L10 12 L14 16" fill="none" stroke-width="1.5" />
             </svg>
           </span>
           <span class="testi-nav-btn__label">Prev</span>
@@ -137,9 +137,9 @@ const testimonials: Testimonial[] = [
         >
           <span class="testi-nav-btn__label">Next</span>
           <span class="testi-nav-btn__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10.5" />
-              <path d="M10 8 L14 12 L10 16" />
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <circle class="testi-nav-btn__icon-bg" cx="12" cy="12" r="11" />
+              <path class="testi-nav-btn__icon-arrow" d="M10 8 L14 12 L10 16" fill="none" stroke-width="1.5" />
             </svg>
           </span>
         </button>
@@ -458,23 +458,20 @@ const testimonials: Testimonial[] = [
   .testi-nav-btn {
     appearance: none;
     border: 0;
-    /* Solid primary pill: brand background, foreground text +
-     * icon stroke. Reads as the dominant action in this scene's
-     * chrome regardless of section theme. */
-    background: var(--primary);
-    color: var(--primary-foreground);
+    background: transparent;
+    color: inherit;
     font: inherit;
-    padding: var(--space-2xs) var(--space-m);
+    padding: 0;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
     cursor: pointer;
-    border-radius: 999px;
-    transition: transform 220ms ease;
+    opacity: 0.85;
+    transition: opacity 220ms ease;
   }
 
   .testi-nav-btn:hover {
-    transform: translateY(-1px);
+    opacity: 1;
   }
 
   .testi-nav-btn__icon {
@@ -489,6 +486,16 @@ const testimonials: Testimonial[] = [
     width: 100%;
     height: 100%;
     display: block;
+  }
+
+  /* Solid circle in --primary, chevron stroke in
+   * --primary-foreground — the icon reads as a filled brand pill
+   * regardless of the section theme, label text stays inherited. */
+  .testi-nav-btn__icon-bg {
+    fill: var(--primary);
+  }
+  .testi-nav-btn__icon-arrow {
+    stroke: var(--primary-foreground);
   }
 
   .testi-nav-btn--prev:hover .testi-nav-btn__icon {
