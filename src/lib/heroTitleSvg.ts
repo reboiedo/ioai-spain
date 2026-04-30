@@ -59,7 +59,7 @@ export function buildHeroTitleSvg({
   const ascender = (font.ascender / unitsPerEm) * fontSize;
 
   let cursor = 0;
-  const charPaths: Array<{ d: string; char: string }> = [];
+  const charPaths: Array<{ d: string; char: string; topY: number }> = [];
   // Tight visual bbox accumulated across all glyphs via svg-path-bounds.
   let tightMinX = Infinity;
   let tightMinY = Infinity;
@@ -70,15 +70,17 @@ export function buildHeroTitleSvg({
     const glyph = font.charToGlyph(char);
     const p = glyph.getPath(cursor, ascender, fontSize);
     const d = p.toPathData(3);
+    let topY = 0;
     if (d) {
       const [x1, y1, x2, y2] = svgPathBounds(d) as [number, number, number, number];
       if (x1 < tightMinX) tightMinX = x1;
       if (y1 < tightMinY) tightMinY = y1;
       if (x2 > tightMaxX) tightMaxX = x2;
       if (y2 > tightMaxY) tightMaxY = y2;
+      topY = y1;
     }
     const advance = (glyph.advanceWidth / unitsPerEm) * fontSize;
-    charPaths.push({ d, char });
+    charPaths.push({ d, char, topY });
     cursor += advance;
   }
 
@@ -112,18 +114,28 @@ export function buildHeroTitleSvg({
   // exactly the few-pixel layout shift we want to avoid.
   const maxEnd = noStretch ? 1 : endScales.length ? Math.max(...endScales, 1) : 1;
   const stretchPad = (maxEnd - 1) * vbH;
+  const totalVbH = vbH + stretchPad;
 
   const pathEls = charPaths
     .map((cp, i) => {
       const zPick = (Math.sin(i * 17.913) * 43758.5453) % 1;
       const zIndex = zPick > 0 ? 3 : 1;
       const endAttr = noStretch ? '' : ` data-end-scale-y="${endScales[i].toFixed(3)}"`;
-      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex}"/>`;
+      // Per-letter transform-origin: anchor scaleY at THIS glyph's
+      // own visible cap-line, expressed as a percentage of the
+      // viewBox height so it survives any CSS-pixel ↔ user-unit
+      // mismatch when the SVG is rendered responsively. Without
+      // this, glyphs whose tops differ from the line's vbY (an
+      // A-apex sets vbY higher than flat-top caps) scale around
+      // a y above their own ink and visibly drift.
+      const yPct = totalVbH > 0 ? ((cp.topY - vbY) / totalVbH) * 100 : 0;
+      const originStyle = `transform-origin: 0 ${yPct.toFixed(3)}%;`;
+      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex};${originStyle}"/>`;
     })
     .join('');
 
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vbX} ${vbY} ${vbW} ${vbH + stretchPad}" role="img" aria-label="${escapeAttr(text)}">` +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vbX} ${vbY} ${vbW} ${totalVbH}" role="img" aria-label="${escapeAttr(text)}">` +
     pathEls +
     `</svg>`
   );

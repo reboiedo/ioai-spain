@@ -174,17 +174,15 @@ const svgMarkup = slotText
    *   --mouse-sy   mouse-proximity, 1 far → (1 − amplitude) at cursor
    *   final scaleY = --scroll-sy × --mouse-sy
    *
-   * `transform-box: view-box` anchors each path's transform-origin
-   * relative to the SVG's own viewBox instead of each path's
-   * computed fill-box. The viewBox top was set via svg-path-bounds
-   * to the exact tight cap-line of the row, so `transform-origin: 0
-   * 0` lands every glyph at that single cap-line. Scaling > 1
-   * extends each glyph DOWNWARD from this shared top edge — no
-   * sub-pixel drift between glyphs whose bbox top sits a hair above
-   * the visible ink (Bezier control points). */
+   * `transform-box: view-box` makes transform-origin resolve
+   * against the SVG's viewBox (a single shared coordinate system
+   * for the whole row). The build-time SVG generator emits each
+   * path's transform-origin as a percentage matching THAT glyph's
+   * tight visible top, so scaling anchors at that letter's actual
+   * cap regardless of how Bezier control points sit relative to
+   * the ink — no sub-pixel drift, no per-letter top shift. */
   .hero-title svg path {
     transform-box: view-box;
-    transform-origin: 0 0;
     fill: currentColor;
     transform: scaleY(calc(var(--scroll-sy, 1) * var(--mouse-sy, 1)));
     /* `position: relative` is necessary for z-index to take effect on
