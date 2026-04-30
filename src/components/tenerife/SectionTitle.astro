@@ -83,6 +83,12 @@ const mobile: string[] | null =
 // for narrow viewports — `mobileLines` if provided, otherwise the
 // same `lines` as desktop.
 const mobileSvgLines = mobile ?? lines;
+
+// Glyph-size matching across stacked mobile lines: each line's
+// wrapper gets a width proportional to its char count vs. the
+// longest line, so the shorter word renders at the same per-letter
+// height as the longest. Mirrors `HeroTitleStack`'s approach.
+const mobileMaxLen = Math.max(...mobileSvgLines.map((l) => l.length), 1);
 ---
 
 <Tag
@@ -90,36 +96,53 @@ const mobileSvgLines = mobile ?? lines;
   style={width ? `max-width: ${width}` : undefined}
   data-eyebrow-position={eyebrow ? eyebrowPos : undefined}
 >
-  <!-- OVERLAP eyebrow: renders FIRST so the heading's textContent
-       reads "{eyebrow} {lines}" (e.g. "learning TRACKS"). Visually
-       absolutely-positioned over the title's upper-left. -->
-  {eyebrow && eyebrowPos === 'overlap' && (
-    <span class="section-title__eyebrow section-title__eyebrow--overlap">
+  <!-- Eyebrow: rendered FIRST so the heading's textContent
+       reads "{eyebrow} {lines}" (e.g. "learning TRACKS",
+       "always SAFETY FIRST"). Visually absolutely-positioned
+       over the title via CSS — `--overlap` sits at the upper-
+       left, `--between` sits at the vertical centre. Either
+       way, the eyebrow takes ZERO layout space; the title
+       lines render at full `font-display-l` size. -->
+  {eyebrow && (
+    <span
+      class:list={[
+        'section-title__eyebrow',
+        `section-title__eyebrow--${eyebrowPos}`,
+      ]}
+    >
       {eyebrow}{' '}
     </span>
   )}
 
-  <!-- Desktop / default path: CSS-rendered text with line-level
-       scroll-driven scaleY animation. The semantic source for
-       screen readers. The eyebrow is inserted INLINE between
-       line 1 and line 2 when `eyebrowPos === 'between'` so the
-       reading order is "{line1} {eyebrow} {line2}". -->
-  <span
-    class="section-title__lines section-title__lines--desktop"
-    aria-hidden={mobile ? 'true' : undefined}
-    data-stl
-  >
-    {lines.map((line, i) => (
-      <>
+  {eyebrowPos === 'between' ? (
+    <!-- `between` desktop: render the lines as a SINGLE
+         SVG-fit row ("SAFETY FIRST") so the title fills the
+         container's width regardless of word length. The
+         eyebrow floats absolutely at horizontal centre over
+         the space between the two words. -->
+    <span
+      class="section-title__lines section-title__lines--desktop section-title__lines--row"
+      aria-hidden={mobile ? 'true' : undefined}
+    >
+      <HeroTitle as="span" noStretch class="section-title__svg-line">
+        {lines.join(' ')}
+      </HeroTitle>
+    </span>
+  ) : (
+    <!-- Desktop / default path: CSS-rendered text with line-
+         level scroll-driven scaleY animation. The semantic
+         source for screen readers (the mobile SVG variant below
+         is decorative). -->
+    <span
+      class="section-title__lines section-title__lines--desktop"
+      aria-hidden={mobile ? 'true' : undefined}
+      data-stl
+    >
+      {lines.map((line) => (
         <span class="section-title__line">{line}</span>
-        {eyebrow && eyebrowPos === 'between' && i === 0 && (
-          <span class="section-title__eyebrow section-title__eyebrow--between">
-            {eyebrow}{' '}
-          </span>
-        )}
-      </>
-    ))}
-  </span>
+      ))}
+    </span>
+  )}
 
   {mobile && (
     <span class="section-title__lines section-title__lines--mobile" data-stl>
@@ -137,30 +160,17 @@ const mobileSvgLines = mobile ?? lines;
   <span
     class="section-title__lines section-title__lines--mobile-svg"
     aria-hidden="true"
+    data-stl-mobile
   >
     {mobileSvgLines.map((line) => (
-      <HeroTitle as="span" noStretch class="section-title__svg-line">
-        {line}
-      </HeroTitle>
+      <span
+        class="section-title__svg-line"
+        style={`width: ${((line.length / mobileMaxLen) * 100).toFixed(2)}%;`}
+      >
+        <HeroTitle as="span" noStretch>{line}</HeroTitle>
+      </span>
     ))}
   </span>
-
-  <!-- Mobile-only overlay eyebrow for `between` mode. The
-       desktop path renders the eyebrow inline (between line 1
-       and line 2 of a horizontal row). On mobile the lines
-       stack vertically via the SVG path, so we show this
-       absolute-positioned overlay instead — sitting on top of
-       the title without taking layout space.
-       `aria-hidden` because the desktop inline copy above is
-       already the semantic source for screen readers. -->
-  {eyebrow && eyebrowPos === 'between' && (
-    <span
-      class="section-title__eyebrow section-title__eyebrow--mobile-overlay"
-      aria-hidden="true"
-    >
-      {eyebrow}
-    </span>
-  )}
 </Tag>
 
 <style>
@@ -219,16 +229,9 @@ const mobileSvgLines = mobile ?? lines;
   @media (max-width: 767.98px) {
     /* Desktop CSS path off, mobile SVG path on. The
      * `.section-title__lines--mobile` CSS-text variant stays off
-     * because the SVG path now handles mobile rendering. The
-     * extra `[data-eyebrow-position='between']` selector mirrors
-     * the desktop flex-row rule's specificity so this `display:
-     * none` actually wins on mobile (CSS cascade, not source
-     * order — without the matching specificity the flex-row
-     * rule beats the bare class selector). */
+     * because the SVG path now handles mobile rendering. */
     .section-title__lines--desktop,
     .section-title:has(.section-title__lines--mobile)
-      .section-title__lines--desktop,
-    .section-title[data-eyebrow-position='between']
       .section-title__lines--desktop {
       display: none;
     }
@@ -268,68 +271,47 @@ const mobileSvgLines = mobile ?? lines;
     top: -0.05em;
     /* Hand-placed annotation, offset from the left edge. */
     left: 8%;
-    font-size: clamp(2rem, 4.5vw, 4rem);
+    /* Sized as a fraction of the TITLE's font-size (em is the
+     * inherited title size) so the eyebrow's visual ratio
+     * stays consistent across breakpoints — the previous
+     * viewport-based `clamp` made the eyebrow grow / shrink
+     * at a different rate than the title. */
+    font-size: 0.32em;
     /* Counter-clockwise tilt, pivoting at the bottom-left so the
      * script's baseline anchors naturally onto the title. */
     transform: rotate(-6deg);
     transform-origin: bottom left;
   }
 
-  /* `between` mode keeps the title HORIZONTAL on desktop:
-   * line 1, eyebrow, line 2 sit in a flex row, baseline-
-   * aligned, with the eyebrow inline-block at ~half the
-   * title's font-size and a slight rotation.
-   *
-   * The font-size override + flex-row layout are scoped to
-   * `@media (min-width: 768px)` so on mobile the desktop path
-   * is fully hidden by the mobile media-query rules and only
-   * the SVG-fit path + the absolute overlay eyebrow remain. */
-  @media (min-width: 768px) {
-    .section-title[data-eyebrow-position='between'] {
-      font-size: clamp(var(--type-step-5), 7.5vw, var(--type-step-7));
-      line-height: var(--leading-tight);
-    }
-
-    .section-title[data-eyebrow-position='between']
-      .section-title__lines--desktop {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      column-gap: 0.25em;
-    }
-
-    .section-title[data-eyebrow-position='between'] .section-title__line {
-      display: inline-block;
-    }
-  }
-
+  /* `between` mode: eyebrow floats absolutely over the gap
+   * between the title's words. Centred both axes so it lands
+   * on or near the space character of the SVG-rendered row
+   * ("SAFETY FIRST"). Takes ZERO layout space. */
   .section-title__eyebrow--between {
-    display: inline-block;
-    /* Sized relative to the title so the script proportions
-     * track the `font-display-l` clamp at every breakpoint. */
-    font-size: 0.5em;
-    align-self: center;
-    transform: rotate(-6deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Same em-based scaling as `--overlap` so both variants
+     * read at the same proportional size relative to the
+     * title across every breakpoint. */
+    font-size: 0.32em;
+    transform: translate(-50%, -50%) rotate(-6deg);
     transform-origin: center;
   }
 
-  /* Mobile overlay eyebrow for `between` mode. Absolute over
-   * the H2 so it doesn't take a row of layout. On desktop it's
-   * hidden — the inline `--between` eyebrow above is the
-   * visible variant there. */
-  .section-title__eyebrow--mobile-overlay {
-    display: none;
-  }
-
-  @media (max-width: 767.98px) {
-    .section-title__eyebrow--mobile-overlay {
-      display: inline-block;
-      position: absolute;
-      top: -0.1em;
-      left: 6%;
-      font-size: clamp(2rem, 6vw, 4rem);
-      transform: rotate(-6deg);
-      transform-origin: bottom left;
+  /* The single-row SVG variant on desktop. The HeroTitle SVG
+   * inside fills the row's width via its existing
+   * `width: 100%` / `height: auto` rules.
+   *
+   * Scoped to `@media (min-width: 768px)` so on mobile the
+   * `.section-title__lines--desktop` `display: none` from the
+   * mobile media query above still wins (same specificity, but
+   * this rule would otherwise come later in source order and
+   * cancel the hide). */
+  @media (min-width: 768px) {
+    .section-title__lines--row {
+      display: block;
+      width: 100%;
     }
   }
 </style>
@@ -372,11 +354,60 @@ const mobileSvgLines = mobile ?? lines;
     ScrollTrigger.refresh();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderAll, { once: true });
-  } else {
-    renderAll();
+  // Match glyph height across stacked mobile lines: char count is too
+  // coarse for narrow glyphs ("I", "F"), so once HeroTitle has rendered
+  // each line's SVG we re-set wrapper widths from the SVGs' actual
+  // viewBox widths. Wrapper width becomes
+  // `naturalWidth(line) / max(naturalWidth) × 100%`, which makes every
+  // line's per-glyph height match the longest line.
+  function syncMobileLineWidths() {
+    const containers = document.querySelectorAll<HTMLElement>('[data-stl-mobile]');
+    containers.forEach((container) => {
+      const wrappers = Array.from(
+        container.querySelectorAll<HTMLElement>('.section-title__svg-line'),
+      );
+      if (wrappers.length < 2) return;
+      const widths = wrappers.map((w) => {
+        const svg = w.querySelector('svg');
+        if (!svg) return null;
+        const vb = (svg as SVGSVGElement).viewBox?.baseVal;
+        return vb && vb.width > 0 ? vb.width : null;
+      });
+      if (widths.some((w) => w === null)) return; // not all rendered yet
+      const max = Math.max(...(widths as number[]));
+      wrappers.forEach((w, i) => {
+        const pct = ((widths[i] as number) / max) * 100;
+        w.style.width = `${pct.toFixed(2)}%`;
+      });
+    });
   }
 
-  document.addEventListener('astro:page-load', renderAll);
+  function watchForMobileSvgs() {
+    syncMobileLineWidths();
+    const containers = document.querySelectorAll<HTMLElement>('[data-stl-mobile]');
+    containers.forEach((container) => {
+      const obs = new MutationObserver(() => syncMobileLineWidths());
+      obs.observe(container, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['data-rendered'],
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+      watchForMobileSvgs();
+    }, { once: true });
+  } else {
+    renderAll();
+    watchForMobileSvgs();
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    renderAll();
+    watchForMobileSvgs();
+  });
 </script>
