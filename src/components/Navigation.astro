@@ -224,8 +224,14 @@ const navItems = navItemsOverride ?? defaultNavItems;
     }
 
     .nav-items {
-      /* Hide navigation items on mobile */
+      /* Hide the centred homepage nav items on mobile. The inline
+       * override variant (Tenerife: Register / More Info) stays
+       * visible — they're CTA-style links that should always be
+       * reachable from the nav. */
       display: none;
+    }
+    .nav-items--inline {
+      display: flex;
     }
 
     .nav-right {
