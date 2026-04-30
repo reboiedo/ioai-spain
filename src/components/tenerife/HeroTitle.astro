@@ -174,11 +174,13 @@ const svgMarkup = slotText
    *                sine-wave + jitter per letter
    *   --mouse-sy   mouse-proximity, 1 far → (1 − amplitude) at cursor
    *   final scaleY = --scroll-sy × --mouse-sy
-   * `transform-box: fill-box` makes `transform-origin: 0 0` anchor at
-   * each glyph's own top-left rather than at the SVG's origin. */
+   * `transform-box: fill-box` makes `transform-origin` resolve to
+   * each glyph's own bbox; `0 100%` anchors at the baseline so
+   * glyphs stretch upward (caps grow toward the sky) and compress
+   * downward toward the baseline — the baseline never moves. */
   .hero-title svg path {
     transform-box: fill-box;
-    transform-origin: 0 0;
+    transform-origin: 0 100%;
     fill: currentColor;
     transform: scaleY(calc(var(--scroll-sy, 1) * var(--mouse-sy, 1)));
     /* `position: relative` is necessary for z-index to take effect on

@@ -71,37 +71,46 @@ const tiles = [...images, ...images];
     overflow: hidden;
   }
 
+  /* Canvas is hidden + slid down on first paint. Once three.js has
+   * loaded, run a frame, and the wave is already animating, we set
+   * `data-canvas-active="1"` and the canvas slides up + fades in.
+   * The static image row stays invisible the whole time — it only
+   * surfaces if WebGL fails (`data-fallback="1"`). */
   .hero-wave__canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     display: block;
+    opacity: 0;
+    transform: translateY(8%);
+    transition:
+      opacity 520ms ease,
+      transform 640ms cubic-bezier(0.22, 0.9, 0.25, 1);
   }
 
-  /* Static CSS marquee fallback. Used as the source surface for
-   * texture loading AND as the visible content during the LCP
-   * window — three.js is dynamic-imported and initialised after
-   * idle, so the static <img>s paint immediately on first frame
-   * and the canvas takes over a beat later. Also the only thing
-   * visible if WebGL init fails or reduced-motion is set. */
+  .hero-wave[data-canvas-active="1"] .hero-wave__canvas {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Static CSS marquee — used as the source surface for texture
+   * loading AND as the only visible content if WebGL init fails or
+   * reduced-motion is set. Hidden by default (opacity 0); the
+   * `data-fallback="1"` rule below reveals it. */
   .hero-wave__fallback {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    opacity: 1;
-    pointer-events: none;
-    transition: opacity 320ms ease;
-  }
-
-  /* Once three.js is rendering, fade out the static strip and let
-   * the canvas show through. */
-  .hero-wave[data-canvas-active="1"] .hero-wave__fallback {
     opacity: 0;
+    pointer-events: none;
   }
 
   .hero-wave[data-fallback="1"] .hero-wave__canvas {
     display: none;
+  }
+  .hero-wave[data-fallback="1"] .hero-wave__fallback {
+    opacity: 1;
   }
 
   .hero-wave__track {
@@ -399,13 +408,17 @@ const tiles = [...images, ...images];
       renderer.render(scene, camera);
     });
 
-    // Fade the static fallback out now that the canvas is rendering.
-    // A double rAF gives Three's first render a chance to land before
-    // we start the cross-fade.
+    // Reveal the canvas once a few frames have rendered so the
+    // wave is already moving when the slide-up + fade-in starts.
+    // Avoids the static row "flashing" before the wave because the
+    // static row is hidden the whole time — the canvas comes in
+    // from the bottom with the wave already in motion.
     requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        container.dataset.canvasActive = '1';
-      }),
+      requestAnimationFrame(() =>
+        setTimeout(() => {
+          container.dataset.canvasActive = '1';
+        }, 150),
+      ),
     );
   }
 
