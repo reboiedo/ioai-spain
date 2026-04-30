@@ -92,23 +92,26 @@ export function buildHeroTitleSvg({
   const vbW = finite ? tightMaxX - tightMinX : cursor;
   const vbH = finite ? tightMaxY - tightMinY : ascender;
 
-  // Per-letter end scaleY — every letter ends at >= 1 so the
-  // reveal is grow-only, no glyph ever shrinks below its natural
-  // height. Sine + jitter + a `(sin*0.5 + 0.5)` shift keeps the
-  // wave's full amplitude in the positive half, so we always add
-  // height instead of subtracting.
+  // Per-letter end scaleY — every letter ends strictly >= 1 so the
+  // reveal is grow-only. Both the sine wave and the jitter are
+  // remapped into the positive half ([0,1]) before scaling, so no
+  // contribution can pull a letter below its natural height.
   const count = charPaths.length;
   const endScales = charPaths.map((_, i) => {
     const t = count > 1 ? i / (count - 1) : 0.5;
     const wave = (Math.sin(t * Math.PI * 2.2) * 0.5 + 0.5) * 0.3 * stretchScale;
-    const jitter = ((Math.sin(i * 12.9898) * 43758.5453) % 1) * 0.1 * stretchScale;
+    const jitterRaw = (Math.sin(i * 12.9898) * 43758.5453) % 1; // [-1, 1)
+    const jitter = (jitterRaw * 0.5 + 0.5) * 0.1 * stretchScale; // [0, 0.1*ss]
     return 1 + wave + jitter;
   });
 
-  // viewBox padding: only when stretchScale > 1 (lines visibly grow
-  // taller than cap height) — matches the post-render pad in the
-  // previous script.
-  const stretchPad = Math.max(0.005, stretchScale - 1) * vbH;
+  // Reserve enough viewBox height to fit the worst-case stretched
+  // glyph entirely inside the SVG box. Without this, scaled paths
+  // paint outside the box (overflow: visible) and some browsers
+  // include the overflow in subsequent layout passes — which is
+  // exactly the few-pixel layout shift we want to avoid.
+  const maxEnd = noStretch ? 1 : endScales.length ? Math.max(...endScales, 1) : 1;
+  const stretchPad = (maxEnd - 1) * vbH;
 
   const pathEls = charPaths
     .map((cp, i) => {
