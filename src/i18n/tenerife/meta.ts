@@ -14,7 +14,7 @@ export const meta = {
     es: '/og-tenerife-es.png'
   }),
   canonical: createTranslation({
-    en: '/tenerife-camp/',
-    es: '/es/tenerife-camp/'
+    en: '/tenerife-summer-camp/',
+    es: '/es/tenerife-summer-camp/'
   })
 } as const;
