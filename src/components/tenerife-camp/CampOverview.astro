@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { useCampTranslations, type Language } from '@/i18n/camp';
 import MarqueeImages from './MarqueeImages.astro';
 
@@ -43,9 +43,10 @@ const carouselImages = [
     <!-- 3-Column Layout: Left Image | Center (Image + Text) | Right Image -->
     <div class="camp-overview__three-columns">
       <div class="camp-overview__column-left">
-        <Image
+        <Picture
           src={leftImage}
           alt="Tenerife Lighthouse"
+          formats={["avif", "webp"]}
           loading="eager"
           class="parallax-left"
           widths={[400, 600, 800]}
@@ -54,9 +55,10 @@ const carouselImages = [
       </div>
 
       <div class="camp-overview__column-center">
-        <Image
+        <Picture
           src={centerImage}
           alt="Swimming in crystal clear waters"
+          formats={["avif", "webp"]}
           loading="eager"
           widths={[600, 900, 1200]}
           sizes="(max-width: 768px) 100vw, 900px"
@@ -79,9 +81,10 @@ const carouselImages = [
       </div>
 
       <div class="camp-overview__column-right">
-        <Image
+        <Picture
           src={rightImage}
           alt="Kids enjoying the beach"
+          formats={["avif", "webp"]}
           loading="eager"
           class="parallax-right"
           widths={[400, 600, 800]}

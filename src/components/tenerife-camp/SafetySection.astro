@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { useCampTranslations, type Language } from '@/i18n/camp';
 import safetyImage from '@/assets/tenerife-camp/safety.jpg';
 
@@ -15,9 +15,10 @@ const t = useCampTranslations(locale);
   <div class="safety-container">
     <div class="safety-content">
       <div class="safety-image">
-        <Image
+        <Picture
           src={safetyImage}
           alt="Camp backpack with safety essentials"
+          formats={["avif", "webp"]}
           loading="lazy"
           widths={[400, 600, 800]}
           sizes="(max-width: 768px) 100vw, 50vw"

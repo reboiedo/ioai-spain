@@ -28,7 +28,7 @@
 
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
-import { Image, type ImageMetadata } from "astro:assets";
+import { Image, Picture, type ImageMetadata } from "astro:assets";
 import harbourLogo from "@/assets/harbour-space-logo.svg";
 import leaguesLogo from "@/assets/icons/leagues-logo.svg";
 import spikes from "@/assets/tenerife/story/spikes.svg";
@@ -213,10 +213,11 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
           data-story-video-trigger
         >
           {posterImage ? (
-            <Image
+            <Picture
               class="story__video-img"
               src={posterImage}
               alt=""
+              formats={["avif", "webp"]}
               widths={[480, 720, 960]}
               sizes="(min-width: 768px) 30vw, 70vw"
               loading="lazy"
@@ -224,10 +225,11 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
           ) : storyPosters.length > 0 ? (
             <div class="story__video-stack" data-story-stack>
               {storyPosters.map((src, i) => (
-                <Image
+                <Picture
                   class="story__video-img story__video-img--stacked"
                   src={src}
                   alt=""
+                  formats={["avif", "webp"]}
                   widths={[480, 720, 960]}
                   sizes="(min-width: 768px) 30vw, 70vw"
                   loading={i === 0 ? "eager" : "lazy"}

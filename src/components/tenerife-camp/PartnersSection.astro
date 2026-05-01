@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { useCampTranslations, type Language } from '@/i18n/camp';
 import partner1 from '@/assets/tenerife-camp/partner-1.png';
 import partner3 from '@/assets/tenerife-camp/partner-3.png';
@@ -27,10 +27,13 @@ const partners = [
       <div class="partners-track">
         {partners.map((partner) => (
           <div class="partner-card">
-            <Image
+            <Picture
               src={partner.image}
               alt={partner.alt}
               class="partner-image"
+              formats={["avif", "webp"]}
+              widths={[160, 240, 320]}
+              sizes="(max-width: 768px) 30vw, 12vw"
               loading="lazy"
             />
           </div>
