@@ -10,8 +10,8 @@ export const apply = {
     es: '¿Listo para participar en el campamento de entrenamiento IOAI España? Las solicitudes se abren con la ronda clasificatoria nacional en febrero — los estudiantes seleccionados son invitados directamente al campamento.'
   }),
   href: createTranslation({
-    en: '/form/tenerife-camp/',
-    es: '/es/form/tenerife-camp/'
+    en: '/form/camp-signup/',
+    es: '/es/form/camp-signup/'
   }),
   brochureHref: createTranslation({
     en: '/brochure/tenerife-camp.pdf',

@@ -47,6 +47,17 @@ const locale = Astro.currentLocale || 'en';
     <slot name="head" />
   </Head>
   <body>
+    <!-- Google Tag Manager (noscript) — fallback iframe for browsers
+         with JS disabled. Pairs with the inline GTM bootstrap in
+         Head.astro; container ID `GTM-PST8FH3P`. -->
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-PST8FH3P"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+      ></iframe>
+    </noscript>
     {showNavigation && <Navigation hideNavItems={hideNavItems} ctaUrlOverride={ctaUrlOverride} navItems={navItems} theme={navTheme} />}
     <main>
       <slot />

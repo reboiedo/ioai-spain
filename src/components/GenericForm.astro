@@ -1143,6 +1143,53 @@ const form = resolvedForm;
         }
       }
 
+      // GTM: emit `lead_captured` for camp-related forms (camp-signup,
+      // camp-contact, …) so Google Ads conversion + GA4 event can fire
+      // off the dataLayer rather than a thank-you URL match. This runs
+      // synchronously BEFORE the form submits to Formspark — GTM picks
+      // up the event before the page navigates away. The trigger in
+      // GTM listens for `lead_captured` (Custom Event) and fires the
+      // Early Bird tag with the values pushed below.
+      //
+      // Restricted to slugs starting with `camp-` so non-camp forms
+      // (download, join-training, etc.) don't pollute the conversion
+      // signal. Add other slugs here if marketing later wants a
+      // download/whitepaper to count too.
+      const formSlug: string = formData.slug;
+      const formLocale: string = locale;
+      if (formSlug.indexOf('camp-') === 0) {
+        const fd = new FormData(formElement);
+        const email = String(
+          fd.get('guardianEmail') || fd.get('email') || ''
+        );
+        const name = String(
+          fd.get('guardianName') || fd.get('fullName') || fd.get('name') || ''
+        );
+        const phone = String(fd.get('phone') || '');
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        (window as any).dataLayer.push({
+          event: 'lead_captured',
+          form_type: formSlug,
+          locale: formLocale,
+          // Marketing's existing "Early Bird Sign Up" conversion is
+          // valued at €15 — same value across camp forms for now.
+          // If/when contact and signup get separate values, branch here.
+          conversion_value: 15,
+          currency: 'EUR',
+          user_data: {
+            email: email,
+            name: name,
+            phone: phone,
+          },
+        });
+        console.log('📡 dataLayer push: lead_captured', {
+          form_type: formSlug,
+          locale: formLocale,
+          email: email ? '(set)' : '(empty)',
+          name: name ? '(set)' : '(empty)',
+        });
+      }
+
       const submitButton = formElement.querySelector('button[type="submit"]');
 
       // Show loading state (form will submit naturally)

@@ -14,7 +14,7 @@ export const nav = {
     es: 'Inscribirse'
   }),
   registerUrl: createTranslation({
-    en: '/form/tenerife-camp/',
-    es: '/es/form/tenerife-camp/'
+    en: '/form/camp-signup/',
+    es: '/es/form/camp-signup/'
   })
 } as const;
