@@ -36,70 +36,18 @@ import { Image, type ImageMetadata } from "astro:assets";
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "yellow" } = Astro.props;
-
-interface Slot {
-  time: string;
-  title: string;
-  description: string;
-}
-
-const slots: Slot[] = [
-  {
-    time: "7:00am – 9:00am",
-    title: "Early rise",
-    description:
-      "The day starts with a morning workout, a quick clean-up, and the day's announcements. Then a generous breakfast to power through the first lecture block.",
-  },
-  {
-    time: "9:30am – 11:00am",
-    title: "1st period",
-    description:
-      "Students pick up the day's coding skills through a mix of lectures, hands-on practice, and short quizzes that keep the room awake and accountable.",
-  },
-  {
-    time: "11:00am – 11:30am",
-    title: "Snack time",
-    description:
-      "A short break to recharge with something nutritious. Energy back up, attention reset, ready for the next block.",
-  },
-  {
-    time: "11:30am – 1:00pm",
-    title: "2nd period",
-    description:
-      "The second teaching block leans into individual practice — the instructor circulates while students build their own small projects from the morning's material.",
-  },
-  {
-    time: "1:30pm – 4:00pm",
-    title: "Lunch",
-    description:
-      "A long, well-balanced lunch on site. Time to eat, talk, and rest before the afternoon programme picks up.",
-  },
-  {
-    time: "4:00pm – 7:00pm",
-    title: "Activities",
-    description:
-      "The full afternoon goes to the extracurricular programme — beach sports, hikes, cultural walks, surfing, the workshops, the day trips. See the previous section for the day-by-day plan.",
-  },
-  {
-    time: "7:00pm – 8:00pm",
-    title: "Dinner",
-    description:
-      "Dinner together as a cohort — fresh seafood, Mediterranean staples, and locally-sourced produce on a rotating menu.",
-  },
-  {
-    time: "8:00pm – 10:00pm",
-    title: "Wind down",
-    description:
-      "The last hours of the day are deliberately unstructured — chill time, an optional movie, occasional quizzes or stargazing on the terrace, then lights out for an early start.",
-  },
-];
+const { locale, theme = "yellow" } = Astro.props;
+const t = useTenerifeTranslations(locale);
+const slots = t.dayInLife.slots;
 
 // Photo set. Prefer dedicated `day-in-life/` images when present;
 // otherwise borrow from `activities/` so the layout has content
@@ -140,8 +88,8 @@ const photos: ImageMetadata[] = Object.entries(sourceModules)
               // Top line stays flat — multi-line stretch on every
               // line reads as noise. The bottom line carries the
               // scroll-driven per-letter scaleY animation.
-              { text: "A DAY AT", noStretch: true },
-              { text: "TENERIFE" },
+              { text: t.dayInLife.titleLine1, noStretch: true },
+              { text: t.dayInLife.titleLine2 },
             ]}
             defaultAlign="left"
             gap="var(--space-s)"
@@ -184,13 +132,7 @@ const photos: ImageMetadata[] = Object.entries(sourceModules)
            list of timeslot rows. No opacity dimming on inactive
            rows — every slot reads at full strength. -->
       <div class="day__right">
-        <p class="font-body-l day__intro">
-          Every day at the camp follows the same rhythm — morning
-          learning blocks, an unhurried lunch, the afternoon programme
-          on the island, dinner together, and a deliberately quiet
-          evening before the next early start. Here's how a typical
-          day breaks down.
-        </p>
+        <p class="font-body-l day__intro">{t.dayInLife.intro}</p>
 
         <ol class="day__list">
           {slots.map((s, i) => (
@@ -211,14 +153,8 @@ const photos: ImageMetadata[] = Object.entries(sourceModules)
     <!-- MOBILE layout (<768px). Title + intro stacked, then a
          horizontal scroll of slot cards. Hidden on desktop. -->
     <div class="day__mobile">
-      <SectionTitle lines={["A DAY AT TENERIFE"]} />
-      <p class="font-body-l day__mobile-intro">
-        Every day at the camp follows the same rhythm — morning
-        learning blocks, an unhurried lunch, the afternoon programme
-        on the island, dinner together, and a deliberately quiet
-        evening before the next early start. Here's how a typical day
-        breaks down.
-      </p>
+      <SectionTitle lines={[t.dayInLife.titleMobile]} />
+      <p class="font-body-l day__mobile-intro">{t.dayInLife.intro}</p>
 
       <HScrollMobile itemWidth="min(80%, 320px)">
         {slots.map((s) => (

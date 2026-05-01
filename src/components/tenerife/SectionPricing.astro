@@ -16,49 +16,19 @@
 
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import RegisterButton from "@/components/tenerife/RegisterButton.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "orange" } = Astro.props;
+const { locale, theme = "orange" } = Astro.props;
 
-interface Tier {
-  variant: "primary" | "secondary";
-  /** Headline statement — the first thing read. */
-  headline: string;
-  price: string;
-  features: string[];
-  cta: { text: string; href: string };
-}
-
-const tiers: Tier[] = [
-  {
-    variant: "primary",
-    headline: "With accommodation",
-    price: "€3,000",
-    features: [
-      "Two-week academic programme",
-      "Full extracurricular schedule",
-      "4-star hotel + all meals",
-      "24-hour supervision + insurance",
-    ],
-    cta: { text: "Register", href: "#apply" },
-  },
-  {
-    variant: "secondary",
-    headline: "Without accommodation",
-    price: "€1,800",
-    features: [
-      "Two-week academic programme",
-      "Full extracurricular schedule",
-      "Daily lunch on site",
-      "Accommodation arranged separately",
-    ],
-    cta: { text: "Register", href: "#apply" },
-  },
-];
+const t = useTenerifeTranslations(locale);
+const tiers = t.pricing.tiers;
 ---
 
 <div class="scene" data-scene data-scene-index="10">
@@ -69,13 +39,8 @@ const tiers: Tier[] = [
     <div class="split pricing__grid">
       <!-- Left: title + intro. -->
       <div class="pricing__intro">
-        <SectionTitle lines={["PACKAGE"]} eyebrow="pick your" />
-        <p class="font-body section-copy pricing__intro-copy">
-          Two ways in. Both include the full academic programme and
-          the afternoon activities; the Full pass adds accommodation,
-          all meals and round-the-clock supervision. Pick the one
-          that fits your travel plans.
-        </p>
+        <SectionTitle lines={[t.pricing.title]} eyebrow={t.pricing.eyebrow} />
+        <p class="font-body section-copy pricing__intro-copy">{t.pricing.copy}</p>
       </div>
 
       <!-- Right: two pricing tickets. Headline + price at the top,

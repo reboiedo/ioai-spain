@@ -16,35 +16,39 @@
 
 import { getRelativeLocaleUrl } from "astro:i18n";
 import { LANGUAGES, useTranslations } from "@/i18n";
-import type { Language } from "@/i18n";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 import Dropdown from "@/components/ui/Dropdown.astro";
 
 export interface Props {
+  /** Locale for this render — drives copyright text + language switcher
+   *  default. */
+  locale: Language;
   /** Theme palette to apply via `data-theme`. Defaults to orange to
    *  match the SectionApply scene above. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "orange" } = Astro.props;
+const { locale, theme = "orange" } = Astro.props;
+
+const t = useTranslations(locale);
+const tCamp = useTenerifeTranslations(locale);
 
 // Mirror Navigation.astro's locale-switcher option list so the
 // footer Dropdown picks the right URL when the user changes the
 // language.
-const currentLocale = (Astro.currentLocale || "en") as Language;
-const t = useTranslations(currentLocale);
 const currentPath = Astro.url.pathname;
 const pathWithoutLocale =
-  currentLocale === "en" ? currentPath : currentPath.replace(`/${currentLocale}`, "") || "/";
+  locale === "en" ? currentPath : currentPath.replace(`/${locale}`, "") || "/";
 const languageOptions = LANGUAGES.map((code) => ({
   value: getRelativeLocaleUrl(code, pathWithoutLocale),
   label: code === "en" ? "EN" : "ES",
-  selected: currentLocale === code,
+  selected: locale === code,
 }));
 ---
 
 <footer class="camp-footer" data-theme={theme} data-camp-footer>
   <p class="camp-footer__copy">
-    © {new Date().getFullYear()} IOAI Spain · Tenerife Camp
+    © {new Date().getFullYear()} {tCamp.footer.copyright}
   </p>
   <div class="camp-footer__lang">
     <Dropdown

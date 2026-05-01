@@ -14,13 +14,17 @@
 import HeroTitle from './HeroTitle.astro';
 import HeroTitleStack from './HeroTitleStack.astro';
 import HeroWaveCarousel from './HeroWaveCarousel.astro';
+import { useTenerifeTranslations, type Language } from '@/i18n/tenerife';
 
 interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Theme key (orange | yellow | blue | neutral) — drives bg + fg. */
   theme?: string;
 }
 
-const { theme = 'blue' } = Astro.props;
+const { locale, theme = 'blue' } = Astro.props;
+const t = useTenerifeTranslations(locale);
 ---
 
 <div class="scene" data-scene data-scene-index="1">
@@ -29,7 +33,7 @@ const { theme = 'blue' } = Astro.props;
          stacked, each auto-sized to width via HeroTitle. CSS swaps
          which one is visible at the 768px breakpoint. -->
     <div class="hero__title hero__title--single">
-      <HeroTitle>TENERIFE CAMP</HeroTitle>
+      <HeroTitle>{t.hero.title}</HeroTitle>
     </div>
     <div class="hero__title hero__title--stacked">
       <!-- Two-line title via the reusable `HeroTitleStack` — it
@@ -40,8 +44,8 @@ const { theme = 'blue' } = Astro.props;
       <HeroTitleStack
         gap="clamp(2rem, 6vw, 4rem)"
         lines={[
-          { text: "TENERIFE", align: "left", noStretch: true },
-          { text: "CAMP", align: "right", stretchScale: 1.5 },
+          { text: t.hero.titleStacked.line1, align: "left", noStretch: true },
+          { text: t.hero.titleStacked.line2, align: "right", stretchScale: 1.5 },
         ]}
       />
     </div>
@@ -53,9 +57,9 @@ const { theme = 'blue' } = Astro.props;
       <HeroWaveCarousel />
     </div>
     <div class="hero__lede">
-      <p class="font-body-s hero__eyebrow">July 5th — 19th, 2026</p>
+      <p class="font-body-s hero__eyebrow">{t.hero.dateEyebrow}</p>
       <p class="font-body-l hero__lede-copy">
-        <span class="hero__lede-line">the IOAI Spain training camp on the slopes of Mount Teide.</span>
+        <span class="hero__lede-line">{t.hero.ledeLine}</span>
       </p>
     </div>
   </section>

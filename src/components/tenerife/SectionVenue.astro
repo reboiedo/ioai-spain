@@ -29,6 +29,7 @@
 
 import { Image, type ImageMetadata } from "astro:assets";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 // Eager-glob every venue photo so we can look one up by filename.
 const photoModules = import.meta.glob<{ default: ImageMetadata }>(
@@ -43,25 +44,16 @@ for (const [path, mod] of Object.entries(photoModules)) {
 }
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "yellow" } = Astro.props;
+const { locale, theme = "yellow" } = Astro.props;
 
-interface PhotoSlot {
-  /** Filename (no extension) inside `src/assets/tenerife/venue/`. */
-  key?: string;
-  /** Alt text — also used as the placeholder label when no photo. */
-  alt: string;
-  /** Aspect ratio for the slot. Varied per slot for rhythm. */
-  aspect: string;
-}
-
-const photoSlots: PhotoSlot[] = [
-  { key: "hotel-1", alt: "Hotel Concordia exterior", aspect: "4 / 3" },
-  { key: "hotel-2", alt: "Hotel Concordia interior", aspect: "5 / 3" },
-];
+const t = useTenerifeTranslations(locale);
+const photoSlots = t.venue.photoSlots;
 ---
 
 <div class="scene" data-scene data-scene-index="6">
@@ -73,15 +65,8 @@ const photoSlots: PhotoSlot[] = [
       <!-- LEFT — sticky title + hotel paragraph. Stays in view as
            the user scrolls through the photo stack on the right. -->
       <div class="venue__intro">
-        <SectionTitle lines={["VENUE"]} />
-        <p class="font-body-l venue__intro-copy">
-          Campers stay at a 4-star property in Puerto de la Cruz, two
-          minutes on foot from Martiánez beach. Rooms are shared
-          between three campers, with all meals — breakfast, lunch
-          and dinner — included on site. The northern coast keeps a
-          mild climate even at the height of summer, so the hotel
-          terrace becomes a second living room.
-        </p>
+        <SectionTitle lines={[t.venue.title]} />
+        <p class="font-body-l venue__intro-copy">{t.venue.copy}</p>
       </div>
 
       <!-- Vertical centreline divider — own grid track between the
@@ -114,7 +99,7 @@ const photoSlots: PhotoSlot[] = [
           <iframe
             class="venue-photo__map"
             src="https://www.google.com/maps?q=Hotel+Concordia+Playa+Puerto+de+la+Cruz+Tenerife&output=embed"
-            title="Hotel Concordia on Google Maps"
+            title={t.venue.mapTitle}
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
             allowfullscreen></iframe>

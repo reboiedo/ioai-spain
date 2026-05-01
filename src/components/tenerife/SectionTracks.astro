@@ -16,74 +16,17 @@
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import Course from "@/components/tenerife/Course.astro";
 import TrackList from "@/components/tenerife/TrackList.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "blue" } = Astro.props;
-
-interface Track {
-  name: string;
-  description: string;
-  outcomes: string;
-}
-
-const beginnerTracks: Track[] = [
-  {
-    name: "Python",
-    description:
-      "No experience needed — just a willingness to think logically and try things out. This track starts from zero and builds steadily: variables, conditions, loops, functions, and eventually a complete working program that you design and build yourself. By the final session, you're not just writing code — you're presenting it, explaining it, and understanding what comes next.",
-    outcomes:
-      "A working Python program, a solid foundation in programming logic, and the confidence to keep going independently.",
-  },
-  {
-    name: "Artificial Intelligence",
-    description:
-      "AI is everywhere — but most people have no idea how it actually works. This track changes that. No coding required. You'll learn what AI really is (and isn't), how machines learn, what data does, how computer vision works, and how to use AI tools effectively. You'll also tackle the harder questions: bias, fairness, and what it means to use AI responsibly.",
-    outcomes:
-      "A clear mental model of how AI systems work, hands-on experience with real AI tools, and a final project that puts your understanding into practice.",
-  },
-  {
-    name: "Game Development",
-    description:
-      "Ever wondered how games actually work — not just how to play them, but how they're built? This track takes you inside the structure of games: the rules, the mechanics, the logic that makes things move and respond. No prior coding knowledge required. You'll finish the camp with a fully playable game you designed and built yourself.",
-    outcomes:
-      "A complete playable game, an understanding of how game logic works, and a new way of looking at every game you play.",
-  },
-  {
-    name: "Design",
-    description:
-      "Design isn't decoration — it's a way of solving problems. This track covers the full creative spectrum: visual design, typography, photography, sound, video, and 3D. You'll work with industry-standard tools like Figma and Canva, and by the end you'll have a multi-format portfolio that shows what you can do across different media.",
-    outcomes:
-      "A structured creative portfolio, practical skills across multiple design disciplines, and a new understanding of how visual communication works.",
-  },
-];
-
-const advancedTracks: Track[] = [
-  {
-    name: "Mathematics",
-    description:
-      "For students who are ready to go well beyond school-level mathematics. This track covers quadratic and polynomial functions, exponential and logarithmic models, trigonometry, set theory, and sequences — connecting them not as isolated topics but as a coherent mathematical toolkit for tackling complex problems. The final session is a multi-round problem-solving showcase across all areas covered.",
-    outcomes:
-      "Fluency in advanced mathematical concepts, the ability to move flexibly between different areas of mathematics, and the kind of problem-solving confidence that shows up everywhere.",
-  },
-  {
-    name: "Algorithms",
-    description:
-      "This track is for students who are already strong programmers and ready to compete at the highest level. The curriculum covers the data structures, algorithms and problem-solving strategies used in top programming olympiads — from segment trees and persistent data structures to graph theory, shortest path algorithms and network flow. You'll work through real olympiad problems under timed conditions, learn to read and analyse top-scoring solutions, and finish with a mock competition. By the end, you'll have the tools and the mindset to perform when it counts.",
-    outcomes:
-      "A deep command of advanced algorithms and data structures, the ability to decompose complex problems under pressure, and real competitive programming experience.",
-  },
-  {
-    name: "Artificial Intelligence",
-    description:
-      "For students who already know Python and have some familiarity with AI concepts, this is where things get serious. You'll work with real datasets, train and evaluate machine learning models, and go hands-on with neural networks, computer vision, and model optimization. The track culminates in a group project where your team identifies a real-world problem and builds a working ML solution to present on the final day.",
-    outcomes:
-      "Practical experience across the full machine learning pipeline, exposure to computer vision and deep learning, and a group project that demonstrates what you can actually do.",
-  },
-];
+const { locale, theme = "blue" } = Astro.props;
+const t = useTenerifeTranslations(locale);
 ---
 
 <div class="scene" data-scene data-flow data-scene-index="3">
@@ -97,33 +40,27 @@ const advancedTracks: Track[] = [
            no 100svh, no bottom pinning. Column height is driven by
            the right-hand card stack. -->
       <div class="tracks__intro">
-        <SectionTitle lines={["TRACKS"]} eyebrow="learning" />
-        <p class="font-body section-copy tracks__intro-copy">
-          Every camper picks one track — beginner or advanced — and
-          goes deep into it. Ten sessions, 35 hours in total, hands-on
-          and project-based, led by experienced educators and industry
-          professionals in small groups. By the end of the camp, every
-          student has something real to show for it.
-        </p>
+        <SectionTitle lines={[t.tracks.title]} eyebrow={t.tracks.eyebrow} />
+        <p class="font-body section-copy tracks__intro-copy">{t.tracks.copy}</p>
       </div>
 
       <!-- Right: two stacked dark cards, each a list of course drawers -->
       <div class="tracks__lists">
         <TrackList
-          title="Beginner"
-          description="For students curious about AI with little or no prior experience. The goal isn't to overwhelm — it's to open a door, build real intuition, and make the subject feel exciting rather than intimidating."
+          title={t.tracks.beginner.title}
+          description={t.tracks.beginner.description}
         >
-          {beginnerTracks.map((t) => (
-            <Course name={t.name} description={t.description} outcomes={t.outcomes} />
+          {t.tracks.beginner.items.map((item) => (
+            <Course name={item.name} description={item.description} outcomes={item.outcomes} />
           ))}
         </TrackList>
 
         <TrackList
-          title="Advanced"
-          description="For students ready for a serious challenge. Structured, rigorous training for those who want to push well past school-level material and into the kind of work done at olympiad and research level."
+          title={t.tracks.advanced.title}
+          description={t.tracks.advanced.description}
         >
-          {advancedTracks.map((t) => (
-            <Course name={t.name} description={t.description} outcomes={t.outcomes} />
+          {t.tracks.advanced.items.map((item) => (
+            <Course name={item.name} description={item.description} outcomes={item.outcomes} />
           ))}
         </TrackList>
 
@@ -131,31 +68,15 @@ const advancedTracks: Track[] = [
              — sits at the bottom of the right column after both
              track lists. -->
         <article class="tracks__fit">
-          <h3 class="font-h3 tracks__fit-title">
-            Not sure if it's the right camp?
-          </h3>
-          <p class="font-body tracks__fit-lede">
-            No prior experience, no clear passion, no plan needed
-            — just an openness to try something that might
-            surprise you. The camp is for kids who:
-          </p>
+          <h3 class="font-h3 tracks__fit-title">{t.tracks.fit.title}</h3>
+          <p class="font-body tracks__fit-lede">{t.tracks.fit.lede}</p>
           <ul class="tracks__fit-list">
-            <li class="tracks__fit-item">
-              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
-              <span class="font-body">Like figuring out how things work</span>
-            </li>
-            <li class="tracks__fit-item">
-              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
-              <span class="font-body">Are curious about AI</span>
-            </li>
-            <li class="tracks__fit-item">
-              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
-              <span class="font-body">Want to meet peers from around the world</span>
-            </li>
-            <li class="tracks__fit-item">
-              <span class="tracks__fit-bullet" aria-hidden="true">→</span>
-              <span class="font-body">Are ready for a summer that counts</span>
-            </li>
+            {t.tracks.fit.items.map((item) => (
+              <li class="tracks__fit-item">
+                <span class="tracks__fit-bullet" aria-hidden="true">→</span>
+                <span class="font-body">{item.text}</span>
+              </li>
+            ))}
           </ul>
         </article>
       </div>

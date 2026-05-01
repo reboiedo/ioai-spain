@@ -27,6 +27,7 @@ import { Image, type ImageMetadata } from "astro:assets";
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import safetyImage from "@/assets/tenerife/safety/safety.jpg";
 import safetyIcon from "@/assets/tenerife/safety/safety.svg";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 // Eager-glob future supervisor portraits — same convention as
 // SectionTeam. Drop `name.jpg` (or .png/.webp) into
@@ -45,59 +46,16 @@ for (const [path, mod] of Object.entries(supervisorModules)) {
 }
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "orange" } = Astro.props;
-
-interface Pillar {
-  title: string;
-  description: string;
-}
-
-const pillars: Pillar[] = [
-  {
-    title: "24/7 supervision",
-    description:
-      "Nineteen dedicated supervisors on the ground plus eight coaches always accessible — day, night, on every activity.",
-  },
-  {
-    title: "Trained mentors",
-    description:
-      "Every staff member carries extensive experience working with children and is trained to age group and individual needs.",
-  },
-  {
-    title: "Insurance & medical",
-    description:
-      "Camp insurance is included; on-site first aid plus a clear escalation path to local medical services for anything more.",
-  },
-  {
-    title: "Daily updates",
-    description:
-      "Parents are kept in the loop with regular check-ins and a direct channel to the camp coordinator for anything urgent.",
-  },
-];
-
-interface Supervisor {
-  /** Full name, displayed under the portrait. */
-  name: string;
-  /** Two-letter initials shown when no portrait is available. */
-  initials: string;
-  /** Optional role / area of responsibility. */
-  role?: string;
-  /** Filename (no extension) in `src/assets/tenerife/safety/supervisors/`. */
-  imageKey?: string;
-}
-
-// Placeholder supervisor list — replace with real names + portraits
-// once available. Initials drive the gradient fallback tile.
-const supervisors: Supervisor[] = [
-  { name: "Olga Litvinova", initials: "OL", role: "Project Manager" },
-  { name: "Patricia Carranza", initials: "PC", role: "Academic Consultant" },
-  { name: "Maria Kanbina", initials: "MK", role: "Customer Relations" },
-  { name: "Kalista Galic", initials: "KG", role: "Camp Supervisor" },
-];
+const { locale, theme = "orange" } = Astro.props;
+const t = useTenerifeTranslations(locale);
+const pillars = t.safety.pillars;
+const supervisors = t.safety.supervisors;
 ---
 
 <div class="scene" data-scene data-scene-index="7">
@@ -111,11 +69,7 @@ const supervisors: Supervisor[] = [
            stays in view as the user passes by. -->
       <div class="safety__content">
         <div class="safety__intro">
-          <p class="font-body-l safety__lede">
-            Your child is looked after at all times. Below is exactly
-            how we take care of every camper, from the moment they
-            land in Tenerife to the day they fly home.
-          </p>
+          <p class="font-body-l safety__lede">{t.safety.lede}</p>
         </div>
 
         <!-- Pillar cards. 2×2 grid, surface cards with title + body
@@ -137,14 +91,8 @@ const supervisors: Supervisor[] = [
              with portrait-on-top + name underneath. Missing portraits
              fall back to a gradient tile with initials. -->
         <div class="safety__supervisors-block">
-          <h3 class="font-h3 safety__supervisors-title">
-            Camp organizers
-          </h3>
-          <p class="font-body safety__supervisors-copy">
-            The team behind the camp — planning the program, looking
-            after every detail, and on call for parents and campers
-            from the first email to the last day on the island.
-          </p>
+          <h3 class="font-h3 safety__supervisors-title">{t.safety.supervisorsTitle}</h3>
+          <p class="font-body safety__supervisors-copy">{t.safety.supervisorsCopy}</p>
           <ul class="safety__supervisors">
             {supervisors.map((s) => (
               <li class="supervisor-card">
@@ -189,8 +137,8 @@ const supervisors: Supervisor[] = [
         <div class="safety__title">
           <HeroTitleStack
             lines={[
-              { text: "SAFETY", noStretch: true },
-              { text: "FIRST" },
+              { text: t.safety.titleLine1, noStretch: true },
+              { text: t.safety.titleLine2 },
             ]}
             defaultAlign="right"
             gap="var(--space-s)"
@@ -210,12 +158,12 @@ const supervisors: Supervisor[] = [
             loading="lazy"
             decoding="async"
           />
-          <!-- Handwritten "always" eyebrow — absolutely positioned
-               between the two title lines, on the right side
-               (where the title is anchored). Same script font +
-               -6deg tilt + primary colour as the original
+          <!-- Handwritten eyebrow — absolutely positioned between
+               the two title lines, on the right side (where the
+               title is anchored). Same script font + -6deg tilt +
+               primary colour as the original
                `eyebrowPosition="between"` SectionTitle variant. -->
-          <span class="safety__title-eyebrow" aria-hidden="true">always</span>
+          <span class="safety__title-eyebrow" aria-hidden="true">{t.safety.titleEyebrow}</span>
         </div>
 
         <!-- Tilted photograph — sits between the two title lines
@@ -224,7 +172,7 @@ const supervisors: Supervisor[] = [
           <Image
             class="safety__photo-img"
             src={safetyImage}
-            alt="Camp staff supervising students during an outdoor activity"
+            alt={t.safety.photoAlt}
             widths={[480, 720, 960]}
             sizes="(min-width: 768px) 30vw, 70vw"
             loading="lazy"

@@ -15,13 +15,17 @@ import RegisterButton from "@/components/tenerife/RegisterButton.astro";
 export interface Props {
   /** Where the CTA links to. */
   href?: string;
+  /** Visible label. Defaults to "Register" so the component still
+   * works on locale-agnostic call sites. */
+  label?: string;
 }
 
-const { href = "/form/tenerife-camp/" } = Astro.props;
+const { href = "/form/tenerife-camp/", label } = Astro.props;
 ---
 
 <RegisterButton
   href={href}
+  label={label}
   size="lg"
   variant="primary"
   class="sticky-join-cta"

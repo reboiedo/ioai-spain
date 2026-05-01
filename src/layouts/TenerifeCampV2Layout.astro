@@ -2,45 +2,47 @@
 import { Font } from 'astro:assets';
 import BaseLayout from './BaseLayout.astro';
 import StickyJoinCta from '@/components/tenerife/StickyJoinCta.astro';
+import { useTenerifeTranslations, type Language } from '@/i18n/tenerife';
 import '@/styles/tenerife-camp-v2.css';
 
 export interface Props {
-  title: string;
-  description?: string;
+  /** Locale for this page render. Drives nav labels, meta, OG image,
+   * StickyJoinCta href + label. Required because the layout owns the
+   * Tenerife translation hook now. */
+  locale: Language;
   showNavigation?: boolean;
-  hideNavItems?: boolean;
-  ctaUrlOverride?: string;
-  ogImage?: string;
+  /** Optional overrides — pages normally let the layout pull these
+   * from the translation module. */
+  title?: string;
+  description?: string;
   ogType?: 'website' | 'article';
-  canonical?: string;
 }
 
 const {
+  locale,
+  showNavigation = true,
   title,
   description,
-  showNavigation = true,
-  hideNavItems = true,
-  ctaUrlOverride,
-  ogImage,
-  ogType,
-  canonical
+  ogType
 } = Astro.props;
+
+const t = useTenerifeTranslations(locale);
 ---
 
 <BaseLayout
-  title={title}
-  description={description}
+  title={title ?? t.meta.title}
+  description={description ?? t.meta.description}
   showNavigation={showNavigation}
   hideNavItems={false}
-  ctaUrlOverride={ctaUrlOverride}
+  ctaUrlOverride={t.nav.registerUrl}
   navItems={[
-    { label: 'More Info', href: '#faq' },
-    { label: 'Register', href: '/form/tenerife-camp/' },
+    { label: t.nav.moreInfoLabel, href: t.nav.moreInfoHref },
+    { label: t.nav.registerLabel, href: t.nav.registerUrl },
   ]}
   navTheme="transparent"
-  ogImage={ogImage}
+  ogImage={t.meta.ogImage}
   ogType={ogType}
-  canonical={canonical}
+  canonical={t.meta.canonical}
 >
   <Fragment slot="head">
     <Font cssVariable="--font-inter-tight" preload />
@@ -84,7 +86,7 @@ const {
   <div class="tenerife-camp-v2">
     <slot />
   </div>
-  <StickyJoinCta />
+  <StickyJoinCta href={t.nav.registerUrl} label={t.nav.registerLabel} />
 </BaseLayout>
 
 <!--

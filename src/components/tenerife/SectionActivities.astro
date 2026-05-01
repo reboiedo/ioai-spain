@@ -22,6 +22,7 @@
 import { Image, type ImageMetadata } from "astro:assets";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 const photoModules = import.meta.glob<{ default: ImageMetadata }>(
   "@/assets/tenerife/activities/*.{jpg,jpeg,png,webp,avif}",
@@ -32,111 +33,15 @@ const photos: ImageMetadata[] = Object.entries(photoModules)
   .map(([, mod]) => mod.default);
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "blue" } = Astro.props;
-
-interface Activity {
-  day: number;
-  title: string;
-  description: string;
-}
-
-const activities: Activity[] = [
-  {
-    day: 1,
-    title: "Welcome & getting to know each other",
-    description:
-      "The camp kicks off with a walk along the seafront of Puerto de la Cruz, finishing at the historic Plaza del Charco. Along the way, campers take part in a simple but effective icebreaker — sharing their name, something they love, and their plans for the future. By the end of the evening, the group already feels like a group.",
-  },
-  {
-    day: 2,
-    title: "Historic Puerto de la Cruz",
-    description:
-      "Campers explore the old town on a guided cultural walk that brings local history to life. Highlights include the 17th-century Church of Nuestra Señora de la Peña de Francia, the town's historic fishing pier — once used to export Malvasia wine — Playa Jardín designed by celebrated Canarian artist César Manrique, and the Castle of San Felipe, a coastal fortress built to defend against pirates. The walk ends back at the iconic Lago Martiánez pool complex.",
-  },
-  {
-    day: 3,
-    title: "Beach sports",
-    description:
-      "A full afternoon at Playa Jardín with volleyball, football, tennis and frisbee. Campers rotate through activities in small groups, keeping it social, competitive and fun.",
-  },
-  {
-    day: 4,
-    title: "Yoga workshop & beach",
-    description:
-      "A more mindful afternoon. While some campers enjoy the beach, others take part in a yoga workshop designed to balance the physical intensity of the week with self-care and reflection. Every camper gets their session.",
-  },
-  {
-    day: 5,
-    title: "Rambla de Castro coastal trail",
-    description:
-      "A scenic coastal hike through one of Tenerife's most beautiful natural routes. The group passes black-sand coves, a historic 1903 steam-engine pumping station, a wooden bridge over a ravine, an 18th-century coastal fort, and arrives at Mirador de San Pedro — a clifftop viewpoint with sweeping ocean views.",
-  },
-  {
-    day: 6,
-    title: "Traditional Canarian games",
-    description:
-      "Back at Playa Jardín for an afternoon of traditional games from the Canary Islands: crab races, tug-of-war and the handkerchief game. Loud, fun, and a genuine window into local culture.",
-  },
-  {
-    day: 7,
-    title: "Zip-line park at Forestal Park",
-    description:
-      "A special day at Forestal Park Tenerife, a high-altitude adventure park in the forests of Monte de La Esperanza. Before heading in, the group takes part in a short session on emotions — naming them, noticing them, and letting go of the negative ones through a dreamcatcher activity afterward. Lunch is a picnic in the forest.",
-  },
-  {
-    day: 8,
-    title: "Teide National Park & Observatory",
-    description:
-      "A full-day excursion to the top of Tenerife. One group visits the Teide Observatory, home to leading European solar telescopes. The other explores the El Portillo Visitor Centre, with exhibitions on volcanic geology, a botanical garden of native species and a simulated volcanic tube. Both groups then meet at Roques de García for lunch and a breathing and nature connection activity, surrounded by one of the most dramatic landscapes in Europe.",
-  },
-  {
-    day: 9,
-    title: "La Orotava cultural walk",
-    description:
-      "A guided tour through the beautifully preserved historic town of La Orotava. Campers visit a neo-Gothic chapel, a 19th-century French garden with panoramic views, the iconic Casa de los Balcones with its carved wooden architecture, and a traditional gofio mill — a staple of Canarian food culture.",
-  },
-  {
-    day: 10,
-    title: "Surfing at Playa Martiánez",
-    description:
-      "Just five minutes from the hotel, campers try surfing for the first time (or build on what they know) in small groups with professional instructors. While half surf, the other half enjoy the beach or the hotel pool.",
-  },
-  {
-    day: 11,
-    title: "Painting workshop & beach",
-    description:
-      "An afternoon combining creativity with sunshine. Campers take a guided painting workshop on the beach, turning their impressions of the trip into their own artwork. A quieter, more reflective counterpoint to the more active days.",
-  },
-  {
-    day: 12,
-    title: "Surfing, round two",
-    description:
-      "Another session in the water, with extended surf classes for all participants. More time in the sea, more time to progress.",
-  },
-  {
-    day: 13,
-    title: "Farewell beach games",
-    description:
-      "The last beach afternoon: handball, beach paddles, gymkhana obstacle courses and relay races. Before leaving, the whole group gathers in a circle to share their favourite memory of Tenerife.",
-  },
-  {
-    day: 14,
-    title: "Loro Parque",
-    description:
-      "The final special-day excursion takes campers to Loro Parque, one of Europe's most celebrated wildlife parks. The visit is designed not just as a fun day out, but as a meaningful encounter with animal welfare and biodiversity conservation — themes that connect to the broader values of the camp.",
-  },
-  {
-    day: 15,
-    title: "Farewell & the jar of messages",
-    description:
-      "The last day brings the group together for a final activity: the jar of messages. Each camper writes a note — a reflection, an encouragement, a memory — folds it up and adds it to a shared jar. It's a simple, powerful way to close two weeks of shared experience. The day ends with a collective farewell discussion and the kind of goodbyes that usually involve promises to stay in touch.",
-  },
-];
-
+const { locale, theme = "blue" } = Astro.props;
+const t = useTenerifeTranslations(locale);
+const activities = t.activities.items;
 const total = activities.length;
 ---
 
@@ -148,18 +53,13 @@ const total = activities.length;
     <!-- ── Hero block ──────────────────────────────────────────── -->
     <header class="adv__hero">
       <div class="adv__title-block">
-        <HeroTitle>ADVENTURES</HeroTitle>
-        <!-- "Daily" eyebrow absolutely centred over ADVENTURES
-             (both axes) so it reads as a stamp on top of the
-             giant word rather than a separate line above it. -->
-        <span class="adv__eyebrow" aria-hidden="true">Daily</span>
+        <HeroTitle>{t.activities.title}</HeroTitle>
+        <!-- Eyebrow absolutely centred over the title (both axes)
+             so it reads as a stamp on top of the giant word
+             rather than a separate line above it. -->
+        <span class="adv__eyebrow" aria-hidden="true">{t.activities.eyebrow}</span>
       </div>
-      <p class="font-body-l adv__intro">
-        Outside of study hours, campers have a full schedule of
-        activities across Tenerife — beaches, national parks,
-        historic towns, and cultural workshops. Two weeks of
-        afternoons and evenings, planned but never crammed.
-      </p>
+      <p class="font-body-l adv__intro">{t.activities.intro}</p>
     </header>
 
     <!-- ── Activity browser ────────────────────────────────────── -->
@@ -183,7 +83,7 @@ const total = activities.length;
                   data-adv-index={i}
                   data-active={i === 0 ? "true" : undefined}
                 >
-                  <p class="font-body adv__day-label">Day {a.day}</p>
+                  <p class="font-body adv__day-label">{t.activities.dayLabel} {a.day}</p>
                   <h3 class="font-h2 adv__name">{a.title}</h3>
                 </div>
               ))}
@@ -195,7 +95,7 @@ const total = activities.length;
                   type="button"
                   class="adv__nav-btn"
                   data-adv-prev
-                  aria-label="Previous activity"
+                  aria-label={t.activities.prevAriaLabel}
                 >
                   <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle class="adv__nav-bg" cx="12" cy="12" r="11" />
@@ -206,7 +106,7 @@ const total = activities.length;
                   type="button"
                   class="adv__nav-btn"
                   data-adv-next
-                  aria-label="Next activity"
+                  aria-label={t.activities.nextAriaLabel}
                 >
                   <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle class="adv__nav-bg" cx="12" cy="12" r="11" />
@@ -287,7 +187,7 @@ const total = activities.length;
                   />
                 ) : (
                   <div class="adv__photo-placeholder" aria-hidden="true">
-                    Day {a.day}
+                    {t.activities.dayLabel} {a.day}
                   </div>
                 )}
               </div>
@@ -311,7 +211,7 @@ const total = activities.length;
             class="ap-card"
             aria-expanded="false"
             data-ap-card
-            aria-label={`Day ${a.day}: ${a.title} — tap to read description`}
+            aria-label={`${t.activities.dayLabel} ${a.day}: ${a.title} — ${t.activities.cardTapHint}`}
           >
             <div class="ap-card__photo">
               {photos[i] && (
@@ -326,7 +226,7 @@ const total = activities.length;
               )}
             </div>
             <div class="ap-card__head">
-              <p class="font-caption ap-card__day">Day {a.day}</p>
+              <p class="font-caption ap-card__day">{t.activities.dayLabel} {a.day}</p>
               <h3 class="font-caption-script ap-card__title">{a.title}</h3>
             </div>
             <div class="ap-card__body">

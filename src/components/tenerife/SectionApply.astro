@@ -35,13 +35,18 @@
 
 import { Image, type ImageMetadata } from "astro:assets";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 export interface Props {
+  /** Locale for this render — drives copy + default CTA / brochure URLs. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
-  /** Where the primary CTA links to. */
+  /** Optional override for the primary CTA URL. Defaults to the
+   *  locale-aware form URL. */
   href?: string;
-  /** URL the brochure download CTA points at. */
+  /** Optional override for the brochure download URL. Defaults to the
+   *  locale-aware brochure URL. */
   brochureHref?: string;
   /** Optional override for the trail portraits. Falls back to the
    * auto-discovered set in `src/assets/tenerife/join/`. */
@@ -49,11 +54,16 @@ export interface Props {
 }
 
 const {
+  locale,
   theme = "orange",
-  href = "/form/tenerife-camp/",
-  brochureHref = "/brochure/tenerife-camp.pdf",
+  href,
+  brochureHref,
   images,
 } = Astro.props;
+
+const t = useTenerifeTranslations(locale);
+const ctaHref = href ?? t.apply.href;
+const ctaBrochureHref = brochureHref ?? t.apply.brochureHref;
 
 // Auto-discover portraits at build time. `eager: true` resolves each
 // import synchronously so we have the metadata in frontmatter (no
@@ -87,7 +97,7 @@ const photos: (ImageMetadata | null)[] = Array.from(
     <!-- LEFT — giant title + image-trail overlay. -->
     <div class="apply__left">
       <div class="apply__title">
-        <HeroTitle>JOIN</HeroTitle>
+        <HeroTitle>{t.apply.title}</HeroTitle>
       </div>
 
       <!-- Image trail. Pointer events on the container so we capture
@@ -118,11 +128,7 @@ const photos: (ImageMetadata | null)[] = Array.from(
          is the only Join action across the page; this section
          doesn't render its own buttons. -->
     <div class="apply__body">
-      <p class="font-body-l apply__copy">
-        Ready to take part in the IOAI Spain training camp? Applications
-        open with the national qualifier round in February — shortlisted
-        students are invited directly to camp.
-      </p>
+      <p class="font-body-l apply__copy">{t.apply.copy}</p>
     </div>
   </section>
 </div>

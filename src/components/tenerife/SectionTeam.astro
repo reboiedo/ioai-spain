@@ -15,6 +15,7 @@ import type { ImageMetadata } from "astro:assets";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import TeamCard from "@/components/tenerife/TeamCard.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 // Eager-glob every team portrait so we can look one up by filename
 // (without extension) when rendering each card. New portraits dropped
@@ -32,85 +33,15 @@ for (const [path, mod] of Object.entries(portraitModules)) {
 }
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "orange" } = Astro.props;
-
-interface Member {
-  initials: string;
-  name: string;
-  role?: string;
-  bio: string;
-  /** Filename (no extension) of the portrait in `src/assets/tenerife/team/`. */
-  imageKey?: string;
-}
-
-const members: Member[] = [
-  {
-    initials: "VA",
-    name: "Vladimir Arkhipov",
-    role: "10+ ML competitions won",
-    bio: "Vladimir has won over 10 machine learning competitions and hackathons, and helped design the final round of the national AI olympiad. He spent time as an ML Engineer at PIK Digital before moving into teaching, where he's been helping students crack AI for over two years.",
-    imageKey: "vladimir",
-  },
-  {
-    initials: "AL",
-    name: "Alberto Leyva Guerra",
-    role: "3× IOI finalist",
-    bio: "Alberto represented his country at the International Olympiad in Informatics (IOI) — the world championship of competitive programming — three years in a row. He earned medals at the Ibero-American computing competition across all three years, and holds Candidate Master rank on Codeforces, a global platform where only the top few percent of competitive programmers reach that level.",
-    imageKey: "alberto",
-  },
-  {
-    initials: "AS",
-    name: "Artem Seleznev",
-    role: "2025 IOAI team mentor",
-    bio: "Artem is a research engineer at AIRI, one of the top AI research institutes in the field. He's won the National Technology AI Olympiad and the AI Challenge twice (2023 and 2024), and was chosen to mentor the national-level team at the 2025 International Olympiad in Artificial Intelligence — the global championship for AI students. He's also spoken at major tech events including Skolkovo.",
-    imageKey: "artem_seleznev",
-  },
-  {
-    initials: "AP",
-    name: "Artem Plotkin",
-    role: "PhD, Computational Maths",
-    bio: "Artem is a software engineer and mathematician with industry experience at Yandex, currently completing a PhD in Computational Mathematics. He coaches competitive programming teams at ICPC and IOI level — two of the most prestigious competitions in the field — and teaches algorithms and nonlinear programming. His own competitive record speaks for itself: 1st place at the 2018 International Data Analysis Olympiad and 5th place at the 2024 CodeRun Backend Championship.",
-    imageKey: "artem_plotkin",
-  },
-  {
-    initials: "IZ",
-    name: "Ivan Zagorulko",
-    role: "3× AI Challenge winner",
-    bio: "Ivan is a research engineer at AIRI and a three-time winner of the AI Challenge (2022, 2023, 2024). He mentored the national-level team at the 2025 International Olympiad in AI, and recently published a research paper accepted at AAAI — one of the most prestigious conferences in the field.",
-    imageKey: "ivan",
-  },
-  {
-    initials: "IM",
-    name: "Ilia Mogilev",
-    role: "10,000+ CS teachers trained",
-    bio: "Ilia has spent 8+ years designing education programs at scale. He's built over 50 learning products, trained more than 10,000 CS teachers nationwide, developed curriculum content for Yandex, and created materials for Hour of Code Kazakhstan that reached 20,000+ students. He also ran a nationwide AI hackathon for 8,000 schoolchildren.",
-    imageKey: "ilia",
-  },
-  {
-    initials: "OM",
-    name: "Ogabek Masharipov",
-    role: "Algorithms lecturer",
-    bio: "Ogabek has taught Computer Science and Robotics at both school and university level across Europe. He's a lecturer in Algorithms and Data Structures at a leading state university, and has taught the IB Computer Science curriculum at a top international gymnasium. His focus is on building structured, efficient lessons that actually stick.",
-    imageKey: "ogabek",
-  },
-  {
-    initials: "AV",
-    name: "Anier Velasco",
-    role: "Contributor, Cohere Aya",
-    bio: "Anier is a researcher and educator specialising in the theory behind machine learning. He studied Computer Science and Data Science at Harbour.Space University, won a gold medal at the National Olympiad in Informatics, and has contributed to Aya — an open-source multilingual AI project backed by Cohere for AI, involving researchers from over 100 countries.",
-    imageKey: "anier",
-  },
-];
-
-// Split the members 4/4 into two rows. Keeping the halves symmetrical
-// makes the opposing-Y parallax read as a balanced pair rather than a
-// lopsided drift.
-const rowA = members.slice(0, 4);
-const rowB = members.slice(4, 8);
+const { locale, theme = "orange" } = Astro.props;
+const t = useTenerifeTranslations(locale);
+const members = t.team.members;
 ---
 
 <div class="scene" data-scene data-scene-index="4">
@@ -122,15 +53,8 @@ const rowB = members.slice(4, 8);
       <!-- LEFT — sticky title + intro paragraph. Stays in view as
            the user scrolls past the coach grid on the right. -->
       <div class="team__intro">
-        <SectionTitle lines={["COACHES"]} eyebrow="superstar" />
-        <p class="font-body section-copy team__intro-copy">
-          Every track is led by someone who works in the field, not just
-          teaches it. The team includes research engineers from leading
-          AI institutes, competitive programming coaches, olympiad
-          winners, PhD researchers, and industry professionals with
-          experience at major tech companies. Several instructors have
-          coached or competed at international level themselves.
-        </p>
+        <SectionTitle lines={[t.team.title]} eyebrow={t.team.eyebrow} />
+        <p class="font-body section-copy team__intro-copy">{t.team.copy}</p>
       </div>
 
       <!-- Vertical centreline divider. Same convention as

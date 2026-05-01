@@ -32,56 +32,31 @@ import quoteMaxim from "@/assets/tenerife/testimonials/quote-maxim.png";
 import quoteAnna from "@/assets/tenerife/testimonials/quote-anna.png";
 import quoteJaime from "@/assets/tenerife/testimonials/quote-jaime.png";
 import chatBubble from "@/assets/tenerife/testimonials/chat-bubble.svg";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "blue" } = Astro.props;
+const { locale, theme = "blue" } = Astro.props;
+const t = useTenerifeTranslations(locale);
 
-interface Testimonial {
-  quote: string;
-  name: string;
-  role: string;
-  context: string;
-  image: ImageMetadata;
-}
+// Map each testimonial entry's `imageKey` to its imported asset so
+// the translation file stays free of asset-specific imports.
+const testimonialImages: Record<string, ImageMetadata> = {
+  alejandro: quoteAlejandro,
+  maxim: quoteMaxim,
+  anna: quoteAnna,
+  jaime: quoteJaime,
+};
 
-const testimonials: Testimonial[] = [
-  {
-    quote:
-      "I won Spain's first-ever gold medal at the 2024 International Olympiad in Informatics, after training at the Harbour.Space Menorca Camp 2023.",
-    name: "Alejandro Vivero",
-    role: "Gold winner student",
-    context: "IOI 2024",
-    image: quoteAlejandro,
-  },
-  {
-    quote:
-      "The experience was truly eye-opening. Learning advanced math and programming alongside talented students from around the world in Barcelona pushed my skills forward and gave me a strong foundation.",
-    name: "Maxim Oboznyi",
-    role: "Silver Medalist",
-    context: "Southwestern European Regional Contest 2022",
-    image: quoteMaxim,
-  },
-  {
-    quote:
-      "My daughter arrived unsure about STEM, but the projects and mentors helped her see it differently. It genuinely helped her find her direction. She's now studying programming at university. We're really grateful!!",
-    name: "Anna",
-    role: "Parent",
-    context: "Barcelona Summer Camp 2019",
-    image: quoteAnna,
-  },
-  {
-    quote:
-      "The Menorca camp was honestly incredible. The activities were hands-on, so it never felt like school, and the mentors were super friendly and helped whenever you got stuck. I'd 100% do it again.",
-    name: "Jaime",
-    role: "Participant",
-    context: "Menorca Summer Camp 2023",
-    image: quoteJaime,
-  },
-];
+const testimonials = t.testimonials.items.map((item) => ({
+  ...item,
+  image: testimonialImages[item.imageKey],
+}));
 ---
 
 <div class="scene" data-scene data-scene-index="9">
@@ -93,7 +68,7 @@ const testimonials: Testimonial[] = [
          can overlap it. The card paints in front of the giant
          type. -->
     <div class="testimonials__hero" aria-hidden="true">
-      <HeroTitle>TESTIMONIALS</HeroTitle>
+      <HeroTitle>{t.testimonials.title}</HeroTitle>
     </div>
 
     <!-- Decorative chat bubble (matches follow.art's testimonials
@@ -120,29 +95,29 @@ const testimonials: Testimonial[] = [
     <div class="testimonials__desktop">
       <div class="testimonials__stage" data-testi-stage>
         <div class="testimonials__track" data-testi-track>
-          {testimonials.map((t, i) => (
+          {testimonials.map((item, i) => (
             <article
               class="testi-card"
               data-testi-index={String(i)}
               data-active={i === 0 ? "true" : undefined}
             >
               <blockquote class="testi-card__quote">
-                <p class="font-body">{t.quote}</p>
+                <p class="font-body">{item.quote}</p>
               </blockquote>
               <div class="testi-card__author">
                 <Image
                   class="testi-card__avatar"
-                  src={t.image}
-                  alt={`Portrait of ${t.name}`}
+                  src={item.image}
+                  alt={`${t.testimonials.portraitAltPrefix}${item.name}`}
                   widths={[68, 136, 204]}
                   sizes="68px"
                   loading="lazy"
                   decoding="async"
                 />
                 <div class="testi-card__meta">
-                  <p class="font-body testi-card__name">{t.name}</p>
-                  <p class="font-caption testi-card__role">{t.role}</p>
-                  <p class="font-caption testi-card__context">{t.context}</p>
+                  <p class="font-body testi-card__name">{item.name}</p>
+                  <p class="font-caption testi-card__role">{item.role}</p>
+                  <p class="font-caption testi-card__context">{item.context}</p>
                 </div>
               </div>
             </article>
@@ -155,7 +130,7 @@ const testimonials: Testimonial[] = [
           type="button"
           class="testi-nav-btn testi-nav-btn--prev"
           data-testi-prev
-          aria-label="Previous testimonial"
+          aria-label={t.testimonials.prevAriaLabel}
         >
           <span class="testi-nav-btn__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -163,15 +138,15 @@ const testimonials: Testimonial[] = [
               <path class="testi-nav-btn__icon-arrow" d="M14 8 L10 12 L14 16" fill="none" stroke-width="1.5" />
             </svg>
           </span>
-          <span class="testi-nav-btn__label">Prev</span>
+          <span class="testi-nav-btn__label">{t.testimonials.prevLabel}</span>
         </button>
         <button
           type="button"
           class="testi-nav-btn testi-nav-btn--next"
           data-testi-next
-          aria-label="Next testimonial"
+          aria-label={t.testimonials.nextAriaLabel}
         >
-          <span class="testi-nav-btn__label">Next</span>
+          <span class="testi-nav-btn__label">{t.testimonials.nextLabel}</span>
           <span class="testi-nav-btn__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <circle class="testi-nav-btn__icon-bg" cx="12" cy="12" r="11" />
@@ -185,34 +160,34 @@ const testimonials: Testimonial[] = [
     <!-- Bottom-left tagline — same anchor pattern as
          follow.art's "Curators & Artists / About Us" block. -->
     <p class="testimonials__tagline" aria-hidden="true">
-      <span>Real voices</span>
-      <span>from camp</span>
+      <span>{t.testimonials.taglineLine1}</span>
+      <span>{t.testimonials.taglineLine2}</span>
     </p>
 
     <!-- MOBILE layout: section title + horizontal-scroll list. -->
     <div class="testimonials__mobile">
-      <SectionTitle lines={["TESTIMONIALS"]} />
+      <SectionTitle lines={[t.testimonials.title]} />
 
       <HScrollMobile itemWidth="min(82%, 360px)">
-        {testimonials.map((t) => (
+        {testimonials.map((item) => (
           <article class="testi-card testi-card--mobile">
             <blockquote class="testi-card__quote">
-              <p class="font-body">{t.quote}</p>
+              <p class="font-body">{item.quote}</p>
             </blockquote>
             <div class="testi-card__author">
               <Image
                 class="testi-card__avatar"
-                src={t.image}
-                alt={`Portrait of ${t.name}`}
+                src={item.image}
+                alt={`${t.testimonials.portraitAltPrefix}${item.name}`}
                 widths={[68, 136, 204]}
                 sizes="68px"
                 loading="lazy"
                 decoding="async"
               />
               <div class="testi-card__meta">
-                <p class="font-body testi-card__name">{t.name}</p>
-                <p class="font-caption testi-card__role">{t.role}</p>
-                <p class="font-caption testi-card__context">{t.context}</p>
+                <p class="font-body testi-card__name">{item.name}</p>
+                <p class="font-caption testi-card__role">{item.role}</p>
+                <p class="font-caption testi-card__context">{item.context}</p>
               </div>
             </div>
           </article>

@@ -32,6 +32,7 @@ import { Image, type ImageMetadata } from "astro:assets";
 import harbourLogo from "@/assets/harbour-space-logo.svg";
 import leaguesLogo from "@/assets/icons/leagues-logo.svg";
 import spikes from "@/assets/tenerife/story/spikes.svg";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 // Auto-discover the rotating poster set. Drop replacements into
 // `src/assets/tenerife/story/` (filenames sort `01-…`, `02-…`).
@@ -45,9 +46,11 @@ const storyPosters: ImageMetadata[] = Object.entries(
   .map(([, mod]) => mod.default);
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
-  /** Two-line stacked title. */
+  /** Two-line stacked title. Falls back to translated values. */
   titleLines?: [string, string];
   /** Optional video poster image (any aspect). */
   posterImage?: ImageMetadata;
@@ -55,43 +58,23 @@ export interface Props {
   videoUrl?: string;
 }
 
-interface Item {
-  label: string;
-  body: string;
-}
-
 const {
+  locale,
   theme = "blue",
-  titleLines = ["ABOUT", "US"],
+  titleLines,
   posterImage,
   videoUrl,
 } = Astro.props;
 
-// Approach pillars — content lifted from the (now-removed) Approach
-// scene. Lives here so the Story scene carries the camp's full
-// narrative on a single page.
-const items: Item[] = [
-  {
-    label: "The academics and the summer are both real",
-    body: "The learning program and the extracurricular program are built with equal care. Mornings go deep into AI. Afternoons go to Tenerife's beaches, trails, and historic towns. Neither half is filler, and you don't have to sacrifice one to get the other.",
-  },
-  {
-    label: "Two tracks, one community",
-    body: "Foundations and applied ML run in parallel, plus a team research sprint that cuts across both. Mornings you're in your track; afternoons and evenings the whole cohort is together — meals, labs, problem sets, hikes.",
-  },
-  {
-    label: "The highest level is in the room",
-    body: "Students selected from the IOAI Spain qualifier, taught by researchers who publish at NeurIPS and ICML, with industry mentors from Barcelona's AI labs. Ambition is the baseline.",
-  },
-];
+const t = useTenerifeTranslations(locale);
+const resolvedTitleLines: [string, string] =
+  titleLines ?? [t.story.titleLine1, t.story.titleLine2];
+const items = t.story.items;
+const facts = t.story.facts;
 
-// Quick-facts trio shown right under the lede paragraph. The
-// `Dates` value is a placeholder — swap once the calendar is set.
-const facts: { label: string; value: string }[] = [
-  { label: "Language", value: "English" },
-  { label: "Ages", value: "14–18" },
-  { label: "Dates", value: "TBD" },
-];
+// Sponsor logos — keyed by name so the data-driven sponsor list
+// from translations can pick the right asset by index.
+const sponsorLogos = [harbourLogo, leaguesLogo];
 ---
 
 <div class="scene" data-scene data-scene-index="2">
@@ -111,42 +94,25 @@ const facts: { label: string; value: string }[] = [
              theme's `--surface` surface so they read as a distinct
              credit strip while staying in the same visual block. -->
         <div class="story__intro">
-          <p class="font-body-l story__lede">
-            For over a decade behind the scenes of olympiad coaching and
-            AI research, we've watched ambitious students chase the same
-            handful of opportunities — and noticed how rarely those
-            opportunities reach beyond a familiar inner circle. The
-            Tenerife camp exists to widen that circle.
-          </p>
+          <p class="font-body-l story__lede">{t.story.lede}</p>
 
           <div class="story__sponsors">
-            <p class="font-caption story__sponsors-label">Powered by</p>
-            <a
-              class="story__sponsors-cell"
-              href="https://harbour.space"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Harbour.Space"
-            >
-              <Image
-                src={harbourLogo}
-                alt="Harbour.Space"
-                class="story__sponsors-logo story__sponsors-logo--harbour"
-              />
-            </a>
-            <a
-              class="story__sponsors-cell"
-              href="https://leaguesofcodes.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Leagues of Code"
-            >
-              <Image
-                src={leaguesLogo}
-                alt="Leagues of Code"
-                class="story__sponsors-logo story__sponsors-logo--leagues"
-              />
-            </a>
+            <p class="font-caption story__sponsors-label">{t.story.poweredBy}</p>
+            {t.story.sponsors.map((sponsor, i) => (
+              <a
+                class="story__sponsors-cell"
+                href={sponsor.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={sponsor.name}
+              >
+                <Image
+                  src={sponsorLogos[i]}
+                  alt={sponsor.name}
+                  class={`story__sponsors-logo story__sponsors-logo--${sponsor.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}
+                />
+              </a>
+            ))}
           </div>
         </div>
 
@@ -194,8 +160,8 @@ const facts: { label: string; value: string }[] = [
               // Top line stays flat — only the bottom line carries
               // the scroll-driven per-letter scaleY animation so
               // the stretch reads as intent rather than noise.
-              { text: titleLines[0], noStretch: true },
-              { text: titleLines[1] },
+              { text: resolvedTitleLines[0], noStretch: true },
+              { text: resolvedTitleLines[1] },
             ]}
             defaultAlign="right"
             gap="var(--space-s)"
@@ -224,7 +190,7 @@ const facts: { label: string; value: string }[] = [
         <a
           class="story__video"
           href={videoUrl ?? "#"}
-          aria-label="Play story video"
+          aria-label={t.story.videoAriaLabel}
         >
           {posterImage ? (
             <Image

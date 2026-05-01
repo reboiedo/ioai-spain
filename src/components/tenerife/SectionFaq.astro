@@ -14,61 +14,18 @@
  */
 
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
 export interface Props {
+  /** Locale for this render. */
+  locale: Language;
   /** Tenerife theme palette to apply via `data-theme`. */
   theme?: "orange" | "blue" | "yellow" | "neutral";
 }
 
-const { theme = "yellow" } = Astro.props;
-
-interface Faq {
-  question: string;
-  answer: string;
-}
-
-const faqs: Faq[] = [
-  {
-    question: "Who is the camp for?",
-    answer:
-      "Curious students aged 14–18, with or without prior coding experience. Beginners pick the Beginner track and work up from zero; more advanced students pick the Advanced track and dive straight into olympiad-level material. Everyone shares the extracurricular programme.",
-  },
-  {
-    question: "Do you need prior coding experience?",
-    answer:
-      "Not for the Beginner tracks. Python, AI, Game Development and Design all start from zero — the goal is to build real intuition, not throw students in the deep end. The Advanced tracks (Mathematics, Algorithms, AI) assume comfort with the basics and move fast.",
-  },
-  {
-    question: "What's included in the price?",
-    answer:
-      "Two weeks of academic programme (35 hours across one chosen track), the full extracurricular programme (excursions, sports, workshops, cultural visits), a 4-star shared-room hotel stay with all meals included, transport between activities, and camp insurance.",
-  },
-  {
-    question: "What language is the camp in?",
-    answer:
-      "Everything happens in English — academic sessions, group activities, and day-to-day camp life. For most students this becomes a genuine language immersion alongside the technical learning.",
-  },
-  {
-    question: "Where do students stay?",
-    answer:
-      "At a 4-star hotel in Puerto de la Cruz on the northern coast of Tenerife, two minutes from Martiánez beach. Rooms are shared between three campers, with breakfast, lunch and dinner included on site every day.",
-  },
-  {
-    question: "How is supervision handled?",
-    answer:
-      "Nineteen dedicated supervisors are on the ground at all times, plus eight coaches who are accessible for help with anything — learning, activities, or in between. All staff are trained to be attentive to individual needs and age groups.",
-  },
-  {
-    question: "What do students need to bring?",
-    answer:
-      "A laptop is required for the academic programme. Beyond that: comfortable summer clothing for two weeks, swimwear, sunscreen, sturdy shoes for hikes, and a refillable water bottle. A full packing list is sent two weeks before camp.",
-  },
-  {
-    question: "How does travel work?",
-    answer:
-      "Tenerife North and Tenerife South airports are both well-connected to mainland Europe. Group transfers between the airport and the hotel are organised on the published arrival and departure days; outside that window, transfers can be arranged for a small fee.",
-  },
-];
+const { locale, theme = "yellow" } = Astro.props;
+const t = useTenerifeTranslations(locale);
+const faqs = t.faq.items;
 ---
 
 <div class="scene" data-scene data-scene-index="11">
@@ -81,12 +38,11 @@ const faqs: Faq[] = [
            bottom-left of the column. -->
       <div class="faq__intro">
         <div class="faq__title">
-          <SectionTitle lines={["CONTACT"]} eyebrow="FAQ &" />
+          <SectionTitle lines={[t.faq.title]} eyebrow={t.faq.eyebrow} />
         </div>
         <p class="font-body-l section-copy faq__contact">
-          Need to talk through something specific? Reach out anytime
-          at <a href="mailto:ioai.spain@harbour.space">ioai.spain@harbour.space</a>
-         <a href="tel:+34671498303">+34&nbsp;671&nbsp;498&nbsp;303</a>
+          {t.faq.contactLead}<a href={t.faq.email.href}>{t.faq.email.label}</a>
+         <a href={t.faq.phone.href}>{t.faq.phone.label}</a>
         </p>
       </div>
 
