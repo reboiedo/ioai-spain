@@ -27,7 +27,7 @@
  * layout reads as intentional even before all photos land.
  */
 
-import { Picture, type ImageMetadata } from "astro:assets";
+import { Image, type ImageMetadata } from "astro:assets";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
@@ -82,11 +82,10 @@ const photoSlots = t.venue.photoSlots;
         {photoSlots.map((slot) => (
           <li class="venue-photo" style={`aspect-ratio: ${slot.aspect};`}>
             {slot.key && photos[slot.key] ? (
-              <Picture
+              <Image
                 class="venue-photo__img"
                 src={photos[slot.key]}
                 alt={slot.alt}
-                formats={["avif", "webp"]}
                 widths={[480, 720, 960, 1280]}
                 sizes="(min-width: 768px) 45vw, 90vw"
                 loading="lazy"

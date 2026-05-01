@@ -1,5 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
+import { Image } from 'astro:assets';
 import accommodationImage from '@/assets/tenerife-camp/stay-accommodation.jpeg';
 import educationImage from '@/assets/tenerife-camp/stay-education.jpg';
 ---
@@ -9,10 +9,9 @@ import educationImage from '@/assets/tenerife-camp/stay-education.jpg';
     <!-- Accommodation Section -->
     <div class="stay-block stay-block--reverse">
       <div class="stay-block__image">
-        <Picture
+        <Image
           src={accommodationImage}
           alt="Camp accommodation building"
-          formats={["avif", "webp"]}
           loading="lazy"
           widths={[400, 600, 800]}
           sizes="(max-width: 768px) 100vw, 50vw"
@@ -39,10 +38,9 @@ import educationImage from '@/assets/tenerife-camp/stay-education.jpg';
         </p>
       </div>
       <div class="stay-block__image">
-        <Picture
+        <Image
           src={educationImage}
           alt="Children at summer camp"
-          formats={["avif", "webp"]}
           loading="lazy"
           widths={[400, 600, 800]}
           sizes="(max-width: 768px) 100vw, 50vw"

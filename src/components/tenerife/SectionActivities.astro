@@ -19,7 +19,7 @@
  * activities by index after a `01-…`, `02-…` filename sort.
  */
 
-import { Picture, type ImageMetadata } from "astro:assets";
+import { Image, type ImageMetadata } from "astro:assets";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
 import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
@@ -177,11 +177,10 @@ const total = activities.length;
                 data-active={i === 0 ? "true" : undefined}
               >
                 {photos[i] ? (
-                  <Picture
+                  <Image
                     class="adv__photo-img"
                     src={photos[i]}
                     alt={a.title}
-                    formats={["avif", "webp"]}
                     widths={[640, 960, 1280, 1600]}
                     sizes="(min-width: 768px) 50vw, 100vw"
                     loading={i < 2 ? "eager" : "lazy"}
@@ -216,11 +215,10 @@ const total = activities.length;
           >
             <div class="ap-card__photo">
               {photos[i] && (
-                <Picture
+                <Image
                   class="ap-card__img"
                   src={photos[i]}
                   alt={a.title}
-                  formats={["avif", "webp"]}
                   widths={[320, 480, 640]}
                   sizes="80vw"
                   loading="lazy"
@@ -720,11 +718,6 @@ const total = activities.length;
     cursor: pointer;
     text-align: left;
     width: 100%;
-    /* Kill the iOS/Android tap-highlight grey flash on tap. */
-    -webkit-tap-highlight-color: transparent;
-    /* Disable mobile double-tap-zoom on the card (we handle the
-     * tap ourselves) and remove the 300ms synthetic-click delay. */
-    touch-action: manipulation;
     /* `3 : 4` is calibrated so the photo row (`1fr`) ends up almost
      * exactly square once head + gaps + padding are subtracted from
      * the card's content height. Slight ±2px slack at extreme card
@@ -750,15 +743,6 @@ const total = activities.length;
 
   .ap-card[aria-expanded="true"] {
     grid-template-rows: 0fr auto 1fr;
-    /* Tighter top padding + smaller row-gap when open: with no photo
-     * occupying row 1, the card otherwise leaves a lot of empty
-     * space between the card edge and the title, and between the
-     * title and the description below. */
-    padding-block-start: var(--space-s);
-    row-gap: var(--space-2xs);
-  }
-  .ap-card[aria-expanded="true"] .ap-card__head {
-    min-height: 0;
   }
 
   .ap-card:focus-visible {
@@ -767,16 +751,10 @@ const total = activities.length;
   }
 
   .ap-card__photo,
+  .ap-card__head,
   .ap-card__body {
     min-height: 0;
     overflow: hidden;
-  }
-  /* Head intentionally NOT clipped — the script title's ascenders /
-   * descenders extend past its line-box, and `overflow: hidden`
-   * would shave them off. The head row is `auto`-sized and
-   * doesn't animate, so visible overflow has no layout impact. */
-  .ap-card__head {
-    min-height: 0;
   }
 
   /* Photo cell fills row 1 (`1fr`) — the card's `3:4` aspect-ratio
@@ -831,7 +809,7 @@ const total = activities.length;
   .ap-card__head {
     display: flex;
     flex-direction: column;
-    gap: 0.45em;
+    gap: 0.15em;
   }
   .ap-card__day {
     margin: 0;
@@ -854,40 +832,6 @@ const total = activities.length;
     opacity: 1;
     overflow-y: auto;
     overscroll-behavior: contain;
-    /* Soft fade at the edges of the scroll container so the
-     * description text doesn't get hard-cut where it overflows.
-     * `--m-top` is 0 by default (top reads as flush against the
-     * title); JS bumps it once the user scrolls down. `--m-bottom`
-     * is on by default to telegraph "there's more below"; JS
-     * collapses it to 0 when we hit the bottom. Both vars also
-     * collapse to 0 when content fits without overflow (set via
-     * `data-overflow="false"`). */
-    --m-top: 0px;
-    --m-bottom: 2.75rem;
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      #000 var(--m-top),
-      #000 calc(100% - var(--m-bottom)),
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      #000 var(--m-top),
-      #000 calc(100% - var(--m-bottom)),
-      transparent 100%
-    );
-  }
-  .ap-card[aria-expanded="true"] .ap-card__body[data-scrolled="true"] {
-    --m-top: 2.75rem;
-  }
-  .ap-card[aria-expanded="true"] .ap-card__body[data-at-bottom="true"] {
-    --m-bottom: 0px;
-  }
-  .ap-card[aria-expanded="true"] .ap-card__body[data-overflow="false"] {
-    --m-top: 0px;
-    --m-bottom: 0px;
   }
   .ap-card__description {
     margin: 0;
@@ -1743,41 +1687,9 @@ const total = activities.length;
       '[data-ap-card]',
     );
     cards.forEach((card) => {
-      const body = card.querySelector<HTMLElement>('.ap-card__body');
-
-      // Drive the top/bottom fade masks based on the body's scroll
-      // position. Threshold of 4px on top so the fade flips on as
-      // soon as the user starts scrolling; bottom check uses a 2px
-      // slack to handle subpixel rounding at the end of the scroll.
-      function updateMask() {
-        if (!body) return;
-        const overflow = body.scrollHeight > body.clientHeight + 1;
-        body.dataset.overflow = overflow ? 'true' : 'false';
-        if (!overflow) return;
-        body.dataset.scrolled = body.scrollTop > 4 ? 'true' : 'false';
-        const atBottom =
-          body.scrollTop + body.clientHeight >= body.scrollHeight - 2;
-        body.dataset.atBottom = atBottom ? 'true' : 'false';
-      }
-
-      if (body) {
-        body.addEventListener('scroll', updateMask, { passive: true });
-      }
-
       card.addEventListener('click', () => {
         const open = card.getAttribute('aria-expanded') === 'true';
         card.setAttribute('aria-expanded', open ? 'false' : 'true');
-        // Recompute mask state once the open transition has space
-        // to lay out (the body's `clientHeight` is ~0 while collapsed).
-        if (!open) {
-          requestAnimationFrame(() => {
-            // Run twice — once after the next frame for a quick read,
-            // and again after the row transition (~550ms) settles in
-            // case the first read still saw the in-progress height.
-            updateMask();
-            window.setTimeout(updateMask, 600);
-          });
-        }
       });
     });
   }

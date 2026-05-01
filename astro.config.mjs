@@ -46,33 +46,5 @@ export default defineConfig({
     },
   ],
 
-  // Image pipeline.
-  //
-  // - `layout: 'constrained'` makes <Image> / <Picture> responsive by
-  //   default: photos scale to their container, Astro auto-generates a
-  //   `srcset` from `image.breakpoints`. Per-component `widths` / `sizes`
-  //   still take precedence on every existing call site.
-  // - `responsiveStyles: true` injects the tiny global stylesheet
-  //   that makes the constrained layout behave correctly without
-  //   per-component CSS.
-  // - Sharp service config sets sane per-format quality defaults.
-  //   AVIF at 50 ≈ JPG 80 visually at a fraction of the bytes;
-  //   WebP at 75 ≈ JPG 85; the JPG fallback uses mozjpeg + progressive
-  //   so the source-format leg stays crisp on older browsers.
-  //   Per-image `quality` props on <Picture> still override these.
-  image: {
-    layout: 'constrained',
-    responsiveStyles: true,
-    service: {
-      entrypoint: 'astro/assets/services/sharp',
-      config: {
-        avif: { quality: 50 },
-        webp: { quality: 75 },
-        jpeg: { quality: 82, mozjpeg: true, progressive: true },
-        png: { compressionLevel: 9 },
-      },
-    },
-  },
-
   integrations: [tenerifeTokens(), tunnel(), icon()],
 });
