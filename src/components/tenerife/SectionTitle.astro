@@ -276,8 +276,11 @@ const mobileMaxWidth = Math.max(...mobileLineWidths, 1);
     /* Shared script-eyebrow size across the whole page —
      * matches SectionActivities's "Daily" and SectionSafety's
      * "always" so every script accent reads at the same scale,
-     * regardless of the parent title's size. */
-    font-size: var(--type-step-1);
+     * regardless of the parent title's size. The script font
+     * needs more presence than body type, so it lives on its
+     * own clamp rather than `--type-step-1` (which is body-size
+     * and reads as too quiet for a handwritten accent). */
+    font-size: clamp(1.75rem, 3.5vw, 3rem);
     /* Counter-clockwise tilt, pivoting at the bottom-left so the
      * script's baseline anchors naturally onto the title. */
     transform: rotate(-6deg);
@@ -293,7 +296,7 @@ const mobileMaxWidth = Math.max(...mobileLineWidths, 1);
     top: 50%;
     left: 50%;
     /* Shared script-eyebrow size — see `--overlap`. */
-    font-size: var(--type-step-1);
+    font-size: clamp(1.75rem, 3.5vw, 3rem);
     transform: translate(-50%, -50%) rotate(-6deg);
     transform-origin: center;
   }

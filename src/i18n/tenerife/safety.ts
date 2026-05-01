@@ -94,6 +94,7 @@ export const safety = {
     {
       name: 'Olga Litvinova',
       initials: 'OL',
+      imageKey: 'olga',
       role: createTranslation({
         en: 'Project Manager',
         es: 'Directora de Proyecto'
@@ -102,6 +103,7 @@ export const safety = {
     {
       name: 'Patricia Carranza',
       initials: 'PC',
+      imageKey: 'patricia',
       role: createTranslation({
         en: 'Academic Consultant',
         es: 'Consultora Académica'
@@ -110,6 +112,7 @@ export const safety = {
     {
       name: 'Maria Kanbina',
       initials: 'MK',
+      imageKey: 'maria',
       role: createTranslation({
         en: 'Customer Relations',
         es: 'Atención al Cliente'
@@ -118,6 +121,7 @@ export const safety = {
     {
       name: 'Kalista Galic',
       initials: 'KG',
+      imageKey: 'kalista',
       role: createTranslation({
         en: 'Camp Supervisor',
         es: 'Supervisora del Campamento'
