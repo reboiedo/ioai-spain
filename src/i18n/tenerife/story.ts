@@ -39,7 +39,7 @@ export const story = {
   }),
   sponsors: [
     { name: 'Harbour.Space', href: 'https://harbour.space' },
-    { name: 'Leagues of Code', href: 'https://leaguesofcodes.com' }
+    { name: 'Leagues of Code', href: 'https://www.leaguesofcode.com' }
   ] satisfies StorySponsor[],
   items: [
     {

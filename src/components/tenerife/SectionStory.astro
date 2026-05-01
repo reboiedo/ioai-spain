@@ -102,32 +102,13 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
            sticky and stays in view as the user passes by. The big
            lede paragraph sits above the item list. -->
       <div class="story__items">
-        <!-- Intro block — lede + sponsors sit together as one
-             opening statement. The lede caps at 70ch; the sponsors
-             below are three equal cards (label + two logos) on the
-             theme's `--surface` surface so they read as a distinct
-             credit strip while staying in the same visual block. -->
+        <!-- Intro block — lede only. The sponsor logos used to sit
+             here as a credit strip; they now live under the first
+             item ("Backed by Harbour.Space and Leagues of Code")
+             where they're directly tied to the copy that names
+             them. -->
         <div class="story__intro">
           <p class="font-body-l story__lede">{t.story.lede}</p>
-
-          <div class="story__sponsors">
-            <p class="font-caption story__sponsors-label">{t.story.poweredBy}</p>
-            {t.story.sponsors.map((sponsor, i) => (
-              <a
-                class="story__sponsors-cell"
-                href={sponsor.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={sponsor.name}
-              >
-                <Image
-                  src={sponsorLogos[i]}
-                  alt={sponsor.name}
-                  class={`story__sponsors-logo story__sponsors-logo--${sponsor.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}
-                />
-              </a>
-            ))}
-          </div>
         </div>
 
         <!-- Quick facts row — three label/value pairs sat horizontally
@@ -151,6 +132,32 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
             <article class="story-item" data-story-item-index={i}>
               <h3 class="font-h4 story-item__label">{it.label}</h3>
               <p class="font-body story-item__body">{it.body}</p>
+              {/* First pillar names Harbour.Space + Leagues of Code,
+                  so the sponsor logos sit directly under its body
+                  instead of as a separate credit strip. The block
+                  is grid-placed in column 3 on desktop so it lines
+                  up with the body text above it. */}
+              {i === 0 && (
+                <div class="story__sponsors">
+                  <div class="story__sponsors-logos">
+                    {t.story.sponsors.map((sponsor, si) => (
+                      <a
+                        class="story__sponsors-cell"
+                        href={sponsor.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={sponsor.name}
+                      >
+                        <Image
+                          src={sponsorLogos[si]}
+                          alt={sponsor.name}
+                          class={`story__sponsors-logo story__sponsors-logo--${sponsor.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}
+                        />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </article>
           ))}
         </HScrollMobile>
@@ -441,62 +448,47 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
     }
   }
 
-  /* Sponsors row — three cells: "POWERED BY" label, then the two
-   * logos. Mobile: 2-column grid. The label spans BOTH columns on
-   * row 1; the two logos sit side-by-side on row 2 (left-anchored).
-   * Desktop: 3 equal columns via the media query below. */
+  /* Sponsors block — sits directly under the FIRST pillar's body
+   * ("Backed by Harbour.Space and Leagues of Code"). Stacked
+   * label + logo row, no card chrome around the cells (the pillar
+   * row above is the visual frame). On desktop the block lands in
+   * column 3 of the `.story-item` grid so it lines up beneath the
+   * body text; on mobile it just stacks naturally inside the
+   * scroll card. */
   .story__sponsors {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* Tight row-gap between label and logos so the group reads as
-     * one unit, but a wider column-gap between the two logos so
-     * Harbour.Space and Leagues of Code aren't crammed together
-     * on mobile. */
-    row-gap: var(--space-2xs, 0.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs, 0.5rem);
+    margin-block-start: var(--space-m);
+  }
+
+  /* Two logos side-by-side, sharing the row equally. Each cell
+   * gets `flex: 1` so the row never overflows; the logos inside
+   * use `max-width: 100%` + `height: auto` so they scale down
+   * proportionally to fit whatever width their cell ends up at. */
+  .story__sponsors-logos {
+    display: flex;
+    flex-wrap: nowrap;
     column-gap: var(--space-l);
+    align-items: center;
   }
 
-  .story__sponsors-label {
-    grid-column: 1 / -1;
-  }
-
-  @media (min-width: 768px) {
-    .story__sponsors {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      /* Reset to a tighter, even gap on desktop where the 3-column
-       * card layout already supplies visual separation between
-       * cells via padding. */
-      column-gap: var(--space-2xs, 0.5rem);
-    }
-    .story__sponsors-label {
-      grid-column: auto;
-    }
-  }
-
-  /* Sponsor cell — clickable wrapper around each logo. Mobile:
-   * transparent (blends with section bg, no padding) and
-   * left-anchored so the logos line up flush with the "POWERED
-   * BY" label above. Desktop: surface card with centred logo via
-   * the media query below. */
+  /* Sponsor cell — clickable wrapper around each logo. Transparent
+   * background; the logo is the entire visual element. Each cell
+   * gets `flex: 1` so the two cells share the row equally; the
+   * logo inside scales to fit. `min-width: 0` so the cell can
+   * shrink below its content's intrinsic width when needed. */
   .story__sponsors-cell {
-    background: var(--background);
+    background: transparent;
     color: var(--foreground);
     padding: 0;
-    border-radius: 4px;
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: 4rem;
     text-decoration: none;
     transition: transform 220ms ease, opacity 220ms ease;
-  }
-
-  @media (min-width: 768px) {
-    .story__sponsors-cell {
-      background: var(--surface);
-      padding: var(--space-m);
-      justify-content: center;
-    }
   }
 
   .story__sponsors-cell:hover {
@@ -504,19 +496,35 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
     opacity: 0.92;
   }
 
-  /* Plain-text label (no card background) — sits in column 1 of the
-   * sponsors row, vertically centred against the logo cards. */
+  /* Plain-text "POWERED BY" label above the logo row. */
   .story__sponsors-label {
     margin: 0;
-    align-self: center;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     opacity: 0.7;
   }
 
+  @media (min-width: 768px) {
+    /* Desktop: place the sponsors block in column 3 of the
+     * `.story-item` grid (same column as the body) so it sits
+     * directly beneath the body copy. */
+    .story-item .story__sponsors {
+      grid-column: 3;
+    }
+  }
+
+  /* Logo sizes by max-height (visual cap) and max-width: 100% so
+   * the SVG scales DOWN to fit its cell when the row is narrow,
+   * but never grows past 2.25rem tall on a roomy desktop column.
+   * `width: auto` + `height: auto` let the natural aspect drive
+   * whichever dimension isn't pinned. `object-fit: contain` is a
+   * belt-and-braces guard for any non-SVG that lands here. */
   .story__sponsors-logo {
-    height: 2.25rem;
+    max-height: 2.25rem;
+    max-width: 100%;
     width: auto;
+    height: auto;
+    object-fit: contain;
     /* Logos ship in their brand colour; flatten to white so they
      * read against any of the section themes' surface colours. */
     filter: brightness(0) invert(1);
