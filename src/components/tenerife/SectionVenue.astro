@@ -59,15 +59,12 @@ interface PhotoSlot {
 }
 
 const photoSlots: PhotoSlot[] = [
-  { key: "hotel", alt: "Hotel exterior", aspect: "4 / 5" },
-  { key: "hotel-terrace", alt: "Hotel terrace", aspect: "4 / 3" },
-  { key: "hotel-room", alt: "Shared room interior", aspect: "3 / 4" },
-  { key: "hotel-pool", alt: "Pool deck", aspect: "4 / 5" },
-  { key: "hotel-beach", alt: "Martiánez beach, two minutes away", aspect: "16 / 9" },
+  { key: "hotel-1", alt: "Hotel Concordia exterior", aspect: "4 / 3" },
+  { key: "hotel-2", alt: "Hotel Concordia interior", aspect: "5 / 3" },
 ];
 ---
 
-<div class="scene" data-scene>
+<div class="scene" data-scene data-scene-index="6">
   <section
     class="section scene__layer scene__layer--tilt venue"
     data-theme={theme}
@@ -113,6 +110,15 @@ const photoSlots: PhotoSlot[] = [
             )}
           </li>
         ))}
+        <li class="venue-photo venue-photo--map" style="aspect-ratio: 4 / 3;">
+          <iframe
+            class="venue-photo__map"
+            src="https://www.google.com/maps?q=Hotel+Concordia+Playa+Puerto+de+la+Cruz+Tenerife&output=embed"
+            title="Hotel Concordia on Google Maps"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>
+        </li>
       </ol>
     </div>
   </section>
@@ -211,6 +217,13 @@ const photoSlots: PhotoSlot[] = [
     object-fit: cover;
     object-position: center;
     display: block;
+  }
+
+  .venue-photo__map {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
   }
 
   .venue-photo__label {

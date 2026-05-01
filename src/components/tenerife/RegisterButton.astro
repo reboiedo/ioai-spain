@@ -1,0 +1,127 @@
+---
+/**
+ * RegisterButton — single source of truth for every "Register" /
+ * action button on the Tenerife camp page. Anywhere a register-style
+ * button appears (floating sticky CTA, pricing tickets, etc.) it
+ * should render this component so the look and feel cannot drift
+ * apart between callsites.
+ *
+ * Variants:
+ *   - `size`     "lg" (default — matches the floating bottom-right
+ *                StickyJoinCta) | "sm" (compact, for use inside
+ *                cards / dense layouts).
+ *   - `variant`  "primary" (default — `--primary` background, used
+ *                for the page's main CTA) | "secondary" (`--secondary`
+ *                background — white in every Tenerife theme — used
+ *                inside cards or wherever a quieter button is needed).
+ *
+ * Any extra attributes (data-*, aria-*, target, rel, …) and any extra
+ * class names spread through to the rendered `<a>`, so a parent can
+ * still attach JS handles or layout-specific overrides without
+ * forking the component.
+ */
+
+export interface Props {
+  href: string;
+  label?: string;
+  size?: 'lg' | 'sm';
+  variant?: 'primary' | 'secondary';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  label = 'Register',
+  size = 'lg',
+  variant = 'primary',
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<a
+  class:list={[
+    'register-btn',
+    `register-btn--${size}`,
+    `register-btn--${variant}`,
+    className,
+  ]}
+  href={href}
+  {...rest}
+>
+  <span class="register-btn__label">{label}</span>
+  <svg
+    class="register-btn__arrow"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M5 12 H19" />
+    <path d="M13 6 L19 12 L13 18" />
+  </svg>
+</a>
+
+<style>
+  .register-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    border-radius: 0.25rem;
+    font-family: var(--font-body);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    transition: transform 200ms ease;
+  }
+
+  .register-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .register-btn__arrow {
+    display: inline-block;
+    /* Fixed (rem-based) so the arrow size doesn't shrink when the
+     * label is set to a smaller font-size — `em` would be parent-
+     * relative and create the drift between sizes that we just
+     * unified. Stroke colour is inherited via `currentColor` so the
+     * arrow tracks the button's foreground per variant. */
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  /* ── Size variants ───────────────────────────────────────────── */
+
+  .register-btn--lg {
+    gap: var(--space-2xl);
+    padding: var(--space-m) var(--space-l);
+    /* font-size inherited (body default ≈ 1rem) */
+  }
+
+  .register-btn--sm {
+    gap: var(--space-l);
+    padding: var(--space-s) var(--space-m);
+    font-size: 0.9rem;
+  }
+
+  /* ── Colour variants ─────────────────────────────────────────── */
+
+  .register-btn--primary {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .register-btn--secondary {
+    /* `--secondary` is white in every Tenerife theme; foreground is
+     * black — quieter than the page's primary so it sits inside
+     * already-coloured surfaces (cards, etc.) without competing. */
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+</style>

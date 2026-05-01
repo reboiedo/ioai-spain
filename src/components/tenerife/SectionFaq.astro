@@ -71,7 +71,7 @@ const faqs: Faq[] = [
 ];
 ---
 
-<div class="scene" data-scene data-flow>
+<div class="scene" data-scene data-scene-index="11">
   <section
     class="section scene__layer scene__layer--tilt faq"
     data-theme={theme}
@@ -146,13 +146,28 @@ const faqs: Faq[] = [
 
   @media (min-width: 768px) {
     .faq__intro {
+      /* Inner sticky pins CONTACT to the top of the viewport while
+       * the drawer list scrolls past on the right.
+       *
+       * Height calc must subtract BOTH the sticky offset AND the
+       * section's bottom padding (`--section-block + --cta-clearance`),
+       * otherwise when the FAQ scene is itself sticky-pinned (as part
+       * of the sticky-stack ladder), the intro overflows the section's
+       * content area and sticky clamps it upward — which drags
+       * CONTACT under the nav. Venue/Safety/DayInLife use `max-height`
+       * with content-driven natural heights, so they stay short enough
+       * to never hit this clamp; FAQ's design needs a tall column to
+       * push the contact line to the bottom, so we pin the height to
+       * exactly the available space instead. */
       position: sticky;
       top: var(--sticky-top);
       align-self: start;
-      /* Fill the viewport (minus the sticky offset and a small bottom
-       * inset) so `justify-content: space-between` can push the
-       * contact line to the bottom-left. */
-      height: calc(100lvh - var(--sticky-top) - var(--space-l));
+      height: calc(
+        100lvh
+        - var(--sticky-top)
+        - var(--section-block)
+        - var(--cta-clearance)
+      );
     }
   }
 

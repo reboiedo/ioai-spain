@@ -16,19 +16,20 @@
  */
 
 import { Image, type ImageMetadata } from "astro:assets";
-import carousel1 from "@/assets/tenerife-camp/experience-carousel1.jpg";
-import carousel2 from "@/assets/tenerife-camp/experience-carousel2.jpg";
-import carousel3 from "@/assets/tenerife-camp/experience-carousel3.jpg";
-import carousel4 from "@/assets/tenerife-camp/experience-carousel4.jpg";
-import carousel5 from "@/assets/tenerife-camp/experience-carousel5.jpg";
-import carousel6 from "@/assets/tenerife-camp/experience-carousel6.jpg";
+import wave1 from "@/assets/tenerife/hero/wave-1.png";
+import wave2 from "@/assets/tenerife/hero/wave-2.png";
+import wave3 from "@/assets/tenerife/hero/wave-3.png";
+import wave4 from "@/assets/tenerife/hero/wave-4.png";
+import wave5 from "@/assets/tenerife/hero/wave-5.png";
+import wave6 from "@/assets/tenerife/hero/wave-6.png";
+import wave7 from "@/assets/tenerife/hero/wave-7.png";
 
 export interface Props {
-  /** Strip images. Defaults to the legacy carousel set. */
+  /** Strip images. Defaults to the Tenerife hero wave set. */
   images?: ImageMetadata[];
 }
 
-const { images = [carousel1, carousel2, carousel3, carousel4, carousel5, carousel6] } =
+const { images = [wave1, wave2, wave3, wave4, wave5, wave6, wave7] } =
   Astro.props;
 
 // Duplicate so the loop seams are off-screen.

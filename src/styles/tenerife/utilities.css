@@ -258,9 +258,81 @@
  *   </div>
  * ────────────────────────────────────────────────────────────────── */
 
+/* Sticky-stack: every `[data-scene]` competes for `top: 0`; the next
+ * scene slides up from below and covers via `z-index`. `margin-bottom`
+ * is the solo-screen-time buffer — how long this scene stays alone in
+ * the viewport before its successor starts entering. 50vh feels
+ * balanced (validated in `src/pages/sticky-test.astro`).
+ *
+ * Z-index is sequenced via `[data-scene-index="N"]` on each section
+ * (1 = first, increasing). Higher index paints on top, which gives
+ * the canonical follow.art-style layered reveal as the user scrolls
+ * downward.
+ *
+ * Drawer-bearing scenes opt out via `[data-flow]` (or by containing
+ * a `<details>` element / nested `[data-flow]`). Sticky removes the
+ * scene from purely-natural flow, so drawer growth inside a sticky
+ * scene wouldn't push downstream siblings; flow scenes behave like
+ * normal block elements and their content's intrinsic height drives
+ * subsequent scenes.
+ *
+ * Tall content-driven sections opt in via `[data-stick-bottom]` and
+ * a tiny ResizeObserver in the page script that writes the measured
+ * outer height into `--h`. The override `top: calc(100vh - var(--h))`
+ * turns the sticky into a bottom-anchored dock: section scrolls
+ * naturally through the viewport, then pins flush at viewport bottom.
+ */
 .scene {
   position: relative;
 }
+
+.scene[data-scene] {
+  position: sticky;
+  /* Bottom-anchored sticky by default. `--h` is the section's measured
+   * outer height (written by the ResizeObserver in tenerife-camp.astro);
+   * the fallback `100vh` makes the formula resolve to `top: 0` before
+   * the observer fires, so nothing jumps. For sections of exactly
+   * 100lvh this is identical to plain `top: 0`. For taller content-
+   * driven sections, the negative top lets the section scroll naturally
+   * through the viewport before docking flush at the bottom. */
+  top: calc(100vh - var(--h, 100vh));
+  z-index: var(--scene-z, 1);
+  margin-bottom: 50vh;
+}
+
+/* Per-scene z-index, sequenced via data-scene-index. Higher index
+ * paints above lower; flow scenes participate too so they aren't
+ * hidden by the previous sticky scene as they scroll past. */
+.scene[data-scene-index="1"]  { --scene-z: 1; }
+.scene[data-scene-index="2"]  { --scene-z: 2; }
+.scene[data-scene-index="3"]  { --scene-z: 3; }
+.scene[data-scene-index="4"]  { --scene-z: 4; }
+.scene[data-scene-index="5"]  { --scene-z: 5; }
+.scene[data-scene-index="6"]  { --scene-z: 6; }
+.scene[data-scene-index="7"]  { --scene-z: 7; }
+.scene[data-scene-index="8"]  { --scene-z: 8; }
+.scene[data-scene-index="9"]  { --scene-z: 9; }
+.scene[data-scene-index="10"] { --scene-z: 10; }
+.scene[data-scene-index="11"] { --scene-z: 11; }
+.scene[data-scene-index="12"] { --scene-z: 12; }
+.scene[data-scene-index="13"] { --scene-z: 13; }
+
+/* Note on drawer-bearing scenes (Tracks, Faq):
+ *
+ * They no longer opt out. The original `data-flow` exception existed
+ * because GSAP's `pinSpacing: false` made pinned scenes `position:
+ * fixed`, removing them from flow — which prevented drawer growth from
+ * pushing siblings. Native sticky keeps the scene in flow: opening a
+ * drawer grows the section's height, ResizeObserver re-writes `--h`,
+ * sticky's `top: calc(100vh - var(--h))` recalculates, downstream
+ * sticky scenes re-anchor automatically. No JS coordination needed.
+ *
+ * Caveat: scroll-scrubbed ScrollTriggers (the entry tilts) cache start/
+ * end scrollY at init. A drawer expansion above an unrendered tilt
+ * makes that tilt's window slightly stale until the next page-level
+ * `ScrollTrigger.refresh()`. The original code accepted this same
+ * staleness — preferable to the visible tilt flash that
+ * `invalidateOnRefresh: true` triggers on a global refresh. */
 
 /* Every scene layer is at least viewport-tall. This is a hard requirement
  * of the pin-and-reveal pattern: when a short scene is pinned, its bottom

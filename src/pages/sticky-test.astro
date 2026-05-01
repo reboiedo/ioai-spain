@@ -8,6 +8,46 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sticky test</title>
+</head>
+<body>
+
+<main>
+  <section class="scene s1">Scene 1 — 100vh</section>
+  <section class="scene s2">Scene 2 — 100vh</section>
+  <section class="scene s3" data-stick-bottom>
+    <h2>Scene 3 — content-driven height</h2>
+    <p>Paragraph 1. This section's height is dictated by its content. A ResizeObserver writes the measured height into a CSS variable, and <code>top: calc(100vh - var(--h))</code> turns native sticky into a bottom-anchored dock.</p>
+    <p>Paragraph 2. Add or remove paragraphs, change the viewport, swap fonts — the dock recalculates automatically. No magic numbers in the CSS.</p>
+    <p>Paragraph 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    <p>Paragraph 4. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>Paragraph 5. Bottom of section — when this line reaches the viewport bottom, sticky engages and the section pins.</p>
+  </section>
+  <section class="scene s4">Scene 4</section>
+  <section class="scene s5">Scene 5</section>
+</main>
+
+<script>
+  import Lenis from 'lenis';
+  const lenis = new Lenis({ lerp: 0.075 });
+  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+
+  // Bottom-anchored sticky for content-driven heights.
+  // Writes each [data-stick-bottom] element's measured height into
+  // its own --h custom property; CSS uses `top: calc(100vh - var(--h))`
+  // so native sticky engages when the element's bottom hits the
+  // viewport bottom — exactly the dock-at-bottom behavior, with no
+  // hard-coded heights.
+  for (const el of document.querySelectorAll('[data-stick-bottom]')) {
+    const ro = new ResizeObserver(([entry]) => {
+      const h = entry.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight;
+      el.style.setProperty('--h', `${h}px`);
+    });
+    ro.observe(el);
+  }
+</script>
+
+</body>
   <style is:global>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { background: #111; color: #fff; font-family: system-ui, sans-serif; }
@@ -18,6 +58,15 @@
        a later scene scrolls up from below and covers the previous
        one (its z-index is higher). This is the canonical "stacked
        sticky" pattern follow.art uses. */
+    /* Default block layout — do NOT use display: grid/flex here.
+     * Sticky elements inside a grid/flex container have their sticky
+     * range bounded to their own cell, which breaks the stacked-sticky
+     * pattern (each scene unsticks the moment its own slot scrolls past
+     * instead of staying stuck through main's full scroll range). */
+    main {
+      display: block;
+    }
+    
     .scene {
       position: sticky;
       /* Short scenes (100vh): stick at vp.top — works as confirmed. */
@@ -27,43 +76,60 @@
       align-items: flex-end;
       padding: 3rem;
       font: 700 3rem sans-serif;
+      /* In-flow gap AFTER each stuck scene = solo-screen-time before
+       * the next scene starts sliding up over it. Without this, scenes
+       * compress into each other and you never see them alone. Override
+       * to 0 on s1 / s5 (or any scene where you want the next to start
+       * immediately covering it). */
+      margin-bottom: 50vh;
     }
 
-    .s1 { z-index: 1; background: #c83030; }
+    .s1 { 
+      z-index: 1; background: #c83030; 
+      margin-bottom: 0px; /* Test extra space between scenes — works as confirmed. With no gap, the next scene starts immediately as you scroll off the first; with a gap, you get a blank scroll until the next scene scrolls up into view. */
+    }
     .s2 { z-index: 2; background: #2a8c43; }
 
-    /* Tall scene 3 — overrides the default top:0 with bottom:0 so
-     * the upper portion scrolls naturally out of view BEFORE the
-     * bottom catches at vp.bottom and locks. This is the "hero
-     * scrolls in, then browser pins" pattern. */
+    /* Tall scene 3 — content-driven height, bottom-anchored sticky.
+     *
+     * The trick: native CSS sticky `bottom: 0` does NOT engage when
+     * scrolling down (it only protects against an element scrolling
+     * off the bottom when scrolling up). To dock at viewport bottom
+     * during a downward scroll, you have to use `top: <negative>`
+     * specifically `top: calc(100vh - <element height>)`.
+     *
+     * Since we don't know the height up front, a ResizeObserver in the
+     * page script measures the element and writes the value into the
+     * `--h` custom property. The CSS just consumes it. Updates on
+     * resize, font load, content change — anything that affects
+     * height. No hard-coded numbers, no wrapper, no spacer. */
     .s3 {
+      height: auto;       /* override base .scene's 100vh */
+      top: calc(100vh - var(--h, 0px));
       z-index: 3;
       background: #2858b8;
-      height: 150vh;
-      top: auto;
-      bottom: 0;
+      color: #fff;
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 3rem;
+      /* margin-bottom inherited from base .scene (100vh) — gives s3
+       * the same solo-docked buffer that the other scenes get before
+       * the next one slides up to cover. */
+      font-family: system-ui, sans-serif;
     }
+    .s3 h2 { font: 700 3rem sans-serif; margin-bottom: 1rem; }
+    .s3 p { font-size: 1.25rem; line-height: 1.5; max-width: 60ch; margin-bottom: 1rem; padding-bottom: 50vh; }
+    .s3 code { background: rgba(255,255,255,0.15); padding: 0.1em 0.3em; border-radius: 3px; }
 
     .s4 { z-index: 4; background: #a833a8; }
-    .s5 { z-index: 5; background: #b8881e; }
+    .s5 {
+      z-index: 5;
+      background: #b8881e;
+      margin-bottom: 0px; /* Test extra space between scenes — works as confirmed. With no gap, the next scene starts immediately as you scroll off the previous; with a gap, you get a blank scroll until the next scene scrolls up into view. */
+      /* margin-bottom inherited from base .scene (100vh) — without
+       * this, main's content ends at s5's bottom and there's no
+       * runway for s5 to stay docked, AND s4 gets prematurely
+       * un-stuck because main is running out below it. */
+    }
   </style>
-</head>
-<body>
-
-<main>
-  <section class="scene s1">Scene 1 — 100vh</section>
-  <section class="scene s2">Scene 2 — 100vh</section>
-  <section class="scene s3">Scene 3 — 150vh (taller)</section>
-  <section class="scene s4">Scene 4</section>
-  <section class="scene s5">Scene 5</section>
-</main>
-
-<script>
-  import Lenis from 'lenis';
-  const lenis = new Lenis({ lerp: 0.075 });
-  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-  requestAnimationFrame(raf);
-</script>
-
-</body>
 </html>

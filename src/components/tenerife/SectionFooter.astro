@@ -72,11 +72,11 @@ const languageOptions = LANGUAGES.map((code) => ({
     align-items: center;
     justify-content: space-between;
     gap: var(--space-m);
-    /* Above the per-scene pin layers below it. The apply scene is
-     * pinned with `pinSpacing: false`, so it stays at the
-     * viewport bottom while this footer rises over it. A modest
-     * z-index keeps the stacking unambiguous. */
-    z-index: 5;
+    /* Above the sticky scene-stack so the footer paints over the
+     * previously-sticky Pricing / Apply layers as it rises into view.
+     * Must beat the highest [data-scene-index] z-index used in the
+     * scene-stack ladder (currently 12 = Apply). */
+    z-index: 20;
   }
 
   .camp-footer__copy {

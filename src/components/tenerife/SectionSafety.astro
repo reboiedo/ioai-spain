@@ -92,18 +92,14 @@ interface Supervisor {
 // Placeholder supervisor list — replace with real names + portraits
 // once available. Initials drive the gradient fallback tile.
 const supervisors: Supervisor[] = [
-  { name: "Supervisor 01", initials: "S1", role: "Day lead" },
-  { name: "Supervisor 02", initials: "S2", role: "Day lead" },
-  { name: "Supervisor 03", initials: "S3", role: "Activities" },
-  { name: "Supervisor 04", initials: "S4", role: "Activities" },
-  { name: "Supervisor 05", initials: "S5", role: "Evenings" },
-  { name: "Supervisor 06", initials: "S6", role: "Evenings" },
-  { name: "Supervisor 07", initials: "S7", role: "Excursions" },
-  { name: "Supervisor 08", initials: "S8", role: "Excursions" },
+  { name: "Olga Litvinova", initials: "OL", role: "Project Manager" },
+  { name: "Patricia Carranza", initials: "PC", role: "Academic Consultant" },
+  { name: "Maria Kanbina", initials: "MK", role: "Customer Relations" },
+  { name: "Kalista Galic", initials: "KG", role: "Camp Supervisor" },
 ];
 ---
 
-<div class="scene" data-scene>
+<div class="scene" data-scene data-scene-index="7">
   <section
     class="section scene__layer scene__layer--tilt safety"
     data-theme={theme}
@@ -141,12 +137,12 @@ const supervisors: Supervisor[] = [
              fall back to a gradient tile with initials. -->
         <div class="safety__supervisors-block">
           <h3 class="font-h3 safety__supervisors-title">
-            Camp supervisors
+            Camp organizers
           </h3>
-          <p class="font-body-s safety__supervisors-copy">
-            The team on the ground at every moment of the camp —
-            coordinating activities, walking with the group between
-            sessions, and on call through the night.
+          <p class="font-body safety__supervisors-copy">
+            The team behind the camp — planning the program, looking
+            after every detail, and on call for parents and campers
+            from the first email to the last day on the island.
           </p>
           <ul class="safety__supervisors">
             {supervisors.map((s) => (
@@ -302,11 +298,18 @@ const supervisors: Supervisor[] = [
   .safety-pillar {
     background: var(--primary);
     color: var(--primary-foreground);
-    padding: var(--space-l);
+    padding: var(--space-m);
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     gap: var(--space-2xs);
+    aspect-ratio: 4 / 5;
+  }
+
+  @media (min-width: 768px) {
+    .safety-pillar {
+      aspect-ratio: 1 / 1;
+    }
   }
 
   .safety-pillar__num {
@@ -379,12 +382,7 @@ const supervisors: Supervisor[] = [
     aspect-ratio: 1 / 1;
     border-radius: 4px;
     overflow: hidden;
-    background:
-      linear-gradient(
-        135deg,
-        var(--foreground-muted) 0%,
-        var(--foreground-muted) 100%
-      );
+    background: var(--surface);
     display: grid;
     place-items: center;
     color: var(--foreground-muted);

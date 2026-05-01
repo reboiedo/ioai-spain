@@ -78,20 +78,17 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
   // those minor resizes.
   ScrollTrigger.config({ ignoreMobileResize: true });
 
-  let sceneTriggers: ScrollTrigger[] = [];
   let tiltTweens: gsap.core.Tween[] = [];
   let displayAssetTweens: gsap.core.Tween[] = [];
+  let stickBottomObservers: ResizeObserver[] = [];
   let lenis: Lenis | null = null;
 
   function initLenis() {
     if (lenis) return;
     lenis = new Lenis({
-      // Slightly slower lerp than the default (0.1) — gives scroll
-      // velocity a longer momentum tail so the binary pin moments
-      // feel less abrupt. With Lenis smoothing wheel input but
-      // ScrollTrigger.pin still being a discrete state change, a
-      // longer momentum decay is the only way to soften the
-      // perceived "thump" when content goes from scrolling to fixed.
+      // Slightly slower than default (0.1) for a softer momentum tail.
+      // Native sticky has no discrete pin moment to mask, but the
+      // gentler curve still reads more cinematic on long scrolls.
       lerp: 0.075,
     });
 
@@ -112,53 +109,38 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
   }
 
   /**
-   * initSceneStack
+   * initStickBottom
    *
-   * Pin each `[data-scene]` for stack-reveal: the scene holds at vp
-   * bottom for one viewport of scroll while the next scene slides up
-   * over it. With `pinSpacing: false`, the next sibling's natural
-   * position takes over visually.
+   * Every sticky scene uses the bottom-anchored formula
+   * `top: calc(100vh - var(--h))` (see `tenerife/utilities.css`) so
+   * tall content-driven sections scroll naturally through the viewport
+   * before docking flush at the bottom. This observer measures each
+   * sticky scene's outer height and writes it to its own `--h`.
    *
-   * Drawer-bearing scenes opt out via `[data-flow]` (or by containing
-   * a `<details>` element). With `pinSpacing: false`, a pinned scene
-   * is `position: fixed` and removed from flow — drawer growth inside
-   * couldn't push downstream siblings. Flow scenes scroll naturally
-   * and the next pinned scene reveals after them.
+   * Sections that match `[data-flow]` (or contain a `<details>` /
+   * `[data-flow]`) opt out of sticky entirely and don't need a
+   * measurement — they're skipped via the selector.
    *
-   * No ResizeObserver here. Drawer toggles do shift downstream pin
-   * engagement scrollY, but we accept that staleness — the alternative
-   * (firing a global `ScrollTrigger.refresh()` on every drawer toggle)
-   * causes visible tilt flashes via `invalidateOnRefresh`, which
-   * always reads as broken motion.
+   * Updates on resize, font swap, drawer toggle, image decode — any
+   * layout change that affects the measured height. No global
+   * ScrollTrigger.refresh() needed (which would visibly re-flash the
+   * scroll-scrubbed tilts).
    */
-  function initSceneStack() {
-    sceneTriggers.forEach((t) => t.kill());
-    sceneTriggers = [];
+  function initStickBottom() {
+    stickBottomObservers.forEach((o) => o.disconnect());
+    stickBottomObservers = [];
 
-    const scenes = gsap.utils.toArray<HTMLElement>('[data-scene]');
-
-    scenes.forEach((scene) => {
-      const isFlowScene =
-        scene.matches('[data-flow]') ||
-        !!scene.querySelector('[data-flow]') ||
-        !!scene.querySelector('details');
-      if (isFlowScene) return;
-
-      const trigger = ScrollTrigger.create({
-        trigger: scene,
-        start: 'bottom bottom',
-        end: '+=100%',
-        pin: true,
-        pinSpacing: false,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
+    // All [data-scene] sections are sticky-stack now. Native sticky
+    // keeps drawer-bearing sections in flow, so the old `data-flow`
+    // opt-out is no longer needed.
+    for (const el of document.querySelectorAll<HTMLElement>('[data-scene]')) {
+      const ro = new ResizeObserver(([entry]) => {
+        const h = entry.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight;
+        el.style.setProperty('--h', `${h}px`);
       });
-      sceneTriggers.push(trigger);
-    });
-
-    // Late-loading content (fonts, images) can shift scene heights
-    // after triggers were created. Force one refresh to re-measure.
-    ScrollTrigger.refresh();
+      ro.observe(el);
+      stickBottomObservers.push(ro);
+    }
   }
 
   function initTilts() {
@@ -177,7 +159,10 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
       //
       // Trigger window: `top bottom` (section's top at viewport
       // bottom — first frame it appears) to `top top` (section's top
-      // at viewport top — pin engages). That's the full entry.
+      // at viewport top — native sticky engages). That's the full
+      // entry. The window ends exactly when sticky takes over, so the
+      // tilt finishes against the unpinned (in-flow) position and
+      // doesn't overlap the stuck phase.
       //
       // `xPercent` is a % of the element's own width. follow.art uses
       // +8.61% on desktop and −12.82% on mobile — different magnitudes
@@ -225,8 +210,8 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
     });
 
     // One final refresh so newly-created tilt triggers recalculate
-    // their start/end against current document layout (pins may have
-    // shifted things during init).
+    // their start/end against current document layout (late image
+    // decodes / font swaps can shift natural section positions).
     ScrollTrigger.refresh();
   }
 
@@ -297,21 +282,21 @@ import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro
   }
 
   function cleanup() {
-    sceneTriggers.forEach((t) => t.kill());
-    sceneTriggers = [];
     tiltTweens.forEach((t) => t.scrollTrigger?.kill());
     tiltTweens.forEach((t) => t.kill());
     tiltTweens = [];
     displayAssetTweens.forEach((t) => t.scrollTrigger?.kill());
     displayAssetTweens.forEach((t) => t.kill());
     displayAssetTweens = [];
+    stickBottomObservers.forEach((o) => o.disconnect());
+    stickBottomObservers = [];
     lenis?.destroy();
     lenis = null;
   }
 
   function init() {
     initLenis();
-    initSceneStack();
+    initStickBottom();
     initTilts();
     initDisplayAssets();
   }

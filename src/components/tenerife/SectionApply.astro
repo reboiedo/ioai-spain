@@ -79,9 +79,9 @@ const photos: (ImageMetadata | null)[] = Array.from(
 );
 ---
 
-<div class="scene">
+<div class="scene apply-wrap">
   <section
-    class="section split scene__layer apply"
+    class="section split scene__layer scene__layer--tilt apply"
     data-theme={theme}
   >
     <!-- LEFT — giant title + image-trail overlay. -->
@@ -128,6 +128,17 @@ const photos: (ImageMetadata | null)[] = Array.from(
 </div>
 
 <style>
+  /* Apply isn't part of the sticky-stack ladder — it's the
+   * end-of-page CTA that needs to scroll into view normally. But it
+   * MUST paint over the previously-sticky Pricing scene (z-index 10),
+   * which is still stuck because main is its containing block. A
+   * relative z-index above the scene-stack ladder ensures Apply
+   * covers Pricing as it rises up from below. */
+  .apply-wrap {
+    position: relative;
+    z-index: 15;
+  }
+
   .apply {
     min-height: 100lvh;
   }

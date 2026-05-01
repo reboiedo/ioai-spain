@@ -22,9 +22,15 @@
  * Mobile (<768px): horizontal-snap scroll via `HScrollMobile`.
  */
 
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
+import quoteAlejandro from "@/assets/tenerife/testimonials/quote-alejandro.png";
+import quoteMaxim from "@/assets/tenerife/testimonials/quote-maxim.png";
+import quoteAnna from "@/assets/tenerife/testimonials/quote-anna.png";
+import quoteJaime from "@/assets/tenerife/testimonials/quote-jaime.png";
 
 export interface Props {
   /** Tenerife theme palette to apply via `data-theme`. */
@@ -38,6 +44,7 @@ interface Testimonial {
   name: string;
   role: string;
   context: string;
+  image: ImageMetadata;
 }
 
 const testimonials: Testimonial[] = [
@@ -47,6 +54,7 @@ const testimonials: Testimonial[] = [
     name: "Alejandro Vivero",
     role: "Gold winner student",
     context: "IOI 2024",
+    image: quoteAlejandro,
   },
   {
     quote:
@@ -54,6 +62,7 @@ const testimonials: Testimonial[] = [
     name: "Maxim Oboznyi",
     role: "Silver Medalist",
     context: "Southwestern European Regional Contest 2022",
+    image: quoteMaxim,
   },
   {
     quote:
@@ -61,6 +70,7 @@ const testimonials: Testimonial[] = [
     name: "Anna",
     role: "Parent",
     context: "Barcelona Summer Camp 2019",
+    image: quoteAnna,
   },
   {
     quote:
@@ -68,11 +78,12 @@ const testimonials: Testimonial[] = [
     name: "Jaime",
     role: "Participant",
     context: "Menorca Summer Camp 2023",
+    image: quoteJaime,
   },
 ];
 ---
 
-<div class="scene" data-scene>
+<div class="scene" data-scene data-scene-index="9">
   <section
     class="section scene__layer scene__layer--tilt testimonials"
     data-theme={theme}
@@ -102,7 +113,15 @@ const testimonials: Testimonial[] = [
                 <p class="font-body">{t.quote}</p>
               </blockquote>
               <div class="testi-card__author">
-                <div class="testi-card__avatar" aria-hidden="true"></div>
+                <Image
+                  class="testi-card__avatar"
+                  src={t.image}
+                  alt={`Portrait of ${t.name}`}
+                  widths={[68, 136, 204]}
+                  sizes="68px"
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div class="testi-card__meta">
                   <p class="font-body testi-card__name">{t.name}</p>
                   <p class="font-caption testi-card__role">{t.role}</p>
@@ -164,7 +183,15 @@ const testimonials: Testimonial[] = [
               <p class="font-body">{t.quote}</p>
             </blockquote>
             <div class="testi-card__author">
-              <div class="testi-card__avatar" aria-hidden="true"></div>
+              <Image
+                class="testi-card__avatar"
+                src={t.image}
+                alt={`Portrait of ${t.name}`}
+                widths={[68, 136, 204]}
+                sizes="68px"
+                loading="lazy"
+                decoding="async"
+              />
               <div class="testi-card__meta">
                 <p class="font-body testi-card__name">{t.name}</p>
                 <p class="font-caption testi-card__role">{t.role}</p>
@@ -350,7 +377,7 @@ const testimonials: Testimonial[] = [
      * stage height is content-driven). */
     flex: 0 0 auto;
     height: 100%;
-    padding: var(--space-l);
+    padding: var(--space-m);
     /* `--secondary` is white in every Tenerife theme;
      * `--secondary-foreground` is black. Cards read as cream
      * postcards in front of the dark `TESTIMONIALS` banner —
@@ -427,6 +454,9 @@ const testimonials: Testimonial[] = [
     height: 4.25rem;
     border-radius: 4px;
     background: var(--secondary-foreground-muted);
+    object-fit: cover;
+    object-position: center;
+    display: block;
   }
 
   .testi-card__meta {

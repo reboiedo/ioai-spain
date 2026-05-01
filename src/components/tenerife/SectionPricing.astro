@@ -15,6 +15,7 @@
  */
 
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
+import RegisterButton from "@/components/tenerife/RegisterButton.astro";
 
 export interface Props {
   /** Tenerife theme palette to apply via `data-theme`. */
@@ -36,31 +37,31 @@ const tiers: Tier[] = [
   {
     variant: "primary",
     headline: "With accommodation",
-    price: "€1,800",
+    price: "€3,000",
     features: [
       "Two-week academic programme",
       "Full extracurricular schedule",
       "4-star hotel + all meals",
       "24-hour supervision + insurance",
     ],
-    cta: { text: "Apply now", href: "#apply" },
+    cta: { text: "Register", href: "#apply" },
   },
   {
     variant: "secondary",
     headline: "Without accommodation",
-    price: "€1,200",
+    price: "€1,800",
     features: [
       "Two-week academic programme",
       "Full extracurricular schedule",
       "Daily lunch on site",
       "Accommodation arranged separately",
     ],
-    cta: { text: "Apply now", href: "#apply" },
+    cta: { text: "Register", href: "#apply" },
   },
 ];
 ---
 
-<div class="scene" data-scene>
+<div class="scene" data-scene data-scene-index="10">
   <section
     class="section scene__layer scene__layer--tilt pricing"
     data-theme={theme}
@@ -107,10 +108,12 @@ const tiers: Tier[] = [
               ))}
             </ul>
 
-            <a class="ticket__cta" href={t.cta.href}>
-              <span class="ticket__cta-text">{t.cta.text}</span>
-              <span class="ticket__cta-arrow" aria-hidden="true">→</span>
-            </a>
+            <RegisterButton
+              href={t.cta.href}
+              label={t.cta.text}
+              size="sm"
+              variant="secondary"
+            />
           </article>
         ))}
       </div>
@@ -177,8 +180,6 @@ const tiers: Tier[] = [
     --ticket-fg: var(--foreground);
     --ticket-bg: var(--surface);
     --ticket-border: transparent;
-    --ticket-cta-bg: var(--secondary);
-    --ticket-cta-fg: var(--secondary-foreground);
 
     position: relative;
     display: grid;
@@ -195,11 +196,6 @@ const tiers: Tier[] = [
     --ticket-fg: var(--card-foreground);
     --ticket-bg: var(--card);
     --ticket-border: transparent;
-    /* Both tickets share the same CTA palette — secondary — so the
-     * primary (dark) card reads as the visual anchor and the button
-     * colour doesn't compete with the card background. */
-    --ticket-cta-bg: var(--secondary);
-    --ticket-cta-fg: var(--secondary-foreground);
   }
 
   /* Head — small accommodation label on top, big price below. */
@@ -278,41 +274,7 @@ const tiers: Tier[] = [
     opacity: 0.9;
   }
 
-  /* CTA — pill button, label centred with arrow on the trailing
-   * edge. `white-space: nowrap` keeps "APPLY NOW" on a single
-   * line at any card width. */
-  .ticket__cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-s);
-    padding: var(--space-s) var(--space-l);
-    background: var(--ticket-cta-bg);
-    color: var(--ticket-cta-fg);
-    border-radius: 999px;
-    text-decoration: none;
-    font-family: var(--font-body);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    line-height: 1;
-    white-space: nowrap;
-    transition: transform 200ms ease;
-  }
-
-  .ticket__cta:hover {
-    transform: translateY(-1px);
-  }
-
-  .ticket__cta-arrow {
-    display: inline-block;
-    line-height: 1;
-    font-size: 1em;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ticket__cta {
-      transition: none;
-    }
-  }
+  /* CTA shape comes from the shared `RegisterButton` component
+   * (size="sm", variant="secondary"). No `.ticket__cta` rules here —
+   * keep the look in one place so it can't drift. */
 </style>

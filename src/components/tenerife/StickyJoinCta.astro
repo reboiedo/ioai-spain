@@ -10,6 +10,8 @@
  * scrolls and clicks normally underneath.
  */
 
+import RegisterButton from "@/components/tenerife/RegisterButton.astro";
+
 export interface Props {
   /** Where the CTA links to. */
   href?: string;
@@ -18,42 +20,35 @@ export interface Props {
 const { href = "/form/tenerife-camp/" } = Astro.props;
 ---
 
-<a class="sticky-join-cta" href={href} data-sticky-join-cta>
-  <span class="sticky-join-cta__label">Register</span>
-  <span class="sticky-join-cta__arrow" aria-hidden="true">→</span>
-</a>
+<RegisterButton
+  href={href}
+  size="lg"
+  variant="primary"
+  class="sticky-join-cta"
+  data-sticky-join-cta
+/>
 
-<style>
+<style is:global>
+  /* The button itself comes from `RegisterButton` (shape, type
+   * treatment, hover). This file only adds the *positioning* — fixed
+   * to the bottom-right of the viewport, with a JS-driven `--cta-lift`
+   * tracking the camp footer as it rises into view.
+   *
+   * `is:global` because the styles target a class that's emitted by
+   * the child component, which has its own scoped CSS — without
+   * `is:global` Astro's per-file scope hash would prevent the
+   * positioning rules from binding. */
   .sticky-join-cta {
     position: fixed;
     right: clamp(1rem, 3vw, 2rem);
     /* `--cta-lift` is written from JS as the page footer rises
      * into the viewport — it's added to `bottom` directly (not
      * via transform) so the lift is *not* eased and tracks
-     * scroll 1:1. The CSS `transition` only applies to
-     * `transform`, which is reserved for the hover micro-lift. */
+     * scroll 1:1. */
     --cta-lift: 0px;
     bottom: calc(clamp(1rem, 3vw, 2rem) + var(--cta-lift));
     z-index: 50; /* above the nav-bar's prev-bg (lower) and any scenes */
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2xl);
-    padding: var(--space-m) var(--space-l);
-    background: var(--primary);
-    color: var(--primary-foreground);
-    text-decoration: none;
-    border-radius: 0.25rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-    transition:
-      transform 220ms ease,
-      opacity 280ms ease,
-      visibility 0s linear 280ms;
-  }
-
-
-  .sticky-join-cta:hover {
-    transform: translateY(-2px);
   }
 
   /* Mobile: anchor the button to BOTH sides with `--cta-inset` of
@@ -70,20 +65,8 @@ const { href = "/form/tenerife-camp/" } = Astro.props;
           + env(safe-area-inset-bottom, 0px)
           + var(--cta-lift)
       );
-      justify-content: space-between;
     }
   }
-
-  .sticky-join-cta__label {
-    font-family: var(--font-body);
-    font-weight: 500;
-  }
-
-  .sticky-join-cta__arrow {
-    font-size: 1.25em;
-    line-height: 1;
-  }
-
 </style>
 
 <script>
