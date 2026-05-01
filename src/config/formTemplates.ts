@@ -117,6 +117,48 @@ export const FORM_TEMPLATES: Record<string, FormTemplate> = {
     },
     action: "https://submit-form.com/p2kDhINPt",
   },
+
+  // Lightweight "more info / get in touch" form for the Tenerife
+  // camp page. Lower commitment than `campSignup` — phone is
+  // optional, no birthdate / accommodation / age-gating. The
+  // `lead_captured` dataLayer push fires for any slug starting with
+  // `camp-`, so this form still counts as an Early Bird conversion
+  // in Google Ads (matches the trigger marketing wired up).
+  campContact: {
+    fields: [
+      "fullName",
+      "email",
+      "phone",
+      "message",
+      "consent"
+    ],
+    fieldOverrides: {
+      // Phone is required on camp-signup (high-commitment registration)
+      // but optional here — sales can follow up over email if the
+      // visitor doesn't want to share a number, and a softer ask
+      // bumps form completion on this lower-intent surface.
+      phone: { required: false },
+      message: {
+        label: {
+          en: "What would you like to know?",
+          es: "¿Qué te gustaría saber?"
+        },
+        placeholder: {
+          en: "Ask us anything about the camp — dates, programme, pricing, anything.",
+          es: "Pregúntanos lo que quieras sobre el campamento — fechas, programa, precios, lo que sea."
+        }
+      }
+    },
+    submitButton: {
+      en: { default: "Send", loading: "Sending..." },
+      es: { default: "Enviar", loading: "Enviando..." },
+    },
+    confirmationMessage: {
+      en: "Thanks — we'll get back to you shortly.",
+      es: "Gracias — te responderemos en breve.",
+    },
+    action: "https://submit-form.com/p2kDhINPt",
+  },
 };
 
 // Helper function to resolve a template for a specific locale with optional field overrides

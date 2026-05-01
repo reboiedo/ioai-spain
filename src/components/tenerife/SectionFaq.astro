@@ -74,7 +74,10 @@ const faqs = t.faq.items;
   .faq__intro {
     display: flex;
     flex-direction: column;
-    gap: var(--space-l);
+    /* Consistent intro gap across every section (Story, Tracks,
+     * Team, Venue, Pricing) — keeps the title→paragraph rhythm
+     * uniform on mobile. */
+    gap: var(--space-xl);
   }
 
   .faq__contact {

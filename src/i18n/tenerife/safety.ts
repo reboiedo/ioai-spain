@@ -63,12 +63,12 @@ export const safety = {
     },
     {
       title: createTranslation({
-        en: 'Insurance & medical',
-        es: 'Seguro y atención médica'
+        en: 'Medical Insurance',
+        es: 'Seguro Médico'
       }),
       description: createTranslation({
-        en: 'Camp insurance is included; on-site first aid plus a clear escalation path to local medical services for anything more.',
-        es: 'El seguro del campamento está incluido; primeros auxilios en el lugar más una ruta clara de escalada a los servicios médicos locales para cualquier otra cosa.'
+        en: 'Civil liability, personal accident and travel assistance insurance are included.',
+        es: 'Se incluye seguro de responsabilidad civil, accidentes personales y asistencia en viaje.'
       })
     },
     {

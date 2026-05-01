@@ -6,8 +6,8 @@ export const nav = {
     es: 'Más Info'
   }),
   moreInfoHref: createTranslation({
-    en: '#faq',
-    es: '#faq'
+    en: '/form/camp-contact/',
+    es: '/es/form/camp-contact/'
   }),
   registerLabel: createTranslation({
     en: 'Register',

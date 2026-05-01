@@ -57,7 +57,7 @@ const tiers = t.pricing.tiers;
             <span class="ticket__corner ticket__corner--br" aria-hidden="true"></span>
 
             <div class="ticket__head">
-              <h3 class="font-caption ticket__headline">{t.headline}</h3>
+              <h3 class="font-body-s ticket__headline">{t.headline}</h3>
               <p class="font-display ticket__price">{t.price}</p>
             </div>
 
@@ -98,7 +98,10 @@ const tiers = t.pricing.tiers;
   .pricing__intro {
     display: flex;
     flex-direction: column;
-    gap: var(--space-l);
+    /* Consistent intro gap across every section (Story, Tracks,
+     * Team, Venue, FAQ) — keeps the title→paragraph rhythm
+     * uniform on mobile. */
+    gap: var(--space-xl);
   }
 
   .pricing__intro-copy {

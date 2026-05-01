@@ -110,6 +110,18 @@ const members = t.team.members;
     gap: var(--space-l);
   }
 
+  /* Vertical stack of title + intro paragraph. `--space-xl` matches
+   * the gap every other section's intro uses (Story, Tracks, Venue,
+   * Pricing, FAQ) so the title-to-copy distance reads consistent on
+   * mobile. Without this rule the children fell back to default
+   * block layout with no gap, and on mobile the SectionTitle's
+   * baseline ended up kissing the paragraph above. */
+  .team__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
   .team__intro-copy {
     margin: 0;
   }

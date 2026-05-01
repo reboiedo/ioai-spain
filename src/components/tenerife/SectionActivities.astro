@@ -687,16 +687,26 @@ const total = activities.length;
   }
 
   /* ── Mobile polaroid card ───────────────────────────────────────
-   * 3-row grid (photo / head / body). The photo cell is always a
-   * square crop (`aspect-ratio: 1 / 1` on `.ap-card__photo` below).
-   * Closed: body row collapsed to 0fr, card height = square photo
-   * + head. Open: body expands to 1fr revealing the description
-   * underneath the photo. The photo stays put — no collapse, no
-   * fade — so the image is always visible at its full square size.
+   * 3-row grid (photo / head / body) with a FIXED outer aspect-ratio
+   * so the card's footprint never changes in the HScroll slider.
    *
-   * Card height is content-driven (no `aspect-ratio` on the card
-   * itself) so the strip respects the photo's square footprint
-   * regardless of viewport width. */
+   *   Closed: rows = auto auto 0fr   (square photo, head, no body)
+   *   Open:   rows = 0fr  auto 1fr   (photo collapses, body grows)
+   *
+   * The day-label + title (row 2) stay in flow across both states —
+   * they ride upward as the photo collapses, giving the impression
+   * of the title sliding to the top, then the description fills
+   * the space the photo vacated.
+   *
+   * `aspect-ratio: 4 / 5` locks the card height proportionally to
+   * its slider-determined width. The photo's own `aspect-ratio: 1/1`
+   * makes it a square within row 1 — there's a small visual slack
+   * between the square photo and the head row (because card 4:5 is
+   * slightly taller than photo+head), but that slack disappears
+   * cleanly when the card opens since row 1 collapses to 0fr.
+   *
+   * Photo also opacity-fades on expand so the collapse reads as a
+   * smooth crossfade rather than content getting cropped. */
   .ap-card {
     appearance: none;
     background: #f4efe7;
@@ -708,18 +718,31 @@ const total = activities.length;
     cursor: pointer;
     text-align: left;
     width: 100%;
+    /* `3 : 4` is calibrated so the photo row (`1fr`) ends up almost
+     * exactly square once head + gaps + padding are subtracted from
+     * the card's content height. Slight ±2px slack at extreme card
+     * widths is invisible. */
+    aspect-ratio: 3 / 4;
     border-radius: 4px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
     overflow: hidden;
     position: relative;
     display: grid;
-    grid-template-rows: auto auto 0fr;
-    gap: var(--space-s);
+    /* `1fr auto 0fr` ↔ `0fr auto 1fr` — the photo and body rows are
+     * BOTH `<flex>` units so the transition between them interpolates
+     * smoothly (browsers can't animate `auto`, so an `auto auto 0fr`
+     * grid would just snap rather than slide). The head row stays
+     * `auto` and rides upward as row 1 shrinks, giving the
+     * "title slides up while description grows below" motion. */
+    grid-template-rows: 1fr auto 0fr;
+    /* Bigger row-gap than column-gap for visual breathing between
+     * the photo bottom edge and the day-label / title above. */
+    row-gap: var(--space-m);
     transition: grid-template-rows 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .ap-card[aria-expanded="true"] {
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: 0fr auto 1fr;
   }
 
   .ap-card:focus-visible {
@@ -734,12 +757,46 @@ const total = activities.length;
     overflow: hidden;
   }
 
+  /* Photo cell fills row 1 (`1fr`) — the card's `3:4` aspect-ratio
+   * is calibrated so this row comes out essentially square once the
+   * head + gaps + padding are subtracted. No `aspect-ratio: 1/1`
+   * here on purpose: forcing it would either fight the row sizing
+   * (overflow) or produce slack inside the cell. Letting the row
+   * dictate the photo's shape keeps the layout consistent and the
+   * `1fr ↔ 0fr` collapse animation smooth. */
   .ap-card__photo {
-    /* Always a square crop — image inside fills via object-fit:
-     * cover, so portrait/landscape source photos all read as
-     * uniform polaroid squares regardless of original aspect. */
-    aspect-ratio: 1 / 1;
     border-radius: 2px;
+    transition: opacity 0.4s ease;
+  }
+
+  .ap-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ap-card[aria-expanded="true"] .ap-card__photo {
+    opacity: 0;
+  }
+
+  /* Per-polaroid override of the script title size. `font-caption-script`
+   * elsewhere on the page (Daily eyebrow, "always" eyebrow, SectionTitle
+   * eyebrows) reads at the shared display scale, but inside this small
+   * mobile card the same scale is way too loud. Smaller, with a touch
+   * tighter line-height so multi-line titles don't take over the head. */
+  .ap-card__title {
+    font-size: clamp(1rem, 4.5vw, 1.4rem);
+    line-height: 1.05;
+  }
+
+  /* Stable minimum head height so day + title don't compress on
+   * shorter titles. Card's `3:4` aspect-ratio + `row-gap:
+   * var(--space-m)` already give comfortable separation from the
+   * photo above; this just keeps the head's own footprint
+   * predictable. */
+  .ap-card__head {
+    min-height: 4rem;
   }
 
   .ap-card__img {

@@ -28,7 +28,7 @@ export const dayInLife = {
   slots: [
     {
       time: createTranslation({
-        en: '7:00am – 9:00am',
+        en: '7:00 – 9:00',
         es: '7:00 – 9:00'
       }),
       title: createTranslation({
@@ -42,7 +42,7 @@ export const dayInLife = {
     },
     {
       time: createTranslation({
-        en: '9:30am – 11:00am',
+        en: '9:30 – 11:00',
         es: '9:30 – 11:00'
       }),
       title: createTranslation({
@@ -56,7 +56,7 @@ export const dayInLife = {
     },
     {
       time: createTranslation({
-        en: '11:00am – 11:30am',
+        en: '11:00 – 11:30',
         es: '11:00 – 11:30'
       }),
       title: createTranslation({
@@ -70,7 +70,7 @@ export const dayInLife = {
     },
     {
       time: createTranslation({
-        en: '11:30am – 1:00pm',
+        en: '11:30 – 13:00',
         es: '11:30 – 13:00'
       }),
       title: createTranslation({
@@ -84,8 +84,8 @@ export const dayInLife = {
     },
     {
       time: createTranslation({
-        en: '1:30pm – 4:00pm',
-        es: '13:30 – 16:00'
+        en: '13:30 – 14:30',
+        es: '13:30 – 14:30'
       }),
       title: createTranslation({
         en: 'Lunch',
@@ -98,8 +98,22 @@ export const dayInLife = {
     },
     {
       time: createTranslation({
-        en: '4:00pm – 7:00pm',
-        es: '16:00 – 19:00'
+        en: '15:00 – 16:30',
+        es: '15:00 – 16:30'
+      }),
+      title: createTranslation({
+        en: '3rd period',
+        es: 'Tercera clase'
+      }),
+      description: createTranslation({
+        en: 'A focused afternoon block — students continue project work, get one-on-one time with the instructor, and push their morning material toward a finished outcome.',
+        es: 'Un bloque vespertino enfocado — los estudiantes continúan el trabajo de proyecto, reciben atención uno a uno con el instructor y avanzan el material de la mañana hacia un resultado terminado.'
+      })
+    },
+    {
+      time: createTranslation({
+        en: '17:00 – 19:30',
+        es: '17:00 – 19:30'
       }),
       title: createTranslation({
         en: 'Activities',
@@ -112,8 +126,8 @@ export const dayInLife = {
     },
     {
       time: createTranslation({
-        en: '7:00pm – 8:00pm',
-        es: '19:00 – 20:00'
+        en: '20:00 – 21:00',
+        es: '20:00 – 21:00'
       }),
       title: createTranslation({
         en: 'Dinner',
@@ -126,8 +140,8 @@ export const dayInLife = {
     },
     {
       time: createTranslation({
-        en: '8:00pm – 10:00pm',
-        es: '20:00 – 22:00'
+        en: '21:00 – 22:00',
+        es: '21:00 – 22:00'
       }),
       title: createTranslation({
         en: 'Wind down',

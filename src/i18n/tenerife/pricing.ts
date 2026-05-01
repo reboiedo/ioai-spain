@@ -22,8 +22,8 @@ export const pricing = {
     es: 'PAQUETE'
   }),
   copy: createTranslation({
-    en: 'Two ways in. Both include the full academic programme and the afternoon activities; the Full pass adds accommodation, all meals and round-the-clock supervision. Pick the one that fits your travel plans.',
-    es: 'Dos formas de entrar. Ambas incluyen el programa académico completo y las actividades de la tarde; el pase Completo añade alojamiento, todas las comidas y supervisión las 24 horas. Elige el que mejor se adapte a tus planes de viaje.'
+    en: 'Both options include the full programme. Lunch and snacks during camp hours come with both. The difference is whether your child stays at the camp hotel with breakfast and dinner included, or stays elsewhere and arranges those meals separately.',
+    es: 'Las dos opciones incluyen el programa completo. La comida y los tentempiés durante el horario del campamento vienen con ambas. La diferencia es si tu hijo se aloja en el hotel del campamento con desayuno y cena incluidos, o se aloja en otro sitio y gestiona esas comidas por su cuenta.'
   }),
   tiers: [
     {
@@ -75,13 +75,13 @@ export const pricing = {
         en: [
           'Two-week academic programme',
           'Full extracurricular schedule',
-          'Daily lunch on site',
+          'Daily lunch + snacks',
           'Accommodation arranged separately'
         ],
         es: [
           'Programa académico de dos semanas',
           'Calendario extracurricular completo',
-          'Almuerzo diario en el lugar',
+          'Almuerzo diario + tentempiés',
           'Alojamiento gestionado por separado'
         ]
       }),

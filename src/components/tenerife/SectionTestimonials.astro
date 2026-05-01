@@ -168,7 +168,7 @@ const testimonials = t.testimonials.items.map((item) => ({
     <div class="testimonials__mobile">
       <SectionTitle lines={[t.testimonials.title]} />
 
-      <HScrollMobile itemWidth="min(82%, 360px)">
+      <HScrollMobile itemWidth="min(85%, 340px)">
         {testimonials.map((item) => (
           <article class="testi-card testi-card--mobile">
             <blockquote class="testi-card__quote">
@@ -454,10 +454,24 @@ const testimonials = t.testimonials.items.map((item) => ({
    * `flex` setting comes from HScrollMobile's grid, so we
    * just reset the desktop transform/aspect/height. */
   .testi-card--mobile {
-    width: 100%;
+    /* Re-apply HScrollMobile's flex-basis explicitly. The desktop
+     * `.testi-card { flex: 0 0 auto }` rule (single class) outranks
+     * HScrollMobile's `.hscroll__track > *` (descendant selector)
+     * by specificity, so without this override the mobile card's
+     * basis stays `auto` and the card sizes to its content's
+     * max-content — which for testimonial blockquotes is hilariously
+     * wide. Binding to `--hscroll-item` makes the `itemWidth` prop
+     * on `<HScrollMobile>` actually drive the card width. */
+    flex: 0 0 var(--hscroll-item);
     height: auto;
     transform: none;
     aspect-ratio: auto;
+    /* Tighter shadow on mobile — the desktop `0 18px 40px` extends
+     * ~58px below the card, which the surrounding HScroll track
+     * clips. A smaller `0 8px 20px` keeps a similar visual weight
+     * but fits within the track's bottom padding so neighbouring
+     * cards peek correctly without their shadows getting cut. */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
   }
 
   .testi-card__quote {

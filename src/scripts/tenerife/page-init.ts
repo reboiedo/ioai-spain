@@ -33,6 +33,22 @@ function initLenis() {
     lerp: 0.14,
   });
 
+  // Expose to other component scripts so modal overlays can stop
+  // smooth-scroll while open. Lenis intercepts wheel/touch events
+  // even when CSS `overflow: hidden` is set on html/body, so a
+  // simple CSS scroll lock alone wouldn't work — we have to call
+  // `lenis.stop()` to truly freeze background scroll. Components
+  // can listen for `tenerife:lock-scroll` / `tenerife:unlock-scroll`
+  // events instead of reaching for the global directly.
+  (window as any).__tenerifeLenis = lenis;
+
+  window.addEventListener('tenerife:lock-scroll', () => {
+    lenis?.stop();
+  });
+  window.addEventListener('tenerife:unlock-scroll', () => {
+    lenis?.start();
+  });
+
   // Drive ScrollTrigger updates from Lenis's scroll event so pins
   // and scroll progress stay in sync with smooth-scrolled position.
   lenis.on('scroll', ScrollTrigger.update);

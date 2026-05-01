@@ -91,7 +91,11 @@ const t = useTenerifeTranslations(locale);
   .tracks__intro {
     display: flex;
     flex-direction: column;
-    gap: var(--space-l);
+    /* `--space-xl` keeps the gap between the SectionTitle and the
+     * intro paragraph consistent with every other section's intro
+     * block (Story, Team, Venue, Pricing, FAQ) — avoids a "this one
+     * looks crammed" feeling on mobile. */
+    gap: var(--space-xl);
   }
 
   .tracks__intro-copy {

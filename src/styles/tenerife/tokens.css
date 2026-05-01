@@ -95,7 +95,7 @@
   --type-step-3: clamp(1.625rem, 1.402rem + 0.915vw, 2.5rem);
   --type-step-4: clamp(2rem, 1.6176rem + 1.5686vw, 3.5rem);
   --type-step-5: clamp(2.25rem, 1.6765rem + 2.3529vw, 4.5rem);
-  --type-step-6: clamp(2.625rem, 1.3824rem + 5.098vw, 7.5rem);
+  --type-step-6: clamp(4rem, 3.1078rem + 3.6601vw, 7.5rem);
   --type-step-7: clamp(5rem, 1.8137rem + 13.0719vw, 17.5rem);
   --weight-black: 900;
   --weight-bold: 700;

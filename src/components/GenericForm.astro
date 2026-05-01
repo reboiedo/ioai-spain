@@ -5,7 +5,7 @@ import { TURNSTILE_SITE_KEY } from '../config/turnstile';
 export interface Props {
   formData: {
     slug: string;
-    formTemplate?: 'application' | 'download' | 'contact' | 'campSignup';
+    formTemplate?: 'application' | 'download' | 'contact' | 'campSignup' | 'campContact';
     ageThreshold?: number; // Age threshold for guardian requirement (default: 14)
     form: {
       title: string;

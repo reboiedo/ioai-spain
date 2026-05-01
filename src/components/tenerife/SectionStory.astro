@@ -34,11 +34,14 @@ import leaguesLogo from "@/assets/icons/leagues-logo.svg";
 import spikes from "@/assets/tenerife/story/spikes.svg";
 import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
-// Auto-discover the rotating poster set. Drop replacements into
-// `src/assets/tenerife/story/` (filenames sort `01-…`, `02-…`).
+// Auto-discover the rotating poster set. Filenames must follow the
+// `reel-N.jpg` pattern (e.g. `reel-1.jpg`, `reel-2.jpg`, …) so the
+// glob can pick them up cleanly without sweeping in unrelated
+// images that happen to live in the same folder (the legacy
+// `01-placeholder.jpg` set is kept around for now but excluded).
 const storyPosters: ImageMetadata[] = Object.entries(
   import.meta.glob<{ default: ImageMetadata }>(
-    "@/assets/tenerife/story/*.{jpg,jpeg,png,webp,avif}",
+    "@/assets/tenerife/story/reel-*.{jpg,jpeg,png,webp,avif}",
     { eager: true },
   ),
 )
@@ -54,8 +57,17 @@ export interface Props {
   titleLines?: [string, string];
   /** Optional video poster image (any aspect). */
   posterImage?: ImageMetadata;
-  /** URL the video tile links to / opens. */
-  videoUrl?: string;
+  /** Mux playback ID for the camp story video. */
+  muxPlaybackId?: string;
+  /** Metadata title sent with Mux Data analytics. Defaults to a
+   *  generic placeholder; override per-page once the real cut lands. */
+  muxVideoTitle?: string;
+  /** Aspect ratio of the source video, as a CSS `aspect-ratio` value
+   *  (e.g. `"9 / 16"` for vertical, `"16 / 9"` for horizontal). Drives
+   *  the overlay frame's shape so the player sits flush with no
+   *  letter/pillarboxing in the modal. Defaults to vertical since
+   *  the current camp story video is shot 9:16. */
+  muxAspect?: string;
 }
 
 const {
@@ -63,7 +75,9 @@ const {
   theme = "blue",
   titleLines,
   posterImage,
-  videoUrl,
+  muxPlaybackId = "1y00ba9KsVZQmIFVHZ501fYzWV005yM467bY1Ae006AIdnQ",
+  muxVideoTitle = "Sample day",
+  muxAspect = "9 / 16",
 } = Astro.props;
 
 const t = useTenerifeTranslations(locale);
@@ -132,7 +146,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
              Each pillar carries title + body on its own card; the
              user swipes through them. `HScrollMobile` handles the
              edge-bleed + progress bar + scroll-snap. -->
-        <HScrollMobile itemWidth="min(80%, 360px)">
+        <HScrollMobile itemWidth="min(86%, 380px)">
           {items.map((it, i) => (
             <article class="story-item" data-story-item-index={i}>
               <h3 class="font-h4 story-item__label">{it.label}</h3>
@@ -184,13 +198,13 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
           decoding="async"
         />
 
-        <!-- Video poster — tilted, sits between the two title lines
-             (overlapping both visually). Click to play (currently
-             links out — wire to inline player later). -->
-        <a
+        <!-- Video poster — tilted, sits between the two title lines.
+             Click opens the Mux player overlay below. -->
+        <button
+          type="button"
           class="story__video"
-          href={videoUrl ?? "#"}
           aria-label={t.story.videoAriaLabel}
+          data-story-video-trigger
         >
           {posterImage ? (
             <Image
@@ -220,7 +234,57 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
             <div class="story__video-placeholder" aria-hidden="true"></div>
           )}
           <span class="story__video-play" aria-hidden="true">▶</span>
-        </a>
+        </button>
+      </div>
+
+      <!-- Mux player overlay. Hidden until the trigger above is
+           clicked. The mux-player web component is registered by
+           the inline `<script>` below; until then the overlay is
+           inert (display: none + aria-hidden). Closes on:
+             - The X button
+             - Backdrop click (anywhere outside the player)
+             - Escape key
+           Each close path also pauses the player so audio doesn't
+           keep playing in the background. -->
+      <div
+        class="story__overlay"
+        data-story-overlay
+        data-playback-id={muxPlaybackId}
+        data-video-title={muxVideoTitle}
+        aria-hidden="true"
+        style={`--overlay-aspect: ${muxAspect};`}
+      >
+        <div class="story__overlay-backdrop" data-story-overlay-backdrop></div>
+        <div class="story__overlay-frame" role="dialog" aria-modal="true" aria-label={t.story.videoAriaLabel}>
+          <button
+            type="button"
+            class="story__overlay-close"
+            data-story-overlay-close
+            aria-label="Close video"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 5 L19 19 M19 5 L5 19" />
+            </svg>
+          </button>
+          <!-- Mux Player web component, declared statically per
+               https://www.mux.com/docs/guides/mux-player-web. The
+               `import '@mux/mux-player'` in the script below
+               registers the custom element; until that runs, the
+               browser treats this as an unknown element (no harm,
+               no fetch). On open, JS calls `.play()`. -->
+          <div class="story__overlay-player">
+            <mux-player
+              data-story-overlay-player
+              playback-id={muxPlaybackId}
+              stream-type="on-demand"
+              accent-color="#ffffff"
+              metadata-video-title={muxVideoTitle}
+              video-title={muxVideoTitle}
+              preload="none"
+              style="width: 100%; height: 100%;"
+            ></mux-player>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -377,10 +441,12 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
   .story__sponsors {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* Tight gap between label and logos so the group reads as one
-     * unit (the spacing AROUND the group is bigger via the
-     * `.story__intro` gap + margin). */
-    gap: var(--space-2xs, 0.5rem);
+    /* Tight row-gap between label and logos so the group reads as
+     * one unit, but a wider column-gap between the two logos so
+     * Harbour.Space and Leagues of Code aren't crammed together
+     * on mobile. */
+    row-gap: var(--space-2xs, 0.5rem);
+    column-gap: var(--space-l);
   }
 
   .story__sponsors-label {
@@ -390,6 +456,10 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
   @media (min-width: 768px) {
     .story__sponsors {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+      /* Reset to a tighter, even gap on desktop where the 3-column
+       * card layout already supplies visual separation between
+       * cells via padding. */
+      column-gap: var(--space-2xs, 0.5rem);
     }
     .story__sponsors-label {
       grid-column: auto;
@@ -658,6 +728,148 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
   .story__video:hover .story__video-play {
     background: rgba(0, 0, 0, 0.7);
   }
+
+  /* `.story__video` is now a `<button>` (was an `<a>`) — strip the
+   * default UA chrome so it visually behaves like the original tile. */
+  button.story__video {
+    appearance: none;
+    border: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* ── Mux player overlay ─────────────────────────────────────────
+   * Fixed full-screen modal that holds the lazy-mounted Mux player.
+   *
+   * IMPORTANT: This element is **portaled to `document.body`** on
+   * init by the JS below. It HAS to be rendered as a direct child
+   * of body — the section it's authored inside lives under
+   * `.scene__layer--tilt`, which receives a GSAP-driven `transform`
+   * on scroll. A transformed ancestor traps `position: fixed`
+   * children, so without the portal the overlay would scroll with
+   * the section AND get clipped to the section's stacking context
+   * (where the nav at `z-index: 1000` and StickyJoinCta at `z: 50`
+   * paint on top of it).
+   *
+   * `z-index: 9999` puts the overlay decisively above the nav
+   * (`z: 1000`) and any other floating chrome.
+   *
+   * Hidden by default via `aria-hidden="true"` — the rule below
+   * keys off that attribute so we don't fight specificity later. */
+  .story__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-l);
+    /* Closed state: invisible + non-interactive. Stays in the DOM
+     * so JS can flip aria-hidden to open without re-rendering. */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+  }
+
+  .story__overlay[aria-hidden="false"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .story__overlay-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    /* Slight backdrop-filter blur for a subtle "stage lights down"
+     * effect on the page underneath. Behind a flag because not all
+     * browsers support it; CSS gracefully falls back to the solid bg. */
+    backdrop-filter: blur(8px);
+  }
+
+  /* Frame sizes itself to whatever aspect ratio the source video
+   * ships in (set via the `--overlay-aspect` custom property on
+   * `.story__overlay`). Width starts at 100% and aspect-ratio
+   * computes the height; if that height exceeds `max-height: 88vh`
+   * the browser clamps height AND proportionally shrinks width so
+   * the aspect ratio is preserved. `max-width: 1100px` caps very
+   * wide desktop horizontal videos.
+   *
+   * This depends on aspect-ratio + max-height interacting correctly
+   * (Chrome 88+, Firefox 89+, Safari 15+). The previous
+   * `width: auto; height: auto` pattern was bugged: with no primary
+   * axis defined, flex layout resolved both to 0 → frame collapsed
+   * and the player rendered invisibly. */
+  .story__overlay-frame {
+    position: relative;
+    aspect-ratio: var(--overlay-aspect, 9 / 16);
+    width: 100%;
+    max-width: 1100px;
+    max-height: 88vh;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  }
+
+  .story__overlay-player {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The lazy-mounted `<mux-player>` fills its parent. Custom
+   * elements default to `display: inline` — without overriding to
+   * `block`, `width: 100%` and `height: 100%` resolve against the
+   * inline box and the player effectively renders at 0×0. The
+   * `:global` opt-out is needed because the custom element's tag
+   * isn't scoped by Astro's `data-astro-cid-*` rewriter. */
+  .story__overlay-player :global(mux-player) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    --controls-backdrop-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .story__overlay-close {
+    position: absolute;
+    top: var(--space-s);
+    right: var(--space-s);
+    z-index: 2;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 180ms ease, transform 180ms ease;
+  }
+
+  .story__overlay-close:hover {
+    background: rgba(0, 0, 0, 0.85);
+    transform: scale(1.05);
+  }
+
+  .story__overlay-close svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  /* When the overlay is open, lock the body scroll so the video
+   * stays the focal point. JS toggles `data-story-overlay-open` on
+   * the html element to scope this. */
+  :global(html[data-story-overlay-open="true"]) {
+    overflow: hidden;
+  }
 </style>
 
 <script>
@@ -701,4 +913,110 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
   }
   document.addEventListener('astro:before-swap', cleanupStoryStack);
   document.addEventListener('astro:page-load', initStoryStack);
+
+  /**
+   * Story video overlay — Mux Player web component + open/close.
+   *
+   * Following the canonical pattern from
+   * https://www.mux.com/docs/guides/mux-player-web — the side-effect
+   * import below registers the `<mux-player>` custom element, and
+   * the player is declared statically in the Astro markup with its
+   * playback-id attribute. Browsers upgrade the unknown element to
+   * the real player as soon as the import lands.
+   *
+   * The static import is intentional (vs. the previous dynamic
+   * `import()`): Vite's dev-mode optimize-deps caches the bundle on
+   * first server start, and on-demand imports of newly-installed
+   * packages can hit a stale cache → "Outdated Optimize Dep" 504.
+   * Static imports get bundled with the page entry, no surprises.
+   */
+  import '@mux/mux-player';
+
+  function initStoryOverlay() {
+    const overlay = document.querySelector<HTMLElement>('[data-story-overlay]');
+    if (!overlay || overlay.dataset.hooked === '1') return;
+    overlay.dataset.hooked = '1';
+
+    // Portal to body. The overlay is authored inside `.scene__layer
+    // --tilt`, which gets a GSAP-driven `transform` on scroll —
+    // transformed ancestors trap fixed children, so without this
+    // move the overlay would scroll with the section, get clipped
+    // by the section's stacking context (nav + StickyJoinCta paint
+    // on top of it), and ignore the viewport entirely. Lifting it
+    // to body decouples it from all that. Astro's scoped-CSS
+    // `data-astro-cid-*` attributes ride along with the element so
+    // the styles still apply post-move.
+    if (overlay.parentElement !== document.body) {
+      document.body.appendChild(overlay);
+    }
+
+    const trigger = document.querySelector<HTMLElement>('[data-story-video-trigger]');
+    const closeBtn = overlay.querySelector<HTMLElement>('[data-story-overlay-close]');
+    const backdrop = overlay.querySelector<HTMLElement>('[data-story-overlay-backdrop]');
+    const player = overlay.querySelector<HTMLElement>('[data-story-overlay-player]');
+    if (!trigger || !closeBtn || !backdrop || !player) return;
+
+    function open() {
+      overlay!.setAttribute('aria-hidden', 'false');
+      document.documentElement.setAttribute('data-story-overlay-open', 'true');
+      // Stop Lenis. CSS `overflow: hidden` doesn't suffice — Lenis
+      // intercepts wheel/touch events and continues scrolling the
+      // page underneath. The page-init script listens for this
+      // event and calls `lenis.stop()`.
+      window.dispatchEvent(new CustomEvent('tenerife:lock-scroll'));
+      // mux-player exposes the underlying media-element API on the
+      // custom element itself — `.play()` is a real method. Most
+      // browsers allow autoplay on user-initiated click; if the
+      // browser refuses (rare on a click), the user just sees the
+      // pre-load poster and can hit play.
+      try {
+        (player as any).play?.();
+      } catch (_) {
+        /* user can hit play manually */
+      }
+    }
+
+    function close() {
+      overlay!.setAttribute('aria-hidden', 'true');
+      document.documentElement.removeAttribute('data-story-overlay-open');
+      window.dispatchEvent(new CustomEvent('tenerife:unlock-scroll'));
+      try {
+        (player as any).pause?.();
+      } catch (_) {}
+    }
+
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      open();
+    });
+    closeBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+
+    // Escape closes only when the overlay is open.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay!.getAttribute('aria-hidden') === 'false') {
+        close();
+      }
+    });
+  }
+
+  function cleanupStoryOverlay() {
+    const overlay = document.querySelector<HTMLElement>('[data-story-overlay]');
+    if (!overlay) return;
+    overlay.removeAttribute('data-hooked');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.documentElement.removeAttribute('data-story-overlay-open');
+    const player = overlay.querySelector<HTMLElement>('[data-story-overlay-player]');
+    if (player) {
+      try { (player as any).pause?.(); } catch (_) {}
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStoryOverlay, { once: true });
+  } else {
+    initStoryOverlay();
+  }
+  document.addEventListener('astro:page-load', initStoryOverlay);
+  document.addEventListener('astro:before-swap', cleanupStoryOverlay);
 </script>

@@ -26,8 +26,8 @@ export const tracks = {
     es: 'RUTAS'
   }),
   copy: createTranslation({
-    en: 'Every camper picks one track — beginner or advanced — and goes deep into it. Ten sessions, 35 hours in total, hands-on and project-based, led by experienced educators and industry professionals in small groups. By the end of the camp, every student has something real to show for it.',
-    es: 'Cada campista elige una ruta — principiante o avanzada — y se sumerge en ella. Diez sesiones, 35 horas en total, prácticas y por proyectos, dirigidas por educadores experimentados y profesionales del sector en grupos pequeños. Al final del campamento, cada estudiante tiene algo real que mostrar.'
+    en: 'Each student commits to one track for the two weeks — beginner or advanced. Ten sessions, 45 hours in total, taught in small groups by working researchers and engineers. The format is hands-on, and every track ends with something built.',
+    es: 'Cada estudiante se compromete con una ruta durante las dos semanas — principiante o avanzada. Diez sesiones, 45 horas en total, impartidas en grupos pequeños por investigadores e ingenieros en activo. El formato es práctico, y cada ruta termina con algo construido.'
   }),
   beginner: {
     title: createTranslation({
@@ -157,8 +157,8 @@ export const tracks = {
       es: '¿No estás seguro de si es el campamento adecuado?'
     }),
     lede: createTranslation({
-      en: 'No prior experience, no clear passion, no plan needed — just an openness to try something that might surprise you. The camp is for kids who:',
-      es: 'No hace falta experiencia previa, ni una pasión clara, ni un plan — solo apertura para probar algo que puede sorprenderte. El campamento es para chicos que:'
+      en: "Students arrive with no prior experience. All they need is an openness to try something new. It's ideal for those who:",
+      es: 'Los estudiantes llegan sin experiencia previa. Lo único que necesitan es estar abiertos a probar algo nuevo. Es ideal para quienes:'
     }),
     items: [
       {

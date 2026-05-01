@@ -65,8 +65,8 @@ export const faq = {
         es: '¿Qué incluye el precio?'
       }),
       answer: createTranslation({
-        en: 'Two weeks of academic programme (35 hours across one chosen track), the full extracurricular programme (excursions, sports, workshops, cultural visits), a 4-star shared-room hotel stay with all meals included, transport between activities, and camp insurance.',
-        es: 'Dos semanas de programa académico (35 horas en la ruta elegida), el programa extracurricular completo (excursiones, deportes, talleres, visitas culturales), alojamiento en hotel de 4 estrellas en habitación compartida con todas las comidas incluidas, transporte entre actividades y el seguro del campamento.'
+        en: 'Two weeks of academic programme (45 hours across one chosen track), the full extracurricular programme (excursions, sports, workshops, cultural visits), a 4-star shared-room hotel stay with all meals included, transport between activities, and camp insurance.',
+        es: 'Dos semanas de programa académico (45 horas en la ruta elegida), el programa extracurricular completo (excursiones, deportes, talleres, visitas culturales), alojamiento en hotel de 4 estrellas en habitación compartida con todas las comidas incluidas, transporte entre actividades y el seguro del campamento.'
       })
     },
     {
@@ -111,12 +111,22 @@ export const faq = {
     },
     {
       question: createTranslation({
-        en: 'How does travel work?',
-        es: '¿Cómo funciona el viaje?'
+        en: 'Are flights included?',
+        es: '¿Están incluidos los vuelos?'
       }),
       answer: createTranslation({
-        en: 'Tenerife North and Tenerife South airports are both well-connected to mainland Europe. Group transfers between the airport and the hotel are organised on the published arrival and departure days; outside that window, transfers can be arranged for a small fee.',
-        es: 'Los aeropuertos de Tenerife Norte y Tenerife Sur están bien conectados con la Europa continental. Los traslados en grupo entre el aeropuerto y el hotel se organizan en los días publicados de llegada y salida; fuera de esa ventana, se pueden organizar traslados con un pequeño coste.'
+        en: 'No — families book their own flights to and from Tenerife. Both Tenerife North and Tenerife South airports are well-connected to mainland Europe.',
+        es: 'No — las familias reservan sus propios vuelos hacia y desde Tenerife. Tanto el aeropuerto de Tenerife Norte como el de Tenerife Sur están bien conectados con la Europa continental.'
+      })
+    },
+    {
+      question: createTranslation({
+        en: 'Is there airport transfer?',
+        es: '¿Hay traslado desde el aeropuerto?'
+      }),
+      answer: createTranslation({
+        en: 'Yes. Group transfers between the airport and the hotel are organised on the published arrival and departure days. Outside those dates, transfers can be arranged for a small fee.',
+        es: 'Sí. Los traslados en grupo entre el aeropuerto y el hotel se organizan en los días publicados de llegada y salida. Fuera de esas fechas, se pueden organizar traslados con un pequeño coste.'
       })
     }
   ] satisfies FaqItem[]

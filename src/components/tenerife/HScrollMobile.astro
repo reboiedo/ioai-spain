@@ -109,6 +109,14 @@ const {
      * visual layout. */
     padding-inline: var(--section-inline);
     scroll-padding-inline: var(--section-inline);
+    /* `overflow-x: auto` forces overflow-y to compute to non-visible
+     * (per spec), which would clip card box-shadows that extend
+     * below their footprint. A small bottom padding gives shadows
+     * room to render inside the scroll area, and a tiny top
+     * padding keeps any card focus rings / hover lifts from kissing
+     * the section content above. Tuned to not be visually noticeable
+     * for non-shadowed cards. */
+    padding-block: 0.25rem 0.75rem;
     /* Hide the native scrollbar — the rail below replaces it. */
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;

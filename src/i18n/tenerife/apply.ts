@@ -6,8 +6,8 @@ export const apply = {
     es: 'ÚNETE'
   }),
   copy: createTranslation({
-    en: 'Ready to take part in the IOAI Spain training camp? Applications open with the national qualifier round in February — shortlisted students are invited directly to camp.',
-    es: '¿Listo para participar en el campamento de entrenamiento IOAI España? Las solicitudes se abren con la ronda clasificatoria nacional en febrero — los estudiantes seleccionados son invitados directamente al campamento.'
+    en: 'Two weeks of serious AI work and an unforgettable Tenerife summer. Spots are limited. Register now for July 5–19, 2026.',
+    es: 'Dos semanas de trabajo serio en IA y un verano inolvidable en Tenerife. Las plazas son limitadas. Regístrate ahora para el 5–19 de julio de 2026.'
   }),
   href: createTranslation({
     en: '/form/camp-signup/',

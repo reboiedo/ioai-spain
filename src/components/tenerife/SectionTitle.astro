@@ -214,10 +214,18 @@ const mobileMaxWidth = Math.max(...mobileLineWidths, 1);
 
   /* Each SVG line takes its row in the mobile path; container
    * width drives glyph size. `display: block` so multi-line stacks
-   * lay out vertically. */
+   * lay out vertically. Small block gap between lines so two-line
+   * titles (e.g. "A DAY AT" / "TENERIFE") read as a stack rather
+   * than glyphs touching across rows. The SVG viewBox is tight
+   * around cap-line ↔ baseline so the visual gap matches the
+   * margin almost exactly. */
   .section-title__svg-line {
     display: block;
     width: 100%;
+  }
+
+  .section-title__svg-line + .section-title__svg-line {
+    margin-block-start: var(--space-s);
   }
 
   /* Override `HeroTitle`'s default `font-size: clamp(4rem, 16vw, 18rem)`

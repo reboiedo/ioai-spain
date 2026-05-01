@@ -71,8 +71,8 @@ export const team = {
       name: 'Artem Plotkin',
       imageKey: 'artem_plotkin',
       role: createTranslation({
-        en: 'PhD, Computational Maths',
-        es: 'PhD en Matemáticas Computacionales'
+        en: 'ICPC and IOI coach',
+        es: 'Entrenador de ICPC e IOI'
       }),
       bio: createTranslation({
         en: 'Artem is a software engineer and mathematician with industry experience at Yandex, currently completing a PhD in Computational Mathematics. He coaches competitive programming teams at ICPC and IOI level — two of the most prestigious competitions in the field — and teaches algorithms and nonlinear programming. His own competitive record speaks for itself: 1st place at the 2018 International Data Analysis Olympiad and 5th place at the 2024 CodeRun Backend Championship.',
@@ -84,8 +84,8 @@ export const team = {
       name: 'Ivan Zagorulko',
       imageKey: 'ivan',
       role: createTranslation({
-        en: '3× AI Challenge winner',
-        es: 'Ganador 3× del AI Challenge'
+        en: '2025 IOAI team mentor',
+        es: 'Mentor del equipo IOAI 2025'
       }),
       bio: createTranslation({
         en: 'Ivan is a research engineer at AIRI and a three-time winner of the AI Challenge (2022, 2023, 2024). He mentored the national-level team at the 2025 International Olympiad in AI, and recently published a research paper accepted at AAAI — one of the most prestigious conferences in the field.',
@@ -110,8 +110,8 @@ export const team = {
       name: 'Ogabek Masharipov',
       imageKey: 'ogabek',
       role: createTranslation({
-        en: 'Algorithms lecturer',
-        es: 'Profesor de Algoritmos'
+        en: 'Leagues of Code Academic Coordinator',
+        es: 'Coordinador Académico de Leagues of Code'
       }),
       bio: createTranslation({
         en: "Ogabek has taught Computer Science and Robotics at both school and university level across Europe. He's a lecturer in Algorithms and Data Structures at a leading state university, and has taught the IB Computer Science curriculum at a top international gymnasium. His focus is on building structured, efficient lessons that actually stick.",
@@ -123,8 +123,8 @@ export const team = {
       name: 'Anier Velasco',
       imageKey: 'anier',
       role: createTranslation({
-        en: 'Contributor, Cohere Aya',
-        es: 'Colaborador, Cohere Aya'
+        en: 'Member of the IOI Spain Scientific Committee',
+        es: 'Miembro del Comité Científico de la IOI España'
       }),
       bio: createTranslation({
         en: 'Anier is a researcher and educator specialising in the theory behind machine learning. He studied Computer Science and Data Science at Harbour.Space University, won a gold medal at the National Olympiad in Informatics, and has contributed to Aya — an open-source multilingual AI project backed by Cohere for AI, involving researchers from over 100 countries.',

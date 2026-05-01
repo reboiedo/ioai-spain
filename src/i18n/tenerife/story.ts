@@ -26,8 +26,8 @@ export const story = {
     es: 'HISTORIA'
   }),
   lede: createTranslation({
-    en: "For over a decade behind the scenes of olympiad coaching and AI research, we've watched ambitious students chase the same handful of opportunities — and noticed how rarely those opportunities reach beyond a familiar inner circle. The Tenerife camp exists to widen that circle.",
-    es: 'Durante más de una década entre bambalinas del coaching de olimpiadas y la investigación en IA, hemos visto a estudiantes ambiciosos perseguir el mismo puñado de oportunidades — y nos ha llamado la atención lo poco que esas oportunidades llegan más allá de un círculo cercano y conocido. El campamento de Tenerife existe para ampliar ese círculo.'
+    en: "Most summer camps make you choose: serious academics or a great summer. We don't think that's a good enough deal. At our camp, mornings go deep into AI and afternoons go to Tenerife's beaches, trails and historic towns. Both halves are built with equal care.",
+    es: 'La mayoría de los campamentos de verano te obligan a elegir: o lo académico va en serio, o tienes un buen verano. No nos parece un trato lo bastante bueno. En nuestro campamento, las mañanas se sumergen en la IA y las tardes se van a las playas, los senderos y los pueblos históricos de Tenerife. Las dos mitades están cuidadas por igual.'
   }),
   poweredBy: createTranslation({
     en: 'Powered by',
@@ -44,32 +44,32 @@ export const story = {
   items: [
     {
       label: createTranslation({
-        en: 'The academics and the summer are both real',
-        es: 'Lo académico y el verano son los dos reales'
+        en: 'Backed by Harbour.Space and Leagues of Code',
+        es: 'Respaldado por Harbour.Space y Leagues of Code'
       }),
       body: createTranslation({
-        en: "The learning program and the extracurricular program are built with equal care. Mornings go deep into AI. Afternoons go to Tenerife's beaches, trails, and historic towns. Neither half is filler, and you don't have to sacrifice one to get the other.",
-        es: 'El programa de aprendizaje y el extracurricular están cuidados por igual. Las mañanas se sumergen en la IA. Las tardes se van a las playas, los senderos y los pueblos históricos de Tenerife. Ninguna mitad es relleno, y no tienes que sacrificar una para tener la otra.'
+        en: 'Two organisations with years of running serious educational programs at scale. The Harbour.Space team has prepared winners of international olympiads in competitive programming and runs the Spanish national selection for the International Olympiad in AI.',
+        es: 'Dos organizaciones con años de experiencia llevando programas educativos serios a gran escala. El equipo de Harbour.Space ha preparado a ganadores de olimpiadas internacionales de programación competitiva y dirige la selección nacional española para la Olimpiada Internacional de IA.'
       })
     },
     {
       label: createTranslation({
-        en: 'Two tracks, one community',
-        es: 'Dos rutas, una sola comunidad'
+        en: 'A track for every starting point',
+        es: 'Una ruta para cada punto de partida'
       }),
       body: createTranslation({
-        en: "Foundations and applied ML run in parallel, plus a team research sprint that cuts across both. Mornings you're in your track; afternoons and evenings the whole cohort is together — meals, labs, problem sets, hikes.",
-        es: 'Fundamentos y ML aplicado corren en paralelo, más un sprint de investigación en equipo que atraviesa los dos. Por la mañana estás en tu ruta; por la tarde y la noche toda la cohorte está junta — comidas, laboratorios, problemas, caminatas.'
+        en: 'The Beginners track opens the door for students with little or no AI experience. The Advanced track is structured, rigorous training for those ready to go deep. Each student picks one they are ready for.',
+        es: 'La ruta de Principiantes abre la puerta a estudiantes con poca o ninguna experiencia en IA. La ruta Avanzada es un entrenamiento estructurado y riguroso para quienes están listos para profundizar. Cada estudiante elige la que le corresponde.'
       })
     },
     {
       label: createTranslation({
-        en: 'The highest level is in the room',
-        es: 'El nivel más alto está en la sala'
+        en: 'National AI olympiad teams train at the camp',
+        es: 'Los equipos nacionales de la olimpiada de IA entrenan en el campamento'
       }),
       body: createTranslation({
-        en: 'Students selected from the IOAI Spain qualifier, taught by researchers who publish at NeurIPS and ICML, with industry mentors from Barcelona\'s AI labs. Ambition is the baseline.',
-        es: 'Estudiantes seleccionados desde el clasificatorio de IOAI España, enseñados por investigadores que publican en NeurIPS e ICML, con mentores de la industria de los laboratorios de IA de Barcelona. La ambición es el punto de partida.'
+        en: "Alongside our two student tracks, the camp hosts top-performing students from multiple countries preparing for the International Olympiad in AI. Outside class, all three groups mix on the same trips, beaches and dinner tables. For a beginner, that proximity is motivation no classroom can manufacture. For advanced students, it's a reminder there's always further to go.",
+        es: 'Junto a nuestras dos rutas de estudiantes, el campamento acoge a los mejores estudiantes de varios países que se preparan para la Olimpiada Internacional de IA. Fuera de clase, los tres grupos se mezclan en las mismas excursiones, playas y mesas a la hora de cenar. Para un principiante, esa cercanía es una motivación que ninguna aula puede fabricar. Para los estudiantes avanzados, es un recordatorio de que siempre hay más camino por delante.'
       })
     }
   ] satisfies StoryItem[],

@@ -166,7 +166,7 @@ const marqueeRowB = [
     <!-- MOBILE layout (<768px). Title + intro stacked, then a
          horizontal scroll of slot cards. Hidden on desktop. -->
     <div class="day__mobile">
-      <SectionTitle lines={[t.dayInLife.titleMobile]} />
+      <SectionTitle lines={[t.dayInLife.titleLine1, t.dayInLife.titleLine2]} />
       <p class="font-body-l day__mobile-intro">{t.dayInLife.intro}</p>
 
       {photos.length > 0 && (

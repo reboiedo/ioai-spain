@@ -48,8 +48,8 @@ export const activities = {
         es: 'Bienvenida y primeros encuentros'
       }),
       description: createTranslation({
-        en: 'The camp kicks off with a walk along the seafront of Puerto de la Cruz, finishing at the historic Plaza del Charco. Along the way, campers take part in a simple but effective icebreaker — sharing their name, something they love, and their plans for the future. By the end of the evening, the group already feels like a group.',
-        es: 'El campamento arranca con un paseo por el frente marítimo de Puerto de la Cruz, terminando en la histórica Plaza del Charco. Por el camino, los campistas hacen un rompehielos sencillo pero efectivo — comparten su nombre, algo que les apasiona y sus planes de futuro. Al final de la tarde, el grupo ya se siente grupo.'
+        en: 'The camp kicks off with a walk along the seafront of Puerto de la Cruz, finishing at the historic Plaza del Charco. Along the way, campers take part in a simple but effective icebreaker — sharing their name, something they love, and their plans for the future. By the end of the evening, the campers already feel like a team.',
+        es: 'El campamento arranca con un paseo por el frente marítimo de Puerto de la Cruz, terminando en la histórica Plaza del Charco. Por el camino, los campistas hacen un rompehielos sencillo pero efectivo — comparten su nombre, algo que les apasiona y sus planes de futuro. Al final de la tarde, los campistas ya se sienten un equipo.'
       })
     },
     {

@@ -41,7 +41,7 @@ const forms = defineCollection({
     enabled: z.boolean().default(true),
 
     // Either use a form template OR provide full form configuration
-    formTemplate: z.enum(['application', 'download', 'contact', 'campSignup']).optional(),
+    formTemplate: z.enum(['application', 'download', 'contact', 'campSignup', 'campContact']).optional(),
 
     // Age threshold for guardian requirement (default: 14)
     ageThreshold: z.number().optional(),
