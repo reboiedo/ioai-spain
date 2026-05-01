@@ -181,7 +181,7 @@ const t = useTenerifeTranslations(locale);
      * tall reserved bar (~8–12rem) and dominates via `max()`. The
      * `--cta-inset` term keeps the gap at least the CTA's edge inset
      * if anyone bumps it. */
-    top: calc(100svh - max(var(--cta-clearance), var(--cta-inset), var(--space-l)));
+    top: calc(100svh - max(var(--cta-clearance), var(--cta-inset), var(--space-l)) - var(--space-l));
     transform: translateY(-100%);
     left: var(--section-inline);
     right: var(--section-inline);
@@ -239,6 +239,16 @@ const t = useTenerifeTranslations(locale);
   @media (max-width: 767.98px) {
     .hero__lede-line {
       display: block;
+    }
+    /* Mobile only: lift the lede further so its bottom edge has
+     * extra clearance from the sticky Join CTA. */
+    .hero__lede {
+      top: calc(
+        100svh
+        - max(var(--cta-clearance), var(--cta-inset), var(--space-l))
+        - var(--space-l)
+        - var(--space-l)
+      );
     }
   }
 

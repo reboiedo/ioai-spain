@@ -83,9 +83,24 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
     padding: 0;
     text-align: left;
     cursor: pointer;
+    /* Kill the iOS/Android tap-highlight grey flash on click. */
+    -webkit-tap-highlight-color: transparent;
+    /* Disable double-tap-zoom on mobile (the click triggers the
+     * portrait↔bio swap, no zoom expected) and remove the 300ms
+     * synthetic-click delay. */
+    touch-action: manipulation;
+    /* Some mobile browsers translate the button by 1px on :active,
+     * which makes the name + role text below the face nudge on
+     * tap. Force a stable transform so the text stays put. */
+    transform: translateZ(0);
 
     display: grid;
     gap: var(--space-s);
+  }
+
+  .team-card:active,
+  .team-card:focus {
+    transform: translateZ(0);
   }
 
   .team-card:focus-visible {
@@ -158,6 +173,39 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
     overscroll-behavior: contain;
     opacity: 0;
     pointer-events: none;
+    /* Soft fade at the edges so long bios don't get hard-cut against
+     * the card's bottom edge when they overflow. Same pattern as the
+     * polaroid cards in SectionActivities: `--m-top` is 0 by default
+     * (top reads flush); JS bumps it once the user scrolls. `--m-bottom`
+     * is on by default to telegraph "more below"; JS clears it at the
+     * end of the scroll. Both vars also collapse when the bio fits
+     * without overflow (`data-overflow="false"`). */
+    --m-top: 0px;
+    --m-bottom: 2.75rem;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 var(--m-top),
+      #000 calc(100% - var(--m-bottom)),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 var(--m-top),
+      #000 calc(100% - var(--m-bottom)),
+      transparent 100%
+    );
+  }
+  .team-card__bio[data-scrolled="true"] {
+    --m-top: 2.75rem;
+  }
+  .team-card__bio[data-at-bottom="true"] {
+    --m-bottom: 0px;
+  }
+  .team-card__bio[data-overflow="false"] {
+    --m-top: 0px;
+    --m-bottom: 0px;
   }
 
   .team-card__bio-text {
@@ -257,9 +305,33 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
    */
   import { gsap } from 'gsap';
 
+  /* Drive top/bottom fade masks based on the bio's scroll position
+   * — same pattern as the polaroid cards. Cheap getter on each scroll
+   * tick; only writes the dataset when the value changes. */
+  function updateBioMask(bio: HTMLElement) {
+    const overflow = bio.scrollHeight > bio.clientHeight + 1;
+    const next = overflow ? 'true' : 'false';
+    if (bio.dataset.overflow !== next) bio.dataset.overflow = next;
+    if (!overflow) return;
+    const scrolled = bio.scrollTop > 4 ? 'true' : 'false';
+    if (bio.dataset.scrolled !== scrolled) bio.dataset.scrolled = scrolled;
+    const atBottom =
+      bio.scrollTop + bio.clientHeight >= bio.scrollHeight - 2
+        ? 'true'
+        : 'false';
+    if (bio.dataset.atBottom !== atBottom) bio.dataset.atBottom = atBottom;
+  }
+
   function install() {
     if ((window as any).__teamCardHooked) return;
     (window as any).__teamCardHooked = true;
+
+    // Attach a scroll listener to every bio panel so the masks
+    // update as the user reads. Listener is on the bio element
+    // itself (not delegated) because `scroll` doesn't bubble.
+    document.querySelectorAll<HTMLElement>('[data-team-bio]').forEach((bio) => {
+      bio.addEventListener('scroll', () => updateBioMask(bio), { passive: true });
+    });
 
     document.addEventListener('click', (e) => {
       const card = (e.target as HTMLElement | null)?.closest<HTMLButtonElement>(
@@ -301,6 +373,11 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
           },
           '-=0.1',
         );
+
+      // After opening, run the mask check once layout settles.
+      if (willOpen) {
+        requestAnimationFrame(() => updateBioMask(bio));
+      }
     });
   }
 
