@@ -19,7 +19,8 @@
  * activities by index after a `01-…`, `02-…` filename sort.
  */
 
-import { Picture, type ImageMetadata } from "astro:assets";
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
 import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
@@ -1522,8 +1523,8 @@ const total = activities.length;
         currentTween.kill();
         currentTween = null;
       }
-      try { canvas.setPointerCapture(e.pointerId); } catch {}
-      canvas.style.cursor = 'grabbing';
+      try { canvas!.setPointerCapture(e.pointerId); } catch {}
+      canvas!.style.cursor = 'grabbing';
       e.preventDefault();
       // Keep RAF ticking for the duration of the drag — set a
       // sentinel tween so startRaf doesn't bail.
@@ -1549,8 +1550,8 @@ const total = activities.length;
       if (!dragging || e.pointerId !== dragPointerId) return;
       dragging = false;
       dragPointerId = null;
-      try { canvas.releasePointerCapture(e.pointerId); } catch {}
-      canvas.style.cursor = '';
+      try { canvas!.releasePointerCapture(e.pointerId); } catch {}
+      canvas!.style.cursor = '';
       // Snap to the nearest frame.
       const cur = sharedUniforms.uOffset.value;
       const idx = offsetToIdx(Math.max(minOffset, Math.min(maxOffset, cur)));
@@ -1581,7 +1582,7 @@ const total = activities.length;
       if (currentTween) currentTween.kill();
       cancelAnimationFrame(rafId);
       resizeObs.disconnect();
-      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas!.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);

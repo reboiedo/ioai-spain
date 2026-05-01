@@ -37,7 +37,7 @@ const t = useCampTranslations(locale);
 
     faqItems.forEach((item) => {
       const button = item.querySelector('.faq-question');
-      const answer = item.querySelector('.faq-answer');
+      const answer = item.querySelector<HTMLElement>('.faq-answer');
       const icon = item.querySelector('.faq-question__icon');
 
       if (!button || !answer || !icon) return;

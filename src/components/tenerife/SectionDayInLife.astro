@@ -32,7 +32,8 @@
  * folder is empty so the layout reads correctly during dev.
  */
 
-import { Picture, type ImageMetadata } from "astro:assets";
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
@@ -881,7 +882,7 @@ const marqueeRowB = [
           // Wrap so the duplicated content keeps the loop seamless.
           if (direction === -1 && x <= -halfWidth) x += halfWidth;
           if (direction === 1 && x >= 0) x -= halfWidth;
-          track.style.transform = `translate3d(${x}px, 0, 0)`;
+          track!.style.transform = `translate3d(${x}px, 0, 0)`;
         }
         raf = requestAnimationFrame(step);
       }

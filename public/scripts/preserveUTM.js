@@ -55,7 +55,6 @@ function addUtmsToLinks() {
       }
     });
 
-    console.log('🎯 UTM parameters preserved on internal links:', utmParams);
   }
 
   // Always inject tracking fields into forms (even without UTMs for timestamp/context)
@@ -109,43 +108,11 @@ function injectTrackingFieldsIntoForms() {
     // Mark as processed
     form.setAttribute('data-tracking-injected', 'true');
 
-    if (Object.keys(trackingData).length > 0) {
-      console.log('🎯 Tracking fields injected into form:', trackingData);
-    }
   });
 }
 
-// Debug: Log when script loads
-console.log('🎯 preserveUTM.js script loaded');
-
-// Debug helper function - call this from browser console to test UTM tracking
-window.debugUTMTracking = function() {
-  console.group('🔍 UTM Tracking Debug');
-  console.log('Current URL:', window.location.href);
-  console.log('UTM Parameters found:', new URLSearchParams(window.location.search));
-
-  // Show all forms and their hidden fields
-  document.querySelectorAll('form').forEach((form, index) => {
-    console.log(`Form ${index + 1}:`, form);
-    const hiddenFields = form.querySelectorAll('input[type="hidden"]');
-    console.log(`  Hidden fields (${hiddenFields.length}):`, Array.from(hiddenFields).map(field => `${field.name}=${field.value}`));
-  });
-
-  // Show all internal links and their URLs
-  const internalLinks = document.querySelectorAll('a[href^="/"]');
-  console.log(`Internal links (${internalLinks.length}):`, Array.from(internalLinks).map(link => link.href));
-
-  console.groupEnd();
-};
-
 // Run on initial page load
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎯 DOMContentLoaded - running addUtmsToLinks');
-  addUtmsToLinks();
-});
+document.addEventListener('DOMContentLoaded', addUtmsToLinks);
 
 // Run again after each View Transition (Astro)
-document.addEventListener('astro:page-load', () => {
-  console.log('🎯 astro:page-load - running addUtmsToLinks');
-  addUtmsToLinks();
-});
+document.addEventListener('astro:page-load', addUtmsToLinks);

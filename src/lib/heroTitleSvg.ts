@@ -77,7 +77,7 @@ export function buildHeroTitleSvg({
       if (x2 > tightMaxX) tightMaxX = x2;
       if (y2 > tightMaxY) tightMaxY = y2;
     }
-    const advance = (glyph.advanceWidth / unitsPerEm) * fontSize;
+    const advance = ((glyph.advanceWidth ?? 0) / unitsPerEm) * fontSize;
     charPaths.push({ d, char });
     cursor += advance;
   }
@@ -151,7 +151,7 @@ export function measureHeroTitleWidth(text: string): number {
       if (x1 < minX) minX = x1;
       if (x2 > maxX) maxX = x2;
     }
-    cursor += (glyph.advanceWidth / unitsPerEm) * fontSize;
+    cursor += ((glyph.advanceWidth ?? 0) / unitsPerEm) * fontSize;
   }
   return Number.isFinite(minX) && Number.isFinite(maxX) ? maxX - minX : cursor;
 }

@@ -48,8 +48,8 @@ const ioaiTraining = { key: 'ioai', icon: courseIcons.ioai, backgroundColor: '#3
               </svg>
               <Icon name={course.icon} class="card-badge-icon" />
             </div>
-            <h4 class="card-title" style={`color: ${course.titleColor};`}>{t.courses.beginner[course.key].title}</h4>
-            <p class="card-description" style={`color: ${course.descriptionColor};`}>{t.courses.beginner[course.key].description}</p>
+            <h4 class="card-title" style={`color: ${course.titleColor};`}>{t.courses.beginner[course.key as keyof typeof t.courses.beginner].title}</h4>
+            <p class="card-description" style={`color: ${course.descriptionColor};`}>{t.courses.beginner[course.key as keyof typeof t.courses.beginner].description}</p>
             <p class="card-hint card-hint--more">{t.courses.tapToLearnMore}</p>
             <p class="card-hint card-hint--close">{t.courses.close}</p>
           </div>
@@ -69,8 +69,8 @@ const ioaiTraining = { key: 'ioai', icon: courseIcons.ioai, backgroundColor: '#3
               </svg>
               <Icon name={course.icon} class="card-badge-icon" />
             </div>
-            <h4 class="card-title" style={`color: ${course.titleColor};`}>{t.courses.advanced[course.key].title}</h4>
-            <p class="card-description" style={`color: ${course.descriptionColor};`}>{t.courses.advanced[course.key].description}</p>
+            <h4 class="card-title" style={`color: ${course.titleColor};`}>{t.courses.advanced[course.key as keyof typeof t.courses.advanced].title}</h4>
+            <p class="card-description" style={`color: ${course.descriptionColor};`}>{t.courses.advanced[course.key as keyof typeof t.courses.advanced].description}</p>
             <p class="card-hint card-hint--more">{t.courses.tapToLearnMore}</p>
             <p class="card-hint card-hint--close">{t.courses.close}</p>
           </div>
@@ -172,8 +172,9 @@ const ioaiTraining = { key: 'ioai', icon: courseIcons.ioai, backgroundColor: '#3
 
       // Keyboard accessibility
       card.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
+        const ke = e as KeyboardEvent;
+        if (ke.key === 'Enter' || ke.key === ' ') {
+          ke.preventDefault();
           toggleCard();
         }
       });

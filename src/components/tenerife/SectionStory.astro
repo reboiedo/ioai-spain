@@ -28,7 +28,8 @@
 
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
-import { Image, Picture, type ImageMetadata } from "astro:assets";
+import { Image, Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import harbourLogo from "@/assets/harbour-space-logo.svg";
 import leaguesLogo from "@/assets/icons/leagues-logo.svg";
 import spikes from "@/assets/tenerife/story/spikes.svg";
@@ -283,24 +284,19 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
               <path d="M5 5 L19 19 M19 5 L5 19" />
             </svg>
           </button>
-          <!-- Mux Player web component, declared statically per
-               https://www.mux.com/docs/guides/mux-player-web. The
-               `import '@mux/mux-player'` in the script below
-               registers the custom element; until that runs, the
-               browser treats this as an unknown element (no harm,
-               no fetch). On open, JS calls `.play()`. -->
-          <div class="story__overlay-player">
-            <mux-player
-              data-story-overlay-player
-              playback-id={muxPlaybackId}
-              stream-type="on-demand"
-              accent-color="#ffffff"
-              metadata-video-title={muxVideoTitle}
-              video-title={muxVideoTitle}
-              preload="none"
-              style="width: 100%; height: 100%;"
-            ></mux-player>
-          </div>
+          <!-- Mux player mount point — empty until first user click.
+               The `import '@mux/mux-player'` below registers the
+               custom element early, but we only inject the actual
+               <mux-player> tag on `open()`. With no element in the
+               DOM, the player can't run thumbnail probes, audio-
+               context init, or background work that occasionally
+               surfaced as "video starts when I click random
+               things". After the first open it stays in the DOM
+               (paused on close) so re-opens are instant. The
+               playback-id and metadata title are read off the
+               overlay's data-* attributes so the markup stays
+               declarative and props-driven. -->
+          <div class="story__overlay-player"></div>
         </div>
       </div>
     </div>
@@ -387,12 +383,6 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
 
   .story__lede {
     margin: 0;
-    /* WCAG AA: white-on-orange body text at 20px clears only 3:1
-     * which is below the 4.5:1 threshold for normal-weight text.
-     * Bumping to 700 weight lets it qualify as "large text" (14pt
-     * bold) which only needs 3:1. Visually still reads as a lede,
-     * not a heading. */
-    font-weight: 700;
   }
 
   /* Facts list. Mobile: Apple-store-style vertical rows (label
@@ -971,17 +961,15 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
    * playback-id attribute. Browsers upgrade the unknown element to
    * the real player as soon as the import lands.
    *
-   * Lazy-loaded on first click of the video poster — the mux-player
-   * bundle is ~150 kB gzip and would otherwise block LCP / inflate
-   * the initial JS payload on every visit, even for users who never
-   * play the video. The dynamic import registers `<mux-player>` and
-   * then the upgraded custom element starts playback. Subsequent
-   * opens reuse the same module (resolved by the bundler cache). */
-  let muxPlayerLoaded: Promise<unknown> | null = null;
-  function loadMuxPlayer() {
-    if (!muxPlayerLoaded) muxPlayerLoaded = import('@mux/mux-player');
-    return muxPlayerLoaded;
-  }
+   * The static import is intentional (vs. a dynamic `import()`):
+   * Vite's dev-mode optimize-deps caches the bundle on first server
+   * start, and on-demand imports of newly-installed packages can
+   * hit a stale cache → "Outdated Optimize Dep" 504, which leaves
+   * the video player un-upgraded and unable to play. Static imports
+   * get bundled with the page entry, no surprises. The bundle is
+   * ~150 kB gzip — accept the cost for now until we can ship a
+   * production-only lazy-load path that doesn't trip dev mode. */
+  import '@mux/mux-player';
 
   function initStoryOverlay() {
     const overlay = document.querySelector<HTMLElement>('[data-story-overlay]');
@@ -1004,8 +992,51 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
     const trigger = document.querySelector<HTMLElement>('[data-story-video-trigger]');
     const closeBtn = overlay.querySelector<HTMLElement>('[data-story-overlay-close]');
     const backdrop = overlay.querySelector<HTMLElement>('[data-story-overlay-backdrop]');
-    const player = overlay.querySelector<HTMLElement>('[data-story-overlay-player]');
-    if (!trigger || !closeBtn || !backdrop || !player) return;
+    const playerMount = overlay.querySelector<HTMLElement>('.story__overlay-player');
+    if (!trigger || !closeBtn || !backdrop || !playerMount) return;
+
+    // Read the playback id + metadata title once from data-* attrs.
+    // The overlay element carries them so the surrounding markup
+    // stays declarative even though the <mux-player> is created
+    // imperatively on first open.
+    const playbackId = overlay.dataset.playbackId ?? '';
+    const videoTitle = overlay.dataset.videoTitle ?? '';
+
+    // Lazily-created singleton — we only create the <mux-player>
+    // element after the first user click on the poster, so until
+    // then there is literally no mux-player in the DOM, which
+    // means no thumbnail probes, no Cast SDK init, no possibility
+    // of a stray click somewhere on the page upgrading the player
+    // and starting the video.
+    //
+    // We build the element with `innerHTML` rather than
+    // `createElement` + per-attribute `setAttribute`. The HTML
+    // parser path lets the custom element pick up every attribute
+    // in a single upgrade pass; the imperative path raced against
+    // mux-player's upgrade and produced a "Source Not Supported /
+    // DEMUXER_ERROR_COULD_NOT_PARSE" once playback-id arrived
+    // after the element had already started fetching.
+    function escAttr(v: string): string {
+      return v.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    }
+    let player: HTMLElement | null = null;
+    function ensurePlayer(): HTMLElement {
+      if (player) return player;
+      playerMount!.innerHTML = `
+        <mux-player
+          data-story-overlay-player
+          playback-id="${escAttr(playbackId)}"
+          stream-type="on-demand"
+          accent-color="#ffffff"
+          metadata-video-title="${escAttr(videoTitle)}"
+          video-title="${escAttr(videoTitle)}"
+          preload="none"
+          style="width: 100%; height: 100%;"
+        ></mux-player>
+      `;
+      player = playerMount!.querySelector<HTMLElement>('mux-player');
+      return player!;
+    }
 
     function open() {
       overlay!.setAttribute('aria-hidden', 'false');
@@ -1013,23 +1044,19 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
       // matching the aria-hidden state. We toggle it together.
       overlay!.removeAttribute('inert');
       document.documentElement.setAttribute('data-story-overlay-open', 'true');
-      // Kick off the mux-player import (no-op after first call).
-      // The element exists statically in the DOM and upgrades to the
-      // real player once the module lands; .play() races the upgrade
-      // and is queued automatically by the custom-element machinery.
-      loadMuxPlayer();
       // Stop Lenis. CSS `overflow: hidden` doesn't suffice — Lenis
       // intercepts wheel/touch events and continues scrolling the
       // page underneath. The page-init script listens for this
       // event and calls `lenis.stop()`.
       window.dispatchEvent(new CustomEvent('tenerife:lock-scroll'));
+      const el = ensurePlayer();
       // mux-player exposes the underlying media-element API on the
       // custom element itself — `.play()` is a real method. Most
       // browsers allow autoplay on user-initiated click; if the
       // browser refuses (rare on a click), the user just sees the
       // pre-load poster and can hit play.
       try {
-        (player as any).play?.();
+        (el as any).play?.();
       } catch (_) {
         /* user can hit play manually */
       }
@@ -1040,9 +1067,11 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
       overlay!.setAttribute('inert', '');
       document.documentElement.removeAttribute('data-story-overlay-open');
       window.dispatchEvent(new CustomEvent('tenerife:unlock-scroll'));
-      try {
-        (player as any).pause?.();
-      } catch (_) {}
+      if (player) {
+        try {
+          (player as any).pause?.();
+        } catch (_) {}
+      }
     }
 
     trigger.addEventListener('click', (e) => {

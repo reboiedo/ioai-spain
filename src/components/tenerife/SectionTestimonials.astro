@@ -654,11 +654,11 @@ const testimonials = t.testimonials.items.map((item) => ({
     let active = 0;
 
     function measure() {
-      cardWidth = stage.clientWidth;
+      cardWidth = stage!.clientWidth;
       // Read the gap from the stage's CSS var so it matches
       // whatever value `--testi-card-gap` resolves to on this
       // viewport (it's a `clamp()` token).
-      const gapStr = getComputedStyle(stage)
+      const gapStr = getComputedStyle(stage!)
         .getPropertyValue('--testi-card-gap')
         .trim();
       gapPx = parseFloat(gapStr) || 0;
@@ -666,7 +666,7 @@ const testimonials = t.testimonials.items.map((item) => ({
       // — fall back to reading the computed gap on the track
       // itself if our token parse came back as zero.
       if (!gapPx) {
-        const trackGap = getComputedStyle(track).columnGap;
+        const trackGap = getComputedStyle(track!).columnGap;
         gapPx = parseFloat(trackGap) || 0;
       }
       step = cardWidth + gapPx;
@@ -738,10 +738,13 @@ const testimonials = t.testimonials.items.map((item) => ({
       type: 'x',
       inertia: false,
       edgeResistance: 0.7,
-      bounds: () => ({
+      // GSAP supports a function form of `bounds` for dynamic
+      // recalculation, but their TS types only list the static
+      // shapes — cast to satisfy the checker.
+      bounds: (() => ({
         minX: -((cards.length - 1) * step),
         maxX: 0,
-      }),
+      })) as unknown as { minX: number; maxX: number },
       onDragStart() {
         track.classList.add('is-dragging');
       },

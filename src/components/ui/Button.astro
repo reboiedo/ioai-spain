@@ -259,9 +259,7 @@ const Tag = enhancedHref ? 'a' : 'button';
       // Check for reduced motion preference
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Store original text for debugging
       const originalText = textElement.textContent;
-      console.log('Original button text:', originalText);
 
       // Different approach: manually split the text and create spans
       // This bypasses SplitText's space-removing behavior entirely
@@ -284,9 +282,6 @@ const Tag = enhancedHref ? 'a' : 'button';
       const split = {
         chars: manualChars
       };
-
-      console.log('Manual split chars:', split.chars.length);
-      console.log('After manual split:', textElement.textContent);
 
       // Set initial state - characters are at normal position
       window.gsap.set(split.chars, { y: 0 });

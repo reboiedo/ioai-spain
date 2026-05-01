@@ -9,15 +9,22 @@
 @import './tenerife/utilities.css';
 
 /* Astro's <Picture> wraps the <img> in a <picture> element which
- * defaults to `display: inline`. Existing `.foo__img { width:100%;
- * height:100% }` rules across these components were written for the
- * pre-Picture <Image> output (a bare img); when wrapped in an inline
- * <picture> they resolve against the inline box and produce
- * letterbox stripes. `display: contents` makes the <picture>
- * transparent to layout — its <source> children are non-rendering,
- * so the <img> reads as a direct child of the parent grid/flex/grid.
- * Scoped to the camp pages so this can't affect other parts of the
- * site that may have their own <picture> assumptions. */
+ * defaults to `display: inline`. Existing `.foo__img { width: 100%;
+ * height: 100% }` rules across these components were written for
+ * the pre-Picture <Image> output; the inline wrapper short-circuits
+ * percentage sizing.
+ *
+ * `display: contents` makes the wrapping <picture> transparent to
+ * layout — its children (<source>s + <img>) are exposed directly
+ * to the parent's grid/flex/aspect-ratio context, so the existing
+ * sizing rules keep working with no per-component rewrites.
+ *
+ * `display: block; width:100%; height:100%` was tried as a more
+ * "defensive" alternative but broke the WebGL scenes (HeroWave +
+ * Activities film strip) where pictures sit inside aspect-derived
+ * tiles whose own height is supplied by inner content; forcing
+ * picture to 100% height created circular sizing and the canvas
+ * tiles ended up zero-height. Stick with display: contents. */
 .tenerife-camp-v2 picture,
 .tenerife-camp-page picture {
   display: contents;
