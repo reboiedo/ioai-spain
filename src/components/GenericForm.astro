@@ -1155,19 +1155,26 @@ const form = resolvedForm;
       // (download, join-training, etc.) don't pollute the conversion
       // signal. Add other slugs here if marketing later wants a
       // download/whitepaper to count too.
-      const formSlug: string = formData.slug;
-      const formLocale: string = locale;
+      // NOTE: this block lives inside an Astro `<script define:vars>`
+      // which is served as raw inline JS (no TS compilation). Keep
+      // everything below as vanilla JS — type annotations or `as`
+      // casts would throw SyntaxError and prevent the surrounding
+      // DOMContentLoaded handler (which sets the Formspark `_redirect`
+      // field) from ever running. That's how the form ends up on
+      // Formspark's default thank-you page when this gets typed wrong.
+      var formSlug = formData.slug;
+      var formLocale = locale;
       if (formSlug.indexOf('camp-') === 0) {
-        const fd = new FormData(formElement);
-        const email = String(
+        var fd = new FormData(formElement);
+        var email = String(
           fd.get('guardianEmail') || fd.get('email') || ''
         );
-        const name = String(
+        var name = String(
           fd.get('guardianName') || fd.get('fullName') || fd.get('name') || ''
         );
-        const phone = String(fd.get('phone') || '');
-        (window as any).dataLayer = (window as any).dataLayer || [];
-        (window as any).dataLayer.push({
+        var phone = String(fd.get('phone') || '');
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
           event: 'lead_captured',
           form_type: formSlug,
           locale: formLocale,
