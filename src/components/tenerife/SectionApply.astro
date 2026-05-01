@@ -405,9 +405,36 @@ const photos: (ImageMetadata | null)[] = Array.from(
       container.addEventListener('pointerenter', onEnter);
     }
 
-    // Initial defaults — wait one frame so getBoundingClientRect returns
-    // sensible dimensions after layout settles.
-    requestAnimationFrame(fillDefaults);
+    // Defer the default photo placement until the section is
+    // actually scrolling INTO view, not on page load. Without this
+    // gate the three placeholder photos paint immediately on top of
+    // the giant title, blocking it before the user can read it.
+    // IntersectionObserver fires once the section crosses ~40% of
+    // the viewport — by then the title has had a moment to read,
+    // and the trail fades in as the section settles. `once: true`
+    // semantics via `disconnect()` after the first trigger so the
+    // defaults never re-fire if the user scrolls past and back.
+    const apply = container.closest('.apply') ?? container;
+    const triggerOnce = () => {
+      requestAnimationFrame(fillDefaults);
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              io.disconnect();
+              triggerOnce();
+              break;
+            }
+          }
+        },
+        { threshold: 0.4 },
+      );
+      io.observe(apply);
+    } else {
+      triggerOnce();
+    }
   }
 
   if (document.readyState === 'loading') {

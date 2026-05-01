@@ -1,32 +1,64 @@
 ---
-import TenerifeCampLayout from '@/layouts/TenerifeCampLayout.astro';
-import CampOverview from '@/components/tenerife-camp/CampOverview.astro';
-import CourseTabs from '@/components/tenerife-camp/CourseTabs.astro';
-import ExperienceSection from '@/components/tenerife-camp/ExperienceSection.astro';
-import SafetySection from '@/components/tenerife-camp/SafetySection.astro';
-import ScheduleSection from '@/components/tenerife-camp/ScheduleSection.astro';
-import PricingSection from '@/components/tenerife-camp/PricingSection.astro';
-import FAQSection from '@/components/tenerife-camp/FAQSection.astro';
-import PartnersSection from '@/components/tenerife-camp/PartnersSection.astro';
-import FooterSection from '@/components/tenerife-camp/FooterSection.astro';
-import { tenerifeCampConfig } from '@/data/tenerifeCampConfig';
+import TenerifeCampV2Layout from '@/layouts/TenerifeCampV2Layout.astro';
+import SectionHero from '@/components/tenerife/SectionHero.astro';
+import SectionStory from '@/components/tenerife/SectionStory.astro';
+import SectionTeam from '@/components/tenerife/SectionTeam.astro';
+import SectionTracks from '@/components/tenerife/SectionTracks.astro';
+import SectionActivities from '@/components/tenerife/SectionActivities.astro';
+import SectionDayInLife from '@/components/tenerife/SectionDayInLife.astro';
+import SectionVenue from '@/components/tenerife/SectionVenue.astro';
+import SectionSafety from '@/components/tenerife/SectionSafety.astro';
+import SectionFaq from '@/components/tenerife/SectionFaq.astro';
+import SectionPricing from '@/components/tenerife/SectionPricing.astro';
+import SectionApply from '@/components/tenerife/SectionApply.astro';
+import SectionFooter from '@/components/tenerife/SectionFooter.astro';
+import SectionTestimonials from '@/components/tenerife/SectionTestimonials.astro';
+import type { Language } from '@/i18n/tenerife';
 
-const locale = 'es';
+const locale: Language = 'es';
 ---
 
-<TenerifeCampLayout
-  title="Campamento de Verano en Tenerife - IOAI España"
-  description="Un campamento de verano educativo en Tenerife que combina informática y matemáticas, actividades creativas y aventura al aire libre."
-  ctaUrlOverride={tenerifeCampConfig.registrationUrl.es}
-  ogImage="/og-tenerife-es.png"
->
-  <CampOverview locale={locale} />
-  <CourseTabs locale={locale} />
-  <ExperienceSection locale={locale} />
-  <SafetySection locale={locale} />
-  <ScheduleSection locale={locale} />
-  <PricingSection locale={locale} />
-  <FAQSection locale={locale} />
-  <PartnersSection locale={locale} />
-  <FooterSection locale={locale} />
-</TenerifeCampLayout>
+<!-- Inline early to block native scroll restoration BEFORE the browser
+     applies it. If set later (inside a module script), the browser has
+     already restored scroll and our pins/tilts measure against the
+     wrong position. -->
+<script is:inline>
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+</script>
+
+<TenerifeCampV2Layout locale={locale}>
+  <SectionHero theme="blue" locale={locale} />
+
+  <SectionStory theme="orange" locale={locale} />
+
+  <SectionTracks theme="blue" locale={locale} />
+
+  <SectionTeam theme="orange" locale={locale} />
+
+  <SectionActivities theme="blue" locale={locale} />
+
+  <SectionVenue theme="yellow" locale={locale} />
+
+  <SectionSafety theme="orange" locale={locale} />
+
+  <SectionDayInLife theme="blue" locale={locale} />
+
+  <SectionTestimonials theme="yellow" locale={locale} />
+
+  <SectionPricing theme="orange" locale={locale} />
+
+  <SectionFaq theme="blue" locale={locale} />
+
+  <SectionApply theme="orange" locale={locale} />
+
+  <SectionFooter theme="orange" locale={locale} />
+
+</TenerifeCampV2Layout>
+
+
+<script>
+  import { initTenerifeCampPage } from '@/scripts/tenerife/page-init';
+  initTenerifeCampPage();
+</script>

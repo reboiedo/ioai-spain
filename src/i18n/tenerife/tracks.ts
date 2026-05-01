@@ -19,11 +19,11 @@ interface FitItem {
 export const tracks = {
   eyebrow: createTranslation({
     en: 'learning',
-    es: 'aprendiendo'
+    es: 'rutas'
   }),
   title: createTranslation({
     en: 'TRACKS',
-    es: 'RUTAS'
+    es: 'FORMATIVAS'
   }),
   copy: createTranslation({
     en: 'Each student commits to one track for the two weeks — beginner or advanced. Ten sessions, 45 hours in total, taught in small groups by working researchers and engineers. The format is hands-on, and every track ends with something built.',

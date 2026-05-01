@@ -167,7 +167,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
       <!-- RIGHT — sticky big-title + overlapping tilted video poster.
            `HeroTitleStack` sizes each line so the shorter line's
            letters match the longer line's height (right-anchored). -->
-      <div class="story__right">
+      <div class="story__right" data-locale={locale}>
         <div class="story__title">
           <HeroTitleStack
             lines={[
@@ -183,6 +183,12 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
           />
         </div>
 
+        <!-- Video + spikes wrapper. Wrap is the single positioned
+             element on the column; spikes are nested INSIDE so they
+             travel with the video tile if its position is tweaked
+             (e.g. Spanish locale needs a different anchor to clear
+             the longer title). -->
+        <div class="story__video-wrap">
         <!-- Decorative spikes — anchored so the bottom-right corner
              sits at the top-left corner of the video tile (with a
              small gap). Same stepped tilt animation as the
@@ -235,6 +241,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
           )}
           <span class="story__video-play" aria-hidden="true">▶</span>
         </button>
+        </div>
       </div>
 
       <!-- Mux player overlay. Hidden until the trigger above is
@@ -549,7 +556,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
       padding-block: var(--space-xl);
       border-block-start: 1px solid var(--border);
       display: grid;
-      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr) minmax(0, 36ch);
+      grid-template-columns: minmax(0, 14rem) minmax(var(--space-l), 1fr) minmax(0, 68ch);
       column-gap: 0;
       align-items: start;
       align-self: auto;
@@ -561,7 +568,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
 
     .story-item__body {
       grid-column: 3;
-      max-width: 36ch;
+      max-width: 68ch;
     }
   }
 
@@ -592,17 +599,52 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
     display: block;
   }
 
-  /* Spikes — parked above-left of the video tile. Anchored via
-   * `right` + `bottom` so its BOTTOM-RIGHT corner sits near the
-   * video's TOP-LEFT corner. Video is at `left:18%; bottom:6%`
-   * with `aspect-ratio: 4/5; width:35%`, so its top edge lives
-   * roughly ~40% from the bottom of the column. The 3% offsets
-   * add a small gap before the corner-touch — easy to tune.
+  /* Wrap — the single positioned anchor that holds BOTH the video
+   * tile and the spikes. By making the wrap the absolute element,
+   * any locale-specific position tweak (e.g. Spanish nudges below)
+   * carries the spikes along automatically — they don't need their
+   * own per-locale rule.
+   *
+   * Defaults match the previous video position (`left:18%;
+   * bottom:6%; width:35%; aspect-ratio:4/5`) so nothing visually
+   * shifts for English.
+   *
+   * `--video-left` / `--video-bottom` are CSS custom props so a
+   * locale-scoped rule below can override them with one line. */
+  .story__video-wrap {
+    position: absolute;
+    width: var(--video-width, 35%);
+    aspect-ratio: 4 / 5;
+    left: var(--video-left, 18%);
+    bottom: var(--video-bottom, 6%);
+    z-index: 2;
+  }
+
+  /* Spanish title ("NUESTRA / HISTORIA") fills far more horizontal
+   * space than English ("ABOUT / US"), and the video at the default
+   * left:18% covers the second line. Push the wrap further left and
+   * down so it tucks under the title rather than over it. The
+   * spikes ride along because they're positioned relative to the
+   * wrap, not the column. */
+  .story__right[data-locale="es"] {
+    --video-left: 4%;
+    --video-width: 28%;
+  }
+  .story__right[data-locale="es"] .story__video-wrap {
+    bottom: auto;
+    top: -4%;
+  }
+
+  /* Spikes — anchored to the wrap (i.e. to the video). Bottom-right
+   * corner of the spikes sits just outside the top-left corner of
+   * the video tile with a small gap. Stays put if the video moves.
    * Stepped tilt loop matches the testimonials / SAFETY icon. */
   .story__spikes {
     position: absolute;
-    right: 79%;
-    bottom: 41%;  /* video top ≈ 40% from bottom; +1% gap */
+    right: 100%;
+    bottom: 100%;
+    margin-right: -2%;
+    margin-bottom: -18%;
     width: clamp(5rem, 11vw, 9rem);
     height: auto;
     transform-origin: 100% 100%;
@@ -627,31 +669,19 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
   @media (max-width: 767.98px) {
     .story__spikes {
       width: clamp(3.5rem, 16vw, 6rem);
-      right: 82%;
-      bottom: 46%;
     }
   }
 
-  /* Tilted video poster — fixed 4:5 aspect ratio, sized as a % of
-   * its containing block. Same `-8deg` tilt on every viewport so
-   * the visual matches across breakpoints. Anchored absolute on
-   * desktop (overlapping the title); falls back to normal flow,
-   * centred under the title on mobile. */
+  /* Tilted video poster — now positioned RELATIVE inside the wrap
+   * so the wrap controls layout and the tile fills it. `-8deg`
+   * tilt is unchanged. */
   .story__video {
     display: block;
-    /* `position: absolute` on every viewport — placed inside
-     * `.story__right` which is the relative containing block.
-     * Both size and offset are pure % of the column, so the
-     * video's relationship to the title scales identically on
-     * mobile and desktop. */
-    position: absolute;
-    width: 35%;
-    bottom: 6%;
-    left: 18%;
-    aspect-ratio: 4 / 5;
+    position: relative;
+    width: 100%;
+    height: 100%;
     margin: 0;
     transform: rotate(-8deg);
-    z-index: 2;
     border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);

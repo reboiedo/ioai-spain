@@ -133,7 +133,7 @@ const supervisors = t.safety.supervisors;
       <!-- RIGHT — sticky big-title stack + overlapping tilted safety
            photo. `HeroTitleStack` sizes each line so the shorter
            line's letters match the longer line's height. -->
-      <div class="safety__right">
+      <div class="safety__right" data-locale={locale}>
         <div class="safety__title">
           <HeroTitleStack
             lines={[
@@ -272,7 +272,11 @@ const supervisors = t.safety.supervisors;
 
   @media (min-width: 768px) {
     .safety__pillars {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      /* Cap each card at 22rem so they don't balloon into giant
+       * squares on ultra-wide displays — extra space falls to the
+       * grid's auto margins instead. */
+      grid-template-columns: repeat(2, minmax(0, 22rem));
+      justify-content: start;
     }
     .safety-pillar {
       aspect-ratio: 1 / 1;
@@ -485,7 +489,7 @@ const supervisors = t.safety.supervisors;
     display: block;
     position: absolute;
     width: 28%;
-    bottom: 28%;
+    bottom: var(--photo-bottom, 28%);
     left: 6%;
     aspect-ratio: 4 / 5;
     margin: 0;
@@ -495,6 +499,14 @@ const supervisors = t.safety.supervisors;
     overflow: hidden;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
     background: var(--card);
+  }
+
+  /* Spanish title ("SEGURIDAD / PRIMERO") sits in the same band
+   * as the photo on English — but in Spanish the photo overlaps
+   * SEGURIDAD instead of fitting between the two lines. Drop the
+   * photo down so it sits BELOW SEGURIDAD, in the PRIMERO band. */
+  .safety__right[data-locale="es"] {
+    --photo-bottom: 2%;
   }
 
   .safety__photo-img {
