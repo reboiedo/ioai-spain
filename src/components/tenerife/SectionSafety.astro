@@ -26,6 +26,7 @@
 import { Image, type ImageMetadata } from "astro:assets";
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import safetyImage from "@/assets/tenerife/safety/safety.jpg";
+import safetyIcon from "@/assets/tenerife/safety/safety.svg";
 
 // Eager-glob future supervisor portraits — same convention as
 // SectionTeam. Drop `name.jpg` (or .png/.webp) into
@@ -194,6 +195,20 @@ const supervisors: Supervisor[] = [
             defaultAlign="right"
             gap="var(--space-s)"
             maxWidth="80%"
+          />
+          <!-- Decorative safety icon — sits to the left of the
+               word SAFETY, vertically centred on that line. Same
+               stepped tilt animation as the testimonials chat
+               bubble. -->
+          <img
+            class="safety__title-icon"
+            src={safetyIcon.src}
+            width={safetyIcon.width}
+            height={safetyIcon.height}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
           />
           <!-- Handwritten "always" eyebrow — absolutely positioned
                between the two title lines, on the right side
@@ -460,11 +475,52 @@ const supervisors: Supervisor[] = [
     /* Shared script-eyebrow size — matches SectionActivities's
      * "Daily" eyebrow and SectionTitle's overlap/between
      * eyebrows so all script accents read at the same scale. */
-    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    font-size: var(--type-step-1);
     line-height: 1;
     color: var(--primary);
     pointer-events: none;
     z-index: 3;
+  }
+
+  /* Decorative safety icon — sits to the left of the SAFETY word
+   * (the top title line), vertically centred on it. SAFETY is the
+   * longest line in the stack, right-aligned within the 80% maxWidth
+   * band — so its left edge lands ~20% from the title's left edge.
+   * The icon parks just inside that, scaled to track the line height.
+   *
+   * Stepped tilt: same `steps(6)` choppy hand-drawn loop as the
+   * testimonials chat bubble. */
+  .safety__title-icon {
+    position: absolute;
+    /* Vertical centre of SAFETY — the top line in a two-line stack
+     * with a small gap. Roughly a quarter of the way down. */
+    top: 25%;
+    left: 4%;
+    width: clamp(3rem, 8vw, 7rem);
+    height: auto;
+    transform-origin: 50% 50%;
+    animation: safety-icon-tilt 2s steps(6) infinite;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  @keyframes safety-icon-tilt {
+    0%, 100% { transform: translateY(-50%) rotate(-4deg); }
+    50% { transform: translateY(-50%) rotate(3deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .safety__title-icon {
+      animation: none;
+      transform: translateY(-50%) rotate(-2deg);
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .safety__title-icon {
+      /* Keep it visible on mobile but a touch smaller. */
+      width: clamp(2.25rem, 14vw, 4rem);
+    }
   }
 
   /* Tilted safety photo — fixed 4:5 aspect ratio, sized as a % of

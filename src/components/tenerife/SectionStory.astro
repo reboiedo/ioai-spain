@@ -31,6 +31,18 @@ import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 import { Image, type ImageMetadata } from "astro:assets";
 import harbourLogo from "@/assets/harbour-space-logo.svg";
 import leaguesLogo from "@/assets/icons/leagues-logo.svg";
+import spikes from "@/assets/tenerife/story/spikes.svg";
+
+// Auto-discover the rotating poster set. Drop replacements into
+// `src/assets/tenerife/story/` (filenames sort `01-…`, `02-…`).
+const storyPosters: ImageMetadata[] = Object.entries(
+  import.meta.glob<{ default: ImageMetadata }>(
+    "@/assets/tenerife/story/*.{jpg,jpeg,png,webp,avif}",
+    { eager: true },
+  ),
+)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, mod]) => mod.default);
 
 export interface Props {
   /** Tenerife theme palette to apply via `data-theme`. */
@@ -191,6 +203,21 @@ const facts: { label: string; value: string }[] = [
           />
         </div>
 
+        <!-- Decorative spikes — anchored so the bottom-right corner
+             sits at the top-left corner of the video tile (with a
+             small gap). Same stepped tilt animation as the
+             testimonials chat bubble and the SAFETY icon. -->
+        <img
+          class="story__spikes"
+          src={spikes.src}
+          width={spikes.width}
+          height={spikes.height}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+        />
+
         <!-- Video poster — tilted, sits between the two title lines
              (overlapping both visually). Click to play (currently
              links out — wire to inline player later). -->
@@ -208,6 +235,21 @@ const facts: { label: string; value: string }[] = [
               sizes="(min-width: 768px) 30vw, 70vw"
               loading="lazy"
             />
+          ) : storyPosters.length > 0 ? (
+            <div class="story__video-stack" data-story-stack>
+              {storyPosters.map((src, i) => (
+                <Image
+                  class="story__video-img story__video-img--stacked"
+                  src={src}
+                  alt=""
+                  widths={[480, 720, 960]}
+                  sizes="(min-width: 768px) 30vw, 70vw"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  data-story-frame
+                  data-active={i === 0 ? "true" : undefined}
+                />
+              ))}
+            </div>
           ) : (
             <div class="story__video-placeholder" aria-hidden="true"></div>
           )}
@@ -514,6 +556,46 @@ const facts: { label: string; value: string }[] = [
     display: block;
   }
 
+  /* Spikes — parked above-left of the video tile. Anchored via
+   * `right` + `bottom` so its BOTTOM-RIGHT corner sits near the
+   * video's TOP-LEFT corner. Video is at `left:18%; bottom:6%`
+   * with `aspect-ratio: 4/5; width:35%`, so its top edge lives
+   * roughly ~40% from the bottom of the column. The 3% offsets
+   * add a small gap before the corner-touch — easy to tune.
+   * Stepped tilt loop matches the testimonials / SAFETY icon. */
+  .story__spikes {
+    position: absolute;
+    right: 79%;
+    bottom: 41%;  /* video top ≈ 40% from bottom; +1% gap */
+    width: clamp(5rem, 11vw, 9rem);
+    height: auto;
+    transform-origin: 100% 100%;
+    animation: story-spikes-tilt 2s steps(6) infinite;
+    pointer-events: none;
+    z-index: 3;
+    color: var(--foreground);
+  }
+
+  @keyframes story-spikes-tilt {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story__spikes {
+      animation: none;
+      transform: rotate(-2deg);
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .story__spikes {
+      width: clamp(3.5rem, 16vw, 6rem);
+      right: 82%;
+      bottom: 46%;
+    }
+  }
+
   /* Tilted video poster — fixed 4:5 aspect ratio, sized as a % of
    * its containing block. Same `-8deg` tilt on every viewport so
    * the visual matches across breakpoints. Anchored absolute on
@@ -548,6 +630,32 @@ const facts: { label: string; value: string }[] = [
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  /* Fading poster stack — every frame absolutely fills the tile;
+   * only the one with `data-active="true"` is visible. CSS
+   * transitions handle the crossfade; a small script flips the
+   * active frame every 4s. */
+  .story__video-stack {
+    position: absolute;
+    inset: 0;
+  }
+
+  .story__video-img--stacked {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 900ms ease;
+  }
+
+  .story__video-img--stacked[data-active="true"] {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story__video-img--stacked {
+      transition: none;
+    }
   }
 
   .story__video-placeholder {
@@ -585,3 +693,46 @@ const facts: { label: string; value: string }[] = [
     background: rgba(0, 0, 0, 0.7);
   }
 </style>
+
+<script>
+  /**
+   * Story poster stack — crossfades through frames every 4s.
+   * Pure DOM: toggles `data-active` on the next frame; CSS handles
+   * the opacity transition.
+   */
+  function initStoryStack() {
+    const stacks = document.querySelectorAll<HTMLElement>('[data-story-stack]');
+    stacks.forEach((stack) => {
+      const frames = Array.from(
+        stack.querySelectorAll<HTMLElement>('[data-story-frame]'),
+      );
+      if (frames.length < 2) return;
+      let i = 0;
+      const tick = () => {
+        frames[i].removeAttribute('data-active');
+        i = (i + 1) % frames.length;
+        frames[i].setAttribute('data-active', 'true');
+      };
+      const id = window.setInterval(tick, 4000);
+      // Stop the interval if the section is removed (Astro view
+      // transitions). Re-init runs on `astro:page-load`.
+      stack.dataset.storyStackTimer = String(id);
+    });
+  }
+
+  function cleanupStoryStack() {
+    document.querySelectorAll<HTMLElement>('[data-story-stack]').forEach((s) => {
+      const id = Number(s.dataset.storyStackTimer);
+      if (id) window.clearInterval(id);
+      delete s.dataset.storyStackTimer;
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStoryStack, { once: true });
+  } else {
+    initStoryStack();
+  }
+  document.addEventListener('astro:before-swap', cleanupStoryStack);
+  document.addEventListener('astro:page-load', initStoryStack);
+</script>

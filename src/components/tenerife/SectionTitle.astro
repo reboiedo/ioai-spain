@@ -277,7 +277,7 @@ const mobileMaxWidth = Math.max(...mobileLineWidths, 1);
      * matches SectionActivities's "Daily" and SectionSafety's
      * "always" so every script accent reads at the same scale,
      * regardless of the parent title's size. */
-    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    font-size: var(--type-step-1);
     /* Counter-clockwise tilt, pivoting at the bottom-left so the
      * script's baseline anchors naturally onto the title. */
     transform: rotate(-6deg);
@@ -293,7 +293,7 @@ const mobileMaxWidth = Math.max(...mobileLineWidths, 1);
     top: 50%;
     left: 50%;
     /* Shared script-eyebrow size — see `--overlap`. */
-    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    font-size: var(--type-step-1);
     transform: translate(-50%, -50%) rotate(-6deg);
     transform-origin: center;
   }

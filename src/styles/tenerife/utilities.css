@@ -71,7 +71,14 @@
      * versions used a tighter calc — fine for plain paragraphs
      * but cramped for sections that end with extra UI like the
      * `HScrollMobile` progress rail. */
-    --cta-clearance: var(--space-6xl);
+    --cta-clearance: var(--space-4xl);
+    /* Tighten the section vertical rhythm on mobile. The desktop
+     * value (`--space-4xl`) reads spacious on narrow viewports;
+     * combined with `--cta-clearance` it stacks ~13–19rem between
+     * every section, which made the scroll cadence feel laggy and
+     * unpredictable. `--space-2xl` keeps real breathing room
+     * without ballooning the gap. */
+    --section-block: var(--space-2xl);
   }
 }
 

@@ -378,6 +378,16 @@ const {
   body:has(.tenerife-camp-v2) {
     background-color: var(--background);
     transition: background-color 150ms ease;
+    /* Kill Safari's rubber-band overscroll. Lenis's lerped scroll
+     * combined with native bounce produces a visible "scroll past
+     * footer then snap back" jump at the page bottom (and a smaller
+     * version at the top). `overscroll-behavior-y: none` disables
+     * the bounce so the page hard-stops at its bounds. */
+    overscroll-behavior-y: none;
+  }
+
+  html:has(.tenerife-camp-v2) {
+    overscroll-behavior-y: none;
   }
 
   .tenerife-camp-v2 {

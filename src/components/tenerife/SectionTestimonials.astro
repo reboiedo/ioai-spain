@@ -31,6 +31,7 @@ import quoteAlejandro from "@/assets/tenerife/testimonials/quote-alejandro.png";
 import quoteMaxim from "@/assets/tenerife/testimonials/quote-maxim.png";
 import quoteAnna from "@/assets/tenerife/testimonials/quote-anna.png";
 import quoteJaime from "@/assets/tenerife/testimonials/quote-jaime.png";
+import chatBubble from "@/assets/tenerife/testimonials/chat-bubble.svg";
 
 export interface Props {
   /** Tenerife theme palette to apply via `data-theme`. */
@@ -94,6 +95,22 @@ const testimonials: Testimonial[] = [
     <div class="testimonials__hero" aria-hidden="true">
       <HeroTitle>TESTIMONIALS</HeroTitle>
     </div>
+
+    <!-- Decorative chat bubble (matches follow.art's testimonials
+         block). Sits between the giant TESTIMONIALS type and the
+         active card, with a stepped wobble for a choppy hand-drawn
+         feel. Paints above the hero title (same z-index, later in
+         DOM order) and below the slider stage (z-index: 2). -->
+    <img
+      class="testimonials__bubble"
+      src={chatBubble.src}
+      width={chatBubble.width}
+      height={chatBubble.height}
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+    />
 
     <!-- DESKTOP layout: horizontal track of cards with the
          active card framed by the stage. Adjacent cards peek
@@ -262,6 +279,44 @@ const testimonials: Testimonial[] = [
     width: 100%;
     height: auto;
     display: block;
+  }
+
+  /* Decorative speech bubble — sits behind the active card, in front
+   * of the giant TESTIMONIALS title. Width-based clamp keeps it
+   * proportionally placed across viewports. */
+  .testimonials__bubble {
+    position: absolute;
+    top: 22%;
+    left: 8%;
+    width: clamp(8rem, 14vw, 16rem);
+    height: auto;
+    z-index: 1; /* above hero title (z:1, earlier in DOM), below slider (z:2) */
+    pointer-events: none;
+    /* Stepped tilt: very choppy hand-drawn loop. `steps(6)` over a
+     * 2s duration = one frame every ~333ms = 3 visible snaps per
+     * second. Lower step count → more poster-like / cartoon-cel feel. */
+    transform-origin: 35% 65%; /* anchor near the bubble's tail */
+    animation: testi-bubble-tilt 2s steps(6) infinite;
+  }
+
+  @keyframes testi-bubble-tilt {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .testimonials__bubble {
+      animation: none;
+      transform: rotate(-2deg);
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    /* Mobile uses the in-flow `SectionTitle` + h-scroll list — the
+     * decorative bubble would crowd the cards on narrow viewports. */
+    .testimonials__bubble {
+      display: none;
+    }
   }
 
   @media (max-width: 767.98px) {

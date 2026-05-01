@@ -20,6 +20,7 @@
  */
 
 import { Image, type ImageMetadata } from "astro:assets";
+import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
 
 const photoModules = import.meta.glob<{ default: ImageMetadata }>(
@@ -296,6 +297,46 @@ const total = activities.length;
       </div>
 
     </div>
+
+    <!-- ── Mobile polaroid stack ─────────────────────────────────
+         On <768px the desktop activity-browser is hidden and this
+         block takes over: a horizontal-snap row of polaroid cards.
+         Tap a card to flip its bottom row from photo → description.
+         Same card pattern as the original v1 mobile experience. -->
+    <div class="adv__mobile">
+      <HScrollMobile itemWidth="min(80%, 320px)">
+        {activities.map((a, i) => (
+          <button
+            type="button"
+            class="ap-card"
+            aria-expanded="false"
+            data-ap-card
+            aria-label={`Day ${a.day}: ${a.title} — tap to read description`}
+          >
+            <div class="ap-card__photo">
+              {photos[i] && (
+                <Image
+                  class="ap-card__img"
+                  src={photos[i]}
+                  alt={a.title}
+                  widths={[320, 480, 640]}
+                  sizes="80vw"
+                  loading="lazy"
+                />
+              )}
+            </div>
+            <div class="ap-card__head">
+              <p class="font-caption ap-card__day">Day {a.day}</p>
+              <h3 class="font-caption-script ap-card__title">{a.title}</h3>
+            </div>
+            <div class="ap-card__body">
+              <p class="font-body-s ap-card__description">{a.description}</p>
+            </div>
+            <span class="ap-card__cue" aria-hidden="true"></span>
+          </button>
+        ))}
+      </HScrollMobile>
+    </div>
   </section>
 </div>
 
@@ -348,7 +389,7 @@ const total = activities.length;
     /* Shared script-eyebrow size — matches SectionSafety's
      * "always" eyebrow and SectionTitle's overlap/between
      * eyebrows so all script accents read at the same scale. */
-    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    font-size: var(--type-step-1);
     pointer-events: none;
     z-index: 2;
   }
@@ -358,7 +399,35 @@ const total = activities.length;
     max-width: 60ch;
   }
 
-  /* ── Activity browser ────────────────────────────────────────── */
+  /* ── Mobile / desktop swap ──────────────────────────────────────
+   * `.adv__browser` (the unified single-frame browser) is the desktop
+   * presentation; `.adv__mobile` (the polaroid h-scroll) is the
+   * mobile presentation. They never coexist — each one is hidden on
+   * the other breakpoint. The `.adv__browser` block-level rules
+   * below still apply on desktop; they're overridden to `display:
+   * none` on mobile by the rule right below. */
+  .adv__mobile {
+    display: block;
+  }
+
+  @media (max-width: 767.98px) {
+    .adv__browser {
+      display: none !important;
+    }
+    /* Runway below the polaroid row so the sticky Join CTA pinned
+     * to the viewport bottom doesn't crash into the last card. */
+    .adv__mobile {
+      padding-block-end: var(--space-3xl);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .adv__mobile {
+      display: none;
+    }
+  }
+
+  /* ── Activity browser (desktop) ──────────────────────────────── */
   .adv__browser {
     /* Browser fills exactly one viewport MINUS the fixed nav so
      * nothing clips behind the nav strip when the section comes
@@ -705,6 +774,127 @@ const total = activities.length;
 
   .adv__nav-arrow {
     stroke: var(--primary-foreground);
+  }
+
+  /* ── Mobile polaroid card ───────────────────────────────────────
+   * 3-row grid (photo / head / body). Closed: photo dominates with
+   * the day + title strip beneath it. Open: photo collapses to 0fr
+   * and body expands to 1fr — the head sits between them and rides
+   * up as the photo collapses. `grid-template-rows` is animated. */
+  .ap-card {
+    appearance: none;
+    background: #f4efe7;
+    color: #1a1a1a;
+    border: 0;
+    padding: var(--space-m);
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: 4px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+    overflow: hidden;
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr auto 0fr;
+    gap: var(--space-s);
+    transition: grid-template-rows 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ap-card[aria-expanded="true"] {
+    grid-template-rows: 0fr auto 1fr;
+  }
+
+  .ap-card:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 4px;
+  }
+
+  .ap-card__photo,
+  .ap-card__head,
+  .ap-card__body {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .ap-card__photo {
+    border-radius: 2px;
+    transition: opacity 0.4s ease;
+  }
+  .ap-card[aria-expanded="true"] .ap-card__photo {
+    opacity: 0;
+  }
+
+  .ap-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ap-card__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+  }
+  .ap-card__day {
+    margin: 0;
+    opacity: 0.55;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+  .ap-card__title {
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .ap-card__body {
+    opacity: 0;
+    transition: opacity 0.35s ease 0.1s;
+  }
+  .ap-card[aria-expanded="true"] .ap-card__body {
+    opacity: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .ap-card__description {
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  /* `+` corner cue rotates to `×` when card is open. */
+  .ap-card__cue {
+    position: absolute;
+    bottom: var(--space-s);
+    right: var(--space-s);
+    width: 1.25rem;
+    height: 1.25rem;
+    pointer-events: none;
+    color: rgba(0, 0, 0, 0.55);
+    z-index: 1;
+  }
+  .ap-card__cue::before,
+  .ap-card__cue::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1.5px;
+    background: currentColor;
+    transform-origin: center;
+    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ap-card__cue::after {
+    transform: rotate(90deg);
+  }
+  .ap-card[aria-expanded="true"] .ap-card__cue::before {
+    transform: rotate(45deg);
+  }
+  .ap-card[aria-expanded="true"] .ap-card__cue::after {
+    transform: rotate(-45deg);
   }
 </style>
 
@@ -1511,4 +1701,31 @@ const total = activities.length;
     init();
   }
   document.addEventListener('astro:page-load', init);
+
+  /**
+   * Mobile polaroid flip — toggle each `[data-ap-card]` between
+   * photo-dominant (closed) and description-dominant (open) by
+   * flipping its `aria-expanded`. The CSS animates the
+   * `grid-template-rows` between `1fr auto 0fr` and `0fr auto 1fr`,
+   * so the photo collapses and the body fills the freed space.
+   * Tap anywhere on the card to flip; tapping again restores.
+   */
+  function initPolaroidFlip() {
+    const cards = document.querySelectorAll<HTMLButtonElement>(
+      '[data-ap-card]',
+    );
+    cards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const open = card.getAttribute('aria-expanded') === 'true';
+        card.setAttribute('aria-expanded', open ? 'false' : 'true');
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPolaroidFlip, { once: true });
+  } else {
+    initPolaroidFlip();
+  }
+  document.addEventListener('astro:page-load', initPolaroidFlip);
 </script>
