@@ -250,12 +250,20 @@ const total = activities.length;
     display: flex;
     flex-direction: column;
     gap: var(--space-3xl);
-    /* Drop the section's default bottom padding so the activity
-     * browser's bottom edge sits flush against the scene bottom.
-     * When the scene pins (data-scene → bottom-bottom), this
-     * means the browser fills the visible viewport below the nav
-     * exactly — no slack, no clipping. */
-    padding-block-end: 0;
+  }
+
+  @media (min-width: 768px) {
+    /* Desktop: drop the section's default bottom padding so the
+     * activity browser's bottom edge sits flush against the scene
+     * bottom. When the scene pins (data-scene → bottom-bottom)
+     * the browser fills the visible viewport below the nav
+     * exactly — no slack, no clipping. Scoped to desktop only so
+     * the mobile polaroid path keeps the standard
+     * `--section-block + --cta-clearance` runway that every other
+     * mobile section uses. */
+    .adv {
+      padding-block-end: 0;
+    }
   }
 
   /* ── Hero block ─────────────────────────────────────────────── */
@@ -314,11 +322,13 @@ const total = activities.length;
     .adv__browser {
       display: none !important;
     }
-    /* Runway below the polaroid row so the sticky Join CTA pinned
-     * to the viewport bottom doesn't crash into the last card. */
-    .adv__mobile {
-      padding-block-end: var(--space-3xl);
-    }
+    /* No per-mobile padding override — the section's default
+     * `padding-block-end: calc(--section-block + --cta-clearance)`
+     * already provides enough runway to clear the sticky Join CTA
+     * even when a polaroid is expanded. Matches the runway used
+     * by every other mobile section (Coaches, Story, Day in Life
+     * etc.) so the scroll cadence into the next scene feels
+     * uniform. */
   }
 
   @media (min-width: 768px) {
@@ -677,10 +687,16 @@ const total = activities.length;
   }
 
   /* ── Mobile polaroid card ───────────────────────────────────────
-   * 3-row grid (photo / head / body). Closed: photo dominates with
-   * the day + title strip beneath it. Open: photo collapses to 0fr
-   * and body expands to 1fr — the head sits between them and rides
-   * up as the photo collapses. `grid-template-rows` is animated. */
+   * 3-row grid (photo / head / body). The photo cell is always a
+   * square crop (`aspect-ratio: 1 / 1` on `.ap-card__photo` below).
+   * Closed: body row collapsed to 0fr, card height = square photo
+   * + head. Open: body expands to 1fr revealing the description
+   * underneath the photo. The photo stays put — no collapse, no
+   * fade — so the image is always visible at its full square size.
+   *
+   * Card height is content-driven (no `aspect-ratio` on the card
+   * itself) so the strip respects the photo's square footprint
+   * regardless of viewport width. */
   .ap-card {
     appearance: none;
     background: #f4efe7;
@@ -692,19 +708,18 @@ const total = activities.length;
     cursor: pointer;
     text-align: left;
     width: 100%;
-    aspect-ratio: 4 / 5;
     border-radius: 4px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
     overflow: hidden;
     position: relative;
     display: grid;
-    grid-template-rows: 1fr auto 0fr;
+    grid-template-rows: auto auto 0fr;
     gap: var(--space-s);
     transition: grid-template-rows 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .ap-card[aria-expanded="true"] {
-    grid-template-rows: 0fr auto 1fr;
+    grid-template-rows: auto auto 1fr;
   }
 
   .ap-card:focus-visible {
@@ -720,11 +735,11 @@ const total = activities.length;
   }
 
   .ap-card__photo {
+    /* Always a square crop — image inside fills via object-fit:
+     * cover, so portrait/landscape source photos all read as
+     * uniform polaroid squares regardless of original aspect. */
+    aspect-ratio: 1 / 1;
     border-radius: 2px;
-    transition: opacity 0.4s ease;
-  }
-  .ap-card[aria-expanded="true"] .ap-card__photo {
-    opacity: 0;
   }
 
   .ap-card__img {

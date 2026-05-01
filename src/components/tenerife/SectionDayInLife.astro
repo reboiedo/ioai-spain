@@ -68,6 +68,19 @@ const photos: ImageMetadata[] = Object.entries(sourceModules)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([, mod]) => mod.default)
   .slice(0, slots.length);
+
+// Mobile marquee: two rows of small thumbnails scrolling in opposite
+// directions above the schedule cards. Row B starts halfway through
+// the photo set so the two rows aren't visually synced. Each row is
+// duplicated in markup so the JS-driven transform can wrap seamlessly
+// (translate by `halfWidth` puts the second copy exactly where the
+// first started).
+const marqueeRowA = photos;
+const marqueeOffset = Math.max(1, Math.floor(photos.length / 2));
+const marqueeRowB = [
+  ...photos.slice(marqueeOffset),
+  ...photos.slice(0, marqueeOffset),
+];
 ---
 
 <div class="scene" data-scene data-scene-index="8">
@@ -156,6 +169,43 @@ const photos: ImageMetadata[] = Object.entries(sourceModules)
       <SectionTitle lines={[t.dayInLife.titleMobile]} />
       <p class="font-body-l day__mobile-intro">{t.dayInLife.intro}</p>
 
+      {photos.length > 0 && (
+        <div class="day__marquee" aria-hidden="true">
+          <div class="day__marquee-row" data-day-marquee-row data-direction="right" data-offset-cards="0">
+            <div class="day__marquee-track" data-day-marquee-track>
+              {[...marqueeRowA, ...marqueeRowA].map((photo) => (
+                <div class="day__marquee-card">
+                  <Image
+                    src={photo}
+                    alt=""
+                    widths={[180, 240, 320]}
+                    sizes="9rem"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="day__marquee-row" data-day-marquee-row data-direction="right" data-offset-cards="0.5">
+            <div class="day__marquee-track" data-day-marquee-track>
+              {[...marqueeRowB, ...marqueeRowB].map((photo) => (
+                <div class="day__marquee-card">
+                  <Image
+                    src={photo}
+                    alt=""
+                    widths={[180, 240, 320]}
+                    sizes="9rem"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <HScrollMobile itemWidth="min(80%, 320px)">
         {slots.map((s) => (
           <article class="day-card">
@@ -198,6 +248,87 @@ const photos: ImageMetadata[] = Object.entries(sourceModules)
   .day__mobile-intro {
     margin: 0;
     max-width: 52ch;
+  }
+
+  /* ── Mobile marquee ────────────────────────────────────────────
+   * Two rows of square-ish photo cards drifting in opposite
+   * directions above the schedule. Visible on mobile only —
+   * desktop already has the photo trail in the sticky left column.
+   *
+   * Cards repeat 2x in markup; JS wraps the transform at half the
+   * track's measured width so the loop is seamless. Full-bleed
+   * margin lets the rows run to the screen edges so cards visibly
+   * enter/exit instead of fading at a section gutter. */
+  .day__marquee {
+    display: none;
+  }
+
+  @media (max-width: 767.98px) {
+    .day__marquee {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-s);
+      /* Bulletproof full-bleed: ignore whatever padding sits on
+       * ancestors and span the viewport edge-to-edge. The
+       * `calc(50% - 50vw)` margin pattern positions the element's
+       * left edge at viewport 0 and right edge at viewport width
+       * regardless of nested padding/margins above. We pair that
+       * with `width: 100vw` so the box is exactly the viewport. */
+      width: 100vw;
+      max-width: 100vw;
+      margin-inline-start: calc(50% - 50vw);
+      margin-inline-end: calc(50% - 50vw);
+      /* `overflow: hidden` on the marquee itself (not just its rows)
+       * prevents the inner `width: max-content` track from leaking
+       * out and stretching the parent grid column. Without this,
+       * `.day__mobile`'s grid track grows to the track's intrinsic
+       * width and the SVG-based SectionTitle (which sizes to its
+       * container) blows up to span the entire photo strip. */
+      overflow: hidden;
+    }
+  }
+
+  .day__marquee-row {
+    overflow: hidden;
+    /* Without `min-width: 0` the row claims its child track's
+     * intrinsic min-content (= max-content here) regardless of
+     * `overflow: hidden`, leaving the parent unable to shrink. */
+    min-width: 0;
+    width: 100%;
+  }
+
+  .day__marquee-track {
+    display: flex;
+    gap: var(--space-s);
+    width: max-content;
+    /* JS owns the running transform; the CSS keeps the track parked
+     * at 0,0,0 on first paint to avoid a flash of unmoved cards. */
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+
+  .day__marquee-card {
+    flex: 0 0 auto;
+    width: clamp(7rem, 28vw, 9rem);
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  }
+
+  .day__marquee-card :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Respect reduced motion — drop the auto-scroll animation entirely. */
+  @media (prefers-reduced-motion: reduce) {
+    .day__marquee {
+      display: none;
+    }
   }
 
   .day-in-life {
@@ -666,4 +797,125 @@ const photos: ImageMetadata[] = Object.entries(sourceModules)
     (window as any).__dayInLifeHooked = false;
     install();
   });
+
+  /**
+   * Mobile marquee — two rows of photo cards drifting in opposite
+   * directions above the schedule cards. JS-driven (rather than CSS
+   * keyframes) for two reasons:
+   *   - smoother on iOS Safari with long tracks (CSS animations on
+   *     wide elements can stutter under Lenis-driven scroll)
+   *   - cheap to pause on touch + resume on release, which matches
+   *     the rest of the page's tactile interactions
+   *
+   * Each track holds its photo set duplicated 2x in markup. We wrap
+   * the running x-translate at `halfWidth` (= one original set) so
+   * the loop is seamless: at the wrap point, the second copy sits
+   * exactly where the first started, no visible jump.
+   *
+   * Skipped under `prefers-reduced-motion: reduce` (the CSS already
+   * hides the marquee in that case; this guard avoids running rAF
+   * for nothing).
+   */
+  type MarqueeRunner = { stop: () => void };
+  const marqueeRunners: MarqueeRunner[] = [];
+
+  function stopMarquees() {
+    while (marqueeRunners.length) {
+      marqueeRunners.pop()?.stop();
+    }
+  }
+
+  function initMarquee() {
+    stopMarquees();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const rows = document.querySelectorAll<HTMLElement>(
+      '[data-day-marquee-row]',
+    );
+    rows.forEach((row) => {
+      const track = row.querySelector<HTMLElement>('[data-day-marquee-track]');
+      if (!track) return;
+
+      const direction = row.dataset.direction === 'right' ? 1 : -1;
+      // Pixels per second. Slow enough to read individual photos
+      // but quick enough that the row visibly moves on a still
+      // viewport. Tune by feel.
+      const SPEED = 14;
+
+      // Brick-offset support: rows can declare a starting horizontal
+      // shift expressed in card widths via `data-offset-cards`
+      // (e.g. "0.5" = stagger by half a card). Read from the live
+      // first card so the offset adapts to the breakpoint-driven
+      // `clamp()` width without us hardcoding pixels.
+      const firstCard = track.querySelector<HTMLElement>(
+        '.day__marquee-card',
+      );
+      const cardWidth = firstCard ? firstCard.offsetWidth : 0;
+      const gapPx = parseFloat(getComputedStyle(track).columnGap) || 0;
+      const offsetCards = parseFloat(row.dataset.offsetCards ?? '0') || 0;
+      const offsetPx = offsetCards * (cardWidth + gapPx);
+
+      let halfWidth = track.scrollWidth / 2;
+      // Right-moving rows start with their second copy showing (x = -halfWidth)
+      // so the first-copy slide-in feels natural rather than empty.
+      // Add the per-row offset so neighbouring rows visibly stagger.
+      let x = direction === 1 ? -halfWidth + offsetPx : -offsetPx;
+      let last = performance.now();
+      let raf = 0;
+      let paused = false;
+
+      const ro = new ResizeObserver(() => {
+        const next = track.scrollWidth / 2;
+        if (next > 0) halfWidth = next;
+      });
+      ro.observe(track);
+
+      function step(now: number) {
+        const dt = (now - last) / 1000;
+        last = now;
+        if (!paused && halfWidth > 0) {
+          x += direction * SPEED * dt;
+          // Wrap so the duplicated content keeps the loop seamless.
+          if (direction === -1 && x <= -halfWidth) x += halfWidth;
+          if (direction === 1 && x >= 0) x -= halfWidth;
+          track.style.transform = `translate3d(${x}px, 0, 0)`;
+        }
+        raf = requestAnimationFrame(step);
+      }
+      raf = requestAnimationFrame((t) => {
+        last = t;
+        step(t);
+      });
+
+      const pause = () => {
+        paused = true;
+      };
+      const resume = () => {
+        paused = false;
+      };
+      row.addEventListener('pointerdown', pause, { passive: true });
+      row.addEventListener('pointerup', resume);
+      row.addEventListener('pointercancel', resume);
+      row.addEventListener('pointerleave', resume);
+
+      marqueeRunners.push({
+        stop: () => {
+          cancelAnimationFrame(raf);
+          ro.disconnect();
+          row.removeEventListener('pointerdown', pause);
+          row.removeEventListener('pointerup', resume);
+          row.removeEventListener('pointercancel', resume);
+          row.removeEventListener('pointerleave', resume);
+        },
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMarquee, { once: true });
+  } else {
+    initMarquee();
+  }
+  document.addEventListener('astro:page-load', initMarquee);
+  document.addEventListener('astro:before-swap', stopMarquees);
 </script>
