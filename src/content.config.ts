@@ -52,7 +52,7 @@ const forms = defineCollection({
       subtitle: z.string().optional(),
       action: z.string().optional(), // Optional when using template
       fields: z.array(z.object({
-        type: z.enum(['text', 'email', 'select', 'textarea', 'checkbox', 'radio', 'date']),
+        type: z.enum(['text', 'email', 'tel', 'select', 'textarea', 'checkbox', 'radio', 'date']),
         name: z.string(),
         label: z.string(),
         placeholder: z.string().optional(),

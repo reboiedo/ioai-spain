@@ -12,7 +12,7 @@ export interface Props {
       subtitle?: string;
       action?: string;
       fields?: Array<{
-        type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
+        type: 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
         name: string;
         label: string;
         placeholder?: string;
@@ -44,7 +44,7 @@ type ResolvedForm = {
   subtitle?: string;
   action: string;
   fields: Array<{
-    type: 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
+    type: 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
     name: string;
     label: string;
     placeholder?: string;

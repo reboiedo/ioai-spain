@@ -1,6 +1,6 @@
 import { getOptionLabel } from '../data/campPricingConfig';
 
-export type FormFieldType = 'text' | 'email' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
+export type FormFieldType = 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
 
 export interface FormFieldOption {
   value: string;
@@ -258,6 +258,23 @@ export const FORM_FIELDS: Record<string, LocalizedFormField> = {
       label: 'Email del Tutor',
       placeholder: 'Ingrese el email del tutor',
       required: false
+    }
+  },
+
+  phone: {
+    en: {
+      type: 'tel',
+      name: 'phone',
+      label: 'Phone Number',
+      placeholder: '+34 600 000 000',
+      required: true
+    },
+    es: {
+      type: 'tel',
+      name: 'phone',
+      label: 'Número de Teléfono',
+      placeholder: '+34 600 000 000',
+      required: true
     }
   },
 

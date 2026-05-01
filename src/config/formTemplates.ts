@@ -100,6 +100,7 @@ export const FORM_TEMPLATES: Record<string, FormTemplate> = {
       "guardianEmail",   // Conditional: shown if under 18 or parent signing up child
       "fullName",        // Participant name
       "email",           // Participant email
+      "phone",           // Contact phone (used for sales follow-up + Enhanced Conversions)
       "gender",          // Participant gender (for diversity tracking)
       "schoolName",      // School name
       "tshirtSize",      // Participant t-shirt size
