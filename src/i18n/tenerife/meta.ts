@@ -6,8 +6,8 @@ export const meta = {
     es: 'Tenerife Camp — IOAI España'
   }),
   description: createTranslation({
-    en: 'A two-week IOAI Spain training camp on the slopes of Mount Teide. AI, mathematics, and outdoor adventure for ages 14–18.',
-    es: 'Un campamento de entrenamiento IOAI España de dos semanas en las laderas del Teide. IA, matemáticas y aventura al aire libre para edades 14–18.'
+    en: 'Two weeks of AI, mathematics and outdoor adventure on the slopes of Mount Teide, for curious students aged 10 to 20.',
+    es: 'Dos semanas de IA, matemáticas y aventura al aire libre en las laderas del Teide, para estudiantes curiosos de 10 a 20 años.'
   }),
   ogImage: createTranslation({
     en: '/og-tenerife.png',

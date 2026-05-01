@@ -22,7 +22,7 @@ export const hero = {
     es: '5 — 19 de julio, 2026'
   }),
   ledeLine: createTranslation({
-    en: 'the IOAI Spain training camp on the slopes of Mount Teide.',
-    es: 'el campamento de entrenamiento de IOAI España en las laderas del Teide.'
+    en: 'Two weeks of AI, mathematics and outdoor adventure for curious students aged 10 to 20.',
+    es: 'Dos semanas de IA, matemáticas y aventura al aire libre para estudiantes curiosos de 10 a 20 años.'
   })
 } as const;

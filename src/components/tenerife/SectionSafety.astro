@@ -248,13 +248,15 @@ const supervisors = t.safety.supervisors;
     margin: 0;
   }
 
-  /* Pillars — 2×2 surface cards. Number top, title, description. */
+  /* Pillars — single column on mobile (cards flow at content height,
+   * no aspect-ratio constraint), 2×2 grid on desktop where the
+   * fixed 1:1 aspect keeps the cards visually balanced. */
   .safety__pillars {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-s);
   }
 
@@ -266,10 +268,12 @@ const supervisors = t.safety.supervisors;
     display: flex;
     flex-direction: column;
     gap: var(--space-2xs);
-    aspect-ratio: 4 / 5;
   }
 
   @media (min-width: 768px) {
+    .safety__pillars {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .safety-pillar {
       aspect-ratio: 1 / 1;
     }

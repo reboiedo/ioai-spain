@@ -17,8 +17,8 @@ export const activities = {
     es: 'AVENTURAS'
   }),
   intro: createTranslation({
-    en: 'Outside of study hours, campers have a full schedule of activities across Tenerife — beaches, national parks, historic towns, and cultural workshops. Two weeks of afternoons and evenings, planned but never crammed.',
-    es: 'Fuera de las horas de estudio, los campistas tienen una agenda completa de actividades por toda Tenerife — playas, parques nacionales, pueblos históricos y talleres culturales. Dos semanas de tardes y noches, planificadas pero nunca sobrecargadas.'
+    en: 'Outside of study hours, campers have a full schedule of activities across Tenerife — beaches, national parks, historic towns and more.',
+    es: 'Fuera de las horas de estudio, los campistas tienen una agenda completa de actividades por toda Tenerife — playas, parques nacionales, pueblos históricos y más.'
   }),
   /** Prefix for the per-card "Day N" label. The day number is appended
    *  by the component, e.g. `${dayLabel} ${a.day}`. */

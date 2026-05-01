@@ -90,8 +90,8 @@ export const story = {
         es: 'Edades'
       }),
       value: createTranslation({
-        en: '14–18',
-        es: '14–18'
+        en: '10–20',
+        es: '10–20'
       })
     },
     {
@@ -100,8 +100,8 @@ export const story = {
         es: 'Fechas'
       }),
       value: createTranslation({
-        en: 'TBD',
-        es: 'Por confirmar'
+        en: 'July 5–19, 2026',
+        es: '5–19 julio, 2026'
       })
     }
   ] satisfies StoryFact[]

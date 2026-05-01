@@ -45,8 +45,8 @@ export const faq = {
         es: '¿Para quién es el campamento?'
       }),
       answer: createTranslation({
-        en: 'Curious students aged 14–18, with or without prior coding experience. Beginners pick the Beginner track and work up from zero; more advanced students pick the Advanced track and dive straight into olympiad-level material. Everyone shares the extracurricular programme.',
-        es: 'Estudiantes curiosos de 14 a 18 años, con o sin experiencia previa en programación. Los principiantes eligen la ruta Principiante y avanzan desde cero; los más avanzados eligen la ruta Avanzada y se sumergen directamente en material de nivel olimpiada. Todos comparten el programa extracurricular.'
+        en: 'Curious students aged 10 to 20, with or without prior coding experience. Beginners pick the Beginner track and work up from zero; more advanced students pick the Advanced track and dive straight into olympiad-level material. Everyone shares the extracurricular programme.',
+        es: 'Estudiantes curiosos de 10 a 20 años, con o sin experiencia previa en programación. Los principiantes eligen la ruta Principiante y avanzan desde cero; los más avanzados eligen la ruta Avanzada y se sumergen directamente en material de nivel olimpiada. Todos comparten el programa extracurricular.'
       })
     },
     {

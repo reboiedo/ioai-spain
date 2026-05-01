@@ -191,7 +191,10 @@ const t = useTenerifeTranslations(locale);
     display: flex;
     flex-direction: column;
     gap: var(--space-s);
-    max-width: 48ch;
+    /* 59ch: wide enough to keep "10 to 20" on the same line as
+     * "aged" so the age range doesn't orphan onto its own row,
+     * with a touch of extra slack for the longer Spanish lede. */
+    max-width: 59ch;
     opacity: 0.9;
   }
 
@@ -208,13 +211,13 @@ const t = useTenerifeTranslations(locale);
 
   /* The two halves render inline on desktop so the paragraph reads
    * as one continuous flow (CSS handles the natural wrap inside the
-   * 48ch max-width). Mobile flips them to block-level so each span
+   * 59ch max-width). Mobile flips them to block-level so each span
    * lands on its own line — exactly two lines, controlled split. */
   .hero__lede-line {
     display: inline;
   }
 
-  /* Tablet portrait + mobile: anchor the 48ch box to the right inset
+  /* Tablet portrait + mobile: anchor the 59ch box to the right inset
    * and right-align the text. iPad Mini portrait (768px) sits just
    * above the old 767.98 cutoff and would otherwise land in desktop
    * styling (lede stranded mid-screen). 1023.98 covers every
