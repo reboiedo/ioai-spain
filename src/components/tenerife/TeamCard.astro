@@ -14,7 +14,7 @@
  *   <TeamCard initials="VA" name="Vladimir Arkhipov" bio="…" />
  */
 
-import { Image, type ImageMetadata } from "astro:assets";
+import { Picture, type ImageMetadata } from "astro:assets";
 
 export interface Props {
   initials: string;
@@ -47,10 +47,11 @@ const nameRest = spaceIndex === -1 ? "" : name.slice(spaceIndex + 1);
   <div class="team-card__face">
     <div class="team-card__portrait" data-initials={initials} data-team-portrait>
       {image && (
-        <Image
+        <Picture
           class="team-card__photo"
           src={image}
           alt={`Portrait of ${name}`}
+          formats={["avif", "webp"]}
           widths={[240, 360, 480, 640]}
           sizes="(min-width: 768px) 22vw, 45vw"
           loading="lazy"

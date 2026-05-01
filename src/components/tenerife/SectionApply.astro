@@ -33,7 +33,7 @@
  * passing the same component), supply `images` explicitly.
  */
 
-import { Image, type ImageMetadata } from "astro:assets";
+import { Picture, type ImageMetadata } from "astro:assets";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
 import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
 
@@ -107,9 +107,10 @@ const photos: (ImageMetadata | null)[] = Array.from(
         {photos.map((img, i) => (
           <div class={`image-trail__photo image-trail__photo--${i + 1}`} data-photo>
             {img ? (
-              <Image
+              <Picture
                 src={img}
                 alt=""
+                formats={["avif", "webp"]}
                 width={320}
                 height={320}
                 loading="lazy"

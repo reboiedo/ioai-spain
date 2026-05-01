@@ -9,6 +9,13 @@ import tenerifeTokens from "./src/integrations/tokens.mjs";
 
 // https://astro.build/config
 export default defineConfig({
+  // Production origin. Lighthouse SEO requires `rel=canonical` to be
+  // an absolute URL; with `site` set, `Astro.url.href` resolves to
+  // the full origin + pathname during build, so the canonical /
+  // og:url / twitter:url tags rendered by Head.astro all ship as
+  // absolute URLs without any per-page wiring.
+  site: 'https://ioai-spain.org',
+
   // Hide Astro's floating dev toolbar (the icon at the bottom of the
   // viewport during `astro dev`). astro-tunnel is unaffected — this
   // only disables the in-page toolbar overlay.
@@ -45,6 +52,26 @@ export default defineConfig({
       weights: [400],
     },
   ],
+
+  // Sharp service config — sane per-format quality defaults so the
+  // <Picture> output across the page emits AVIF and WebP variants
+  // tuned to a reasonable size/quality trade. No `image.layout` /
+  // `image.responsiveStyles` here on purpose: those knobs inject
+  // global responsive styles that fight per-component CSS (and
+  // were what caused the prod-blank regression last time we tried
+  // to turn them on). Per-image `widths` + `sizes` on every
+  // <Picture> call site already drive responsive selection.
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp',
+      config: {
+        avif: { quality: 50 },
+        webp: { quality: 75 },
+        jpeg: { quality: 82, mozjpeg: true, progressive: true },
+        png: { compressionLevel: 9 },
+      },
+    },
+  },
 
   integrations: [tenerifeTokens(), tunnel(), icon()],
 });

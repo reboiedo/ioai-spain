@@ -15,7 +15,7 @@
  * bails and a fallback CSS marquee is shown instead.
  */
 
-import { Image, type ImageMetadata } from "astro:assets";
+import { Picture, type ImageMetadata } from "astro:assets";
 import wave1 from "@/assets/tenerife/hero/wave-1.png";
 import wave2 from "@/assets/tenerife/hero/wave-2.png";
 import wave3 from "@/assets/tenerife/hero/wave-3.png";
@@ -48,10 +48,11 @@ const tiles = [...images, ...images];
     <div class="hero-wave__track">
       {tiles.map((img) => (
         <div class="hero-wave__tile">
-          <Image
+          <Picture
             class="hero-wave__img"
             src={img}
             alt=""
+            formats={["avif", "webp"]}
             widths={[320, 480, 640]}
             sizes="20vw"
             loading="eager"

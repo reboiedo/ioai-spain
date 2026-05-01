@@ -32,7 +32,7 @@
  * folder is empty so the layout reads correctly during dev.
  */
 
-import { Image, type ImageMetadata } from "astro:assets";
+import { Picture, type ImageMetadata } from "astro:assets";
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import SectionTitle from "@/components/tenerife/SectionTitle.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
@@ -123,9 +123,10 @@ const marqueeRowB = [
               data-day-trail-photo
               data-day-trail-index={String(i)}
             >
-              <Image
+              <Picture
                 src={photo}
                 alt=""
+                formats={["avif", "webp"]}
                 width={320}
                 height={400}
                 widths={[240, 360, 480]}
@@ -175,9 +176,10 @@ const marqueeRowB = [
             <div class="day__marquee-track" data-day-marquee-track>
               {[...marqueeRowA, ...marqueeRowA].map((photo) => (
                 <div class="day__marquee-card">
-                  <Image
+                  <Picture
                     src={photo}
                     alt=""
+                    formats={["avif", "webp"]}
                     widths={[180, 240, 320]}
                     sizes="9rem"
                     loading="lazy"
@@ -191,9 +193,10 @@ const marqueeRowB = [
             <div class="day__marquee-track" data-day-marquee-track>
               {[...marqueeRowB, ...marqueeRowB].map((photo) => (
                 <div class="day__marquee-card">
-                  <Image
+                  <Picture
                     src={photo}
                     alt=""
+                    formats={["avif", "webp"]}
                     widths={[180, 240, 320]}
                     sizes="9rem"
                     loading="lazy"

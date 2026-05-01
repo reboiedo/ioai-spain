@@ -1,0 +1,13 @@
+# IOAI Spain — robots.txt
+#
+# Allow all crawlers everywhere except the legacy /tenerife-camp/
+# preview routes (kept around for design comparison; the canonical
+# camp page is /tenerife-summer-camp/, which carries the meta tag
+# `<meta name="robots" content="noindex, nofollow">` separately).
+
+User-agent: *
+Allow: /
+Disallow: /tenerife-camp/
+Disallow: /es/tenerife-camp/
+
+Sitemap: https://ioai-spain.org/sitemap-index.xml

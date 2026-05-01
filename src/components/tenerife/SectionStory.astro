@@ -28,7 +28,7 @@
 
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
-import { Image, type ImageMetadata } from "astro:assets";
+import { Image, Picture, type ImageMetadata } from "astro:assets";
 import harbourLogo from "@/assets/harbour-space-logo.svg";
 import leaguesLogo from "@/assets/icons/leagues-logo.svg";
 import spikes from "@/assets/tenerife/story/spikes.svg";
@@ -130,7 +130,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
         <HScrollMobile itemWidth="min(86%, 380px)">
           {items.map((it, i) => (
             <article class="story-item" data-story-item-index={i}>
-              <h3 class="font-h4 story-item__label">{it.label}</h3>
+              <h2 class="font-h4 story-item__label">{it.label}</h2>
               <p class="font-body story-item__body">{it.body}</p>
               {/* First pillar names Harbour.Space + Leagues of Code,
                   so the sponsor logos sit directly under its body
@@ -220,10 +220,11 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
           data-story-video-trigger
         >
           {posterImage ? (
-            <Image
+            <Picture
               class="story__video-img"
               src={posterImage}
               alt=""
+              formats={["avif", "webp"]}
               widths={[480, 720, 960]}
               sizes="(min-width: 768px) 30vw, 70vw"
               loading="lazy"
@@ -231,10 +232,11 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
           ) : storyPosters.length > 0 ? (
             <div class="story__video-stack" data-story-stack>
               {storyPosters.map((src, i) => (
-                <Image
+                <Picture
                   class="story__video-img story__video-img--stacked"
                   src={src}
                   alt=""
+                  formats={["avif", "webp"]}
                   widths={[480, 720, 960]}
                   sizes="(min-width: 768px) 30vw, 70vw"
                   loading={i === 0 ? "eager" : "lazy"}
@@ -266,6 +268,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
         data-playback-id={muxPlaybackId}
         data-video-title={muxVideoTitle}
         aria-hidden="true"
+        inert
         style={`--overlay-aspect: ${muxAspect};`}
       >
         <div class="story__overlay-backdrop" data-story-overlay-backdrop></div>
@@ -384,6 +387,12 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
 
   .story__lede {
     margin: 0;
+    /* WCAG AA: white-on-orange body text at 20px clears only 3:1
+     * which is below the 4.5:1 threshold for normal-weight text.
+     * Bumping to 700 weight lets it qualify as "large text" (14pt
+     * bold) which only needs 3:1. Visually still reads as a lede,
+     * not a heading. */
+    font-weight: 700;
   }
 
   /* Facts list. Mobile: Apple-store-style vertical rows (label
@@ -962,13 +971,17 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
    * playback-id attribute. Browsers upgrade the unknown element to
    * the real player as soon as the import lands.
    *
-   * The static import is intentional (vs. the previous dynamic
-   * `import()`): Vite's dev-mode optimize-deps caches the bundle on
-   * first server start, and on-demand imports of newly-installed
-   * packages can hit a stale cache → "Outdated Optimize Dep" 504.
-   * Static imports get bundled with the page entry, no surprises.
-   */
-  import '@mux/mux-player';
+   * Lazy-loaded on first click of the video poster — the mux-player
+   * bundle is ~150 kB gzip and would otherwise block LCP / inflate
+   * the initial JS payload on every visit, even for users who never
+   * play the video. The dynamic import registers `<mux-player>` and
+   * then the upgraded custom element starts playback. Subsequent
+   * opens reuse the same module (resolved by the bundler cache). */
+  let muxPlayerLoaded: Promise<unknown> | null = null;
+  function loadMuxPlayer() {
+    if (!muxPlayerLoaded) muxPlayerLoaded = import('@mux/mux-player');
+    return muxPlayerLoaded;
+  }
 
   function initStoryOverlay() {
     const overlay = document.querySelector<HTMLElement>('[data-story-overlay]');
@@ -996,7 +1009,15 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
 
     function open() {
       overlay!.setAttribute('aria-hidden', 'false');
+      // `inert` makes the overlay's children unreachable via tab,
+      // matching the aria-hidden state. We toggle it together.
+      overlay!.removeAttribute('inert');
       document.documentElement.setAttribute('data-story-overlay-open', 'true');
+      // Kick off the mux-player import (no-op after first call).
+      // The element exists statically in the DOM and upgrades to the
+      // real player once the module lands; .play() races the upgrade
+      // and is queued automatically by the custom-element machinery.
+      loadMuxPlayer();
       // Stop Lenis. CSS `overflow: hidden` doesn't suffice — Lenis
       // intercepts wheel/touch events and continues scrolling the
       // page underneath. The page-init script listens for this
@@ -1016,6 +1037,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
 
     function close() {
       overlay!.setAttribute('aria-hidden', 'true');
+      overlay!.setAttribute('inert', '');
       document.documentElement.removeAttribute('data-story-overlay-open');
       window.dispatchEvent(new CustomEvent('tenerife:unlock-scroll'));
       try {
@@ -1043,6 +1065,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
     if (!overlay) return;
     overlay.removeAttribute('data-hooked');
     overlay.setAttribute('aria-hidden', 'true');
+    overlay.setAttribute('inert', '');
     document.documentElement.removeAttribute('data-story-overlay-open');
     const player = overlay.querySelector<HTMLElement>('[data-story-overlay-player]');
     if (player) {

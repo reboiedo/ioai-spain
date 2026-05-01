@@ -23,7 +23,7 @@
  * cards (2×2), then supervisors grid (2-up).
  */
 
-import { Image, type ImageMetadata } from "astro:assets";
+import { Picture, type ImageMetadata } from "astro:assets";
 import HeroTitleStack from "@/components/tenerife/HeroTitleStack.astro";
 import safetyImage from "@/assets/tenerife/safety/safety.jpg";
 import safetyIcon from "@/assets/tenerife/safety/safety.svg";
@@ -98,10 +98,11 @@ const supervisors = t.safety.supervisors;
               <li class="supervisor-card">
                 <div class="supervisor-card__portrait">
                   {s.imageKey && supervisorPhotos[s.imageKey] ? (
-                    <Image
+                    <Picture
                       class="supervisor-card__photo"
                       src={supervisorPhotos[s.imageKey]}
                       alt={s.name}
+                      formats={["avif", "webp"]}
                       widths={[120, 180, 240]}
                       sizes="(min-width: 768px) 12vw, 30vw"
                       loading="lazy"
@@ -169,10 +170,11 @@ const supervisors = t.safety.supervisors;
         <!-- Tilted photograph — sits between the two title lines
              (overlapping both visually). Static image, no click. -->
         <div class="safety__photo">
-          <Image
+          <Picture
             class="safety__photo-img"
             src={safetyImage}
             alt={t.safety.photoAlt}
+            formats={["avif", "webp"]}
             widths={[480, 720, 960]}
             sizes="(min-width: 768px) 30vw, 70vw"
             loading="lazy"

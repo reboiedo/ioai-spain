@@ -8,6 +8,21 @@
 @import './tenerife/tokens.css';
 @import './tenerife/utilities.css';
 
+/* Astro's <Picture> wraps the <img> in a <picture> element which
+ * defaults to `display: inline`. Existing `.foo__img { width:100%;
+ * height:100% }` rules across these components were written for the
+ * pre-Picture <Image> output (a bare img); when wrapped in an inline
+ * <picture> they resolve against the inline box and produce
+ * letterbox stripes. `display: contents` makes the <picture>
+ * transparent to layout — its <source> children are non-rendering,
+ * so the <img> reads as a direct child of the parent grid/flex/grid.
+ * Scoped to the camp pages so this can't affect other parts of the
+ * site that may have their own <picture> assumptions. */
+.tenerife-camp-v2 picture,
+.tenerife-camp-page picture {
+  display: contents;
+}
+
 /* PP Neue Corp Condensed Ultrabold — self-hosted local font.
  *
  * The primitive `--font-neue-corp` below is referenced by the

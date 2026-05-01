@@ -19,7 +19,7 @@
  * activities by index after a `01-…`, `02-…` filename sort.
  */
 
-import { Image, type ImageMetadata } from "astro:assets";
+import { Picture, type ImageMetadata } from "astro:assets";
 import HScrollMobile from "@/components/tenerife/HScrollMobile.astro";
 import HeroTitle from "@/components/tenerife/HeroTitle.astro";
 import { useTenerifeTranslations, type Language } from "@/i18n/tenerife";
@@ -177,10 +177,11 @@ const total = activities.length;
                 data-active={i === 0 ? "true" : undefined}
               >
                 {photos[i] ? (
-                  <Image
+                  <Picture
                     class="adv__photo-img"
                     src={photos[i]}
                     alt={a.title}
+                    formats={["avif", "webp"]}
                     widths={[640, 960, 1280, 1600]}
                     sizes="(min-width: 768px) 50vw, 100vw"
                     loading={i < 2 ? "eager" : "lazy"}
@@ -211,14 +212,14 @@ const total = activities.length;
             class="ap-card"
             aria-expanded="false"
             data-ap-card
-            aria-label={`${t.activities.dayLabel} ${a.day}: ${a.title} — ${t.activities.cardTapHint}`}
           >
             <div class="ap-card__photo">
               {photos[i] && (
-                <Image
+                <Picture
                   class="ap-card__img"
                   src={photos[i]}
                   alt={a.title}
+                  formats={["avif", "webp"]}
                   widths={[320, 480, 640]}
                   sizes="80vw"
                   loading="lazy"
@@ -227,7 +228,7 @@ const total = activities.length;
             </div>
             <div class="ap-card__head">
               <p class="font-caption ap-card__day">{t.activities.dayLabel} {a.day}</p>
-              <h3 class="font-caption-script ap-card__title">{a.title}</h3>
+              <h2 class="font-caption-script ap-card__title">{a.title}</h2>
             </div>
             <div class="ap-card__body">
               <p class="font-body-s ap-card__description">{a.description}</p>
