@@ -2,6 +2,15 @@
    Tenerife Summer Camp - Custom Styles
    ======================================== */
 
+/* Astro's <Picture> wraps the <img> in a <picture> element which
+ * defaults to `display: inline` — that breaks `width: 100%` on the
+ * inner <img>. `display: contents` makes the <picture> wrapper
+ * transparent to layout so existing `.foo__img` width/height rules
+ * keep working post-conversion. */
+.tenerife-camp-page picture {
+  display: contents;
+}
+
 /*
   Color Palette extracted from target page:
   - Primary: Bright Red/Orange (#e34b2a)

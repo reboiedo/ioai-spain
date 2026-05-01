@@ -3,6 +3,26 @@
    astro.config.mjs and injected by TenerifeCampV2Layout — do not add
    @import url() here. */
 
+/* Astro's <Picture> wraps the <img> in a <picture> element. Browsers
+ * default <picture> to `display: inline`, which means the inner
+ * <img>'s `width: 100%; height: 100%; object-fit: cover` resolves
+ * against the inline picture box (intrinsic size) instead of the
+ * grid / flex cell that the original <Image> used to fill. The
+ * symptom is letterbox stripes (white space top + bottom of photos
+ * inside aspect-ratio-locked cells, e.g. SectionVenue).
+ *
+ * `display: contents` makes the <picture> wrapper transparent to
+ * layout — the <source> children are non-rendering anyway, and the
+ * <img> becomes a direct child of the parent grid / flex container.
+ * Every `.foo__img { width: 100%; height: 100% }` rule from the
+ * pre-Picture era starts working again with no per-component change.
+ * Scoped to the camp pages so this can't affect other parts of the
+ * site that may have their own assumptions about <picture>. */
+.tenerife-camp-v2 picture,
+.tenerife-camp-page picture {
+  display: contents;
+}
+
 /* CSS spec: @import MUST come before any other rules (except
  * @charset / @layer). Keep them first. */
 @import './tenerife/tokens.css';
