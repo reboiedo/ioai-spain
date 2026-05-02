@@ -60,20 +60,5 @@ const locale: Language = 'en';
 
 <script>
   import { initTenerifeCampPage } from '@/scripts/tenerife/page-init';
-
-  // Defer the heavy init pass (Lenis smooth-scroll + ScrollTrigger
-  // pin setup + tilt registration) past first paint. Lighthouse
-  // measured `index.*.js` doing 2.2 s of work on the critical path
-  // — most of it boilerplate that doesn't need to block LCP. Wrap
-  // in `requestIdleCallback` so the browser can paint the hero
-  // text + image first and run this when it's idle. Falls back to
-  // a 50 ms timeout where rIC isn't available (Safari < 16 quirks).
-  function deferred(fn: () => void) {
-    if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(fn, { timeout: 1500 });
-    } else {
-      setTimeout(fn, 50);
-    }
-  }
-  deferred(initTenerifeCampPage);
+  initTenerifeCampPage();
 </script>

@@ -45,16 +45,16 @@
   --color-orange-950: oklch(0.174 0.071 29.2);
   --color-white: oklch(1 0 250);
   --color-yellow-50: oklch(0.977 0.029 89.6);
-  --color-yellow-100: oklch(0.945 0.061 86.4);
-  --color-yellow-200: oklch(0.911 0.092 83.8);
-  --color-yellow-300: oklch(0.874 0.121 80.5);
-  --color-yellow-400: oklch(0.829 0.14 76.7);
-  --color-yellow-500: oklch(0.753 0.145 76.9);
-  --color-yellow-600: oklch(0.656 0.139 74.4);
-  --color-yellow-700: oklch(0.544 0.121 66.3);
-  --color-yellow-800: oklch(0.422 0.102 56.8);
-  --color-yellow-900: oklch(0.301 0.086 45.3);
-  --color-yellow-950: oklch(0.184 0.076 29.2);
+  --color-yellow-100: oklch(0.941 0.062 84.5);
+  --color-yellow-200: oklch(0.904 0.096 82.5);
+  --color-yellow-300: oklch(0.864 0.125 78.4);
+  --color-yellow-400: oklch(0.81 0.14 77.2);
+  --color-yellow-500: oklch(0.733 0.142 77);
+  --color-yellow-600: oklch(0.635 0.134 74.1);
+  --color-yellow-700: oklch(0.528 0.118 66.1);
+  --color-yellow-800: oklch(0.412 0.103 54.2);
+  --color-yellow-900: oklch(0.295 0.094 39.5);
+  --color-yellow-950: oklch(0.197 0.081 29.2);
   --leading-display: 0.85;
   --leading-loose: 2;
   --leading-none: 1;
@@ -279,8 +279,8 @@
   --accent: var(--color-black);
   --accent-foreground: var(--color-white);
   --accent-foreground-muted: var(--color-neutrals-200);
-  --background: var(--color-yellow-500);
-  --border: var(--color-yellow-400);
+  --background: var(--color-yellow-400);
+  --border: var(--color-yellow-300);
   --card: var(--color-black);
   --card-border: var(--color-neutrals-800);
   --card-foreground: var(--color-white);
@@ -295,5 +295,5 @@
   --secondary-border: var(--color-neutrals-100);
   --secondary-foreground: var(--color-black);
   --secondary-foreground-muted: var(--color-neutrals-700);
-  --surface: var(--color-yellow-400);
+  --surface: var(--color-yellow-300);
 }
