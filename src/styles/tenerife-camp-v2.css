@@ -47,16 +47,31 @@
   font-weight: 800;
   font-style: normal;
   font-display: swap;
+  /* Tighten the metrics-mismatch jump on font swap. PP Neue Corp
+   * Condensed Ultrabold is much taller and narrower than the
+   * fallback Impact/Arial Narrow; without overrides the cap-height
+   * and line-box of the fallback don't line up with the real font,
+   * so on swap the giant hero title visibly leaps upward. These
+   * percentages bring the fallback's effective metrics close to
+   * the real font (calibrated by eye against the rendered hero —
+   * tweak if you swap the .woff2 for a different cut). */
+  size-adjust: 96%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 :root {
   /* Primitive font stack: `'PP Neue Corp Condensed'` (our @font-face
-   * family above), with Inter Tight as the fallback so the temporary
-   * FOUT swap stays within the "2 families" rule (Neue Corp for
-   * display, Inter Tight for everything else). Referenced by
-   * `tokens/tenerife/tokens.json` → `core.font.neue-corp` →
-   * `--font-neue-corp` → consumed by `.font-display` / `.font-display-l`. */
-  --font-neue-corp: 'PP Neue Corp Condensed', var(--font-inter-tight), sans-serif;
+   * family above), with `Impact` and `'Arial Narrow Bold'` as
+   * fallbacks. Both are condensed bold system fonts present on
+   * basically every desktop / mobile OS (Impact ships with macOS,
+   * Windows, and most Linux distros via msttcorefonts; Arial
+   * Narrow Bold is the Windows/Office equivalent). They're
+   * dimensionally far closer to PP Neue Corp than Inter Tight or
+   * a generic `sans-serif`, so the swap-on-load doesn't reflow
+   * the giant hero title noticeably. */
+  --font-neue-corp: 'PP Neue Corp Condensed', Impact, 'Arial Narrow Bold', 'Helvetica Neue Condensed', sans-serif;
 }
 
 /* Re-scope Tenerife font tokens under the page wrapper.
@@ -72,5 +87,21 @@
   --font-heading: var(--font-inter-tight);
   --font-body: var(--font-inter-tight);
   --font-script: var(--font-rock-salt);
+}
+
+/* `--font-sans` was inherited from BaseLayout's `"Funnel Sans"`
+ * which is never @font-face-loaded on this page — meaning every
+ * component that uses `var(--font-sans)` (the global Button,
+ * Dropdown, etc.) silently fell back to `ui-sans-serif` /
+ * `system-ui`, producing a visible letter-spacing jump in the
+ * nav between the very first paint (default UA font) and after
+ * CSS resolved. Apply the override at the `body` level (NOT on
+ * `.tenerife-camp-v2`) because the `<nav>` is a sibling of `<main>`
+ * — it lives outside the wrapper, so a wrapper-scoped override
+ * doesn't cascade into the nav buttons. Scoped to camp pages via
+ * `body:has(.tenerife-camp-v2)` so other parts of the site keep
+ * their original font tokens. */
+body:has(.tenerife-camp-v2) {
+  --font-sans: var(--font-inter-tight);
 }
 
