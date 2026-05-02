@@ -148,8 +148,8 @@
                   "curve": "linear",
                   "end": 0.12,
                   "overrides": {
-                    "200": 0.8,
-                    "500": 0.6212633306810114
+                    "200": 0.81,
+                    "500": 0.64
                   },
                   "start": 0.96
                 },
@@ -277,7 +277,7 @@
   "designSystem": {
     "name": "Tenerife Camp"
   },
-  "generatedAt": "2026-05-01T19:32:48.242Z",
+  "generatedAt": "2026-05-02T00:06:23.236Z",
   "modes": [
     "default",
     "orange",
