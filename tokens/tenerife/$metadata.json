@@ -158,9 +158,10 @@
               {
                 "chroma": {
                   "curve": "ease-in-out",
-                  "end": 0.15,
+                  "end": 0.12,
                   "overrides": {
-                    "400": 0.14
+                    "400": 0.14,
+                    "700": 0.15
                   },
                   "start": 0.03
                 },
@@ -176,7 +177,7 @@
                   "curve": "ease-out",
                   "end": 0.18,
                   "overrides": {
-                    "400": 0.81
+                    "400": 0.83
                   },
                   "start": 0.98
                 },
@@ -277,7 +278,7 @@
   "designSystem": {
     "name": "Tenerife Camp"
   },
-  "generatedAt": "2026-05-02T00:06:23.236Z",
+  "generatedAt": "2026-05-02T00:39:58.856Z",
   "modes": [
     "default",
     "orange",
