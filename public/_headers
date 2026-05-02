@@ -1,0 +1,33 @@
+# Cloudflare Pages — long-term cache for content-hashed assets.
+#
+# Files under /_astro/ have content hashes baked into their
+# filenames (e.g. `hero-1.Cl7FrJw7_Z2ui7Ax.avif`), so any change
+# to the source produces a new URL. That means we can serve them
+# with `immutable` + a 1-year max-age — the browser will never
+# need to re-validate, and the only way an updated build can
+# affect a user is via a fresh URL.
+#
+# Same logic applies to the self-hosted display font under /fonts/.
+# Astro Fonts API output (under /_astro/fonts/) is already covered
+# by the /_astro/ rule above.
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# robots.txt + the OG / favicon images change rarely but aren't
+# hashed, so a one-day cache is the right trade — fast repeat
+# loads but a same-day publish will refresh.
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/favicon.svg
+  Cache-Control: public, max-age=86400
+
+/og-tenerife.png
+  Cache-Control: public, max-age=86400
+
+/og-tenerife-es.png
+  Cache-Control: public, max-age=86400

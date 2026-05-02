@@ -60,5 +60,15 @@ const locale: Language = 'es';
 
 <script>
   import { initTenerifeCampPage } from '@/scripts/tenerife/page-init';
-  initTenerifeCampPage();
+
+  // Defer the heavy init pass past first paint. See the EN page
+  // for the rationale — same comment, same fallback. */
+  function deferred(fn: () => void) {
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(fn, { timeout: 1500 });
+    } else {
+      setTimeout(fn, 50);
+    }
+  }
+  deferred(initTenerifeCampPage);
 </script>
