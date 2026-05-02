@@ -16,6 +16,19 @@ export default defineConfig({
   // absolute URLs without any per-page wiring.
   site: 'https://ioai-spain.org',
 
+  // Inline scoped component CSS into the HTML rather than emitting
+  // shared external stylesheets. Astro's default ('auto') bundled
+  // ~22 components' scoped styles into a single 71 KB single-line
+  // CSS chunk (`SectionTestimonials.<hash>.css`) which Cloudflare
+  // Pages was 500-ing on, even though the file existed and other
+  // <30 KB CSS files served fine. Inlining sidesteps the issue
+  // entirely AND removes one render-blocking external request,
+  // which improves FCP. Tradeoff: HTML is slightly larger and not
+  // cached separately, but HTML is `must-revalidate` regardless. */
+  build: {
+    inlineStylesheets: 'always',
+  },
+
   // Hide Astro's floating dev toolbar (the icon at the bottom of the
   // viewport during `astro dev`). astro-tunnel is unaffected — this
   // only disables the in-page toolbar overlay.
