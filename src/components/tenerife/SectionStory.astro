@@ -956,22 +956,16 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
    *
    * Following the canonical pattern from
    * https://www.mux.com/docs/guides/mux-player-web — the side-effect
-   * import registers the `<mux-player>` custom element. We dynamic-
-   * import it lazily inside `ensurePlayer()` so the ~150 kB gzip
-   * bundle is only fetched after the user actually clicks the video
-   * poster — Lighthouse flagged this as 250+ kB of unused JS on
-   * initial load.
-   *
-   * Vite's optimize-deps would otherwise 504 ("Outdated Optimize
-   * Dep") on the first dynamic request after a config change; this
-   * is hedged by `vite.optimizeDeps.include = ['@mux/mux-player']`
-   * in astro.config.mjs which forces the package into the pre-bundle
-   * up front. */
-  let muxImported: Promise<unknown> | null = null;
-  function loadMuxPlayer() {
-    if (!muxImported) muxImported = import('@mux/mux-player');
-    return muxImported;
-  }
+   * import registers the `<mux-player>` custom element. We keep the
+   * static import (vs. a lazy dynamic one): the dynamic path worked
+   * in dev but the prod bundle race produced a "Source Not
+   * Supported / DEMUXER_ERROR_COULD_NOT_PARSE" intermittently, and
+   * shipping a 250 kB unused chunk to LCP is a smaller cost than a
+   * broken video. We still get most of the perf win because the
+   * <mux-player> element itself isn't mounted in the DOM until the
+   * first user click on the poster (see `ensurePlayer`) — no
+   * thumbnail probes, no Cast SDK init while idle. */
+  import '@mux/mux-player';
 
   function initStoryOverlay() {
     const overlay = document.querySelector<HTMLElement>('[data-story-overlay]');
@@ -1022,15 +1016,8 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
       return v.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
     }
     let player: HTMLElement | null = null;
-    async function ensurePlayer(): Promise<HTMLElement> {
+    function ensurePlayer(): HTMLElement {
       if (player) return player;
-      // Wait for the bundle to land + the custom element to register
-      // before injecting the markup, so the parser performs a single
-      // attribute-aware upgrade pass and the player isn't briefly an
-      // HTMLUnknownElement (which produced "DEMUXER_ERROR_COULD_NOT_
-      // PARSE" on a previous attempt that called .play() too early).
-      await loadMuxPlayer();
-      await customElements.whenDefined('mux-player');
       playerMount!.innerHTML = `
         <mux-player
           data-story-overlay-player
@@ -1047,7 +1034,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
       return player!;
     }
 
-    async function open() {
+    function open() {
       overlay!.setAttribute('aria-hidden', 'false');
       // `inert` makes the overlay's children unreachable via tab,
       // matching the aria-hidden state. We toggle it together.
@@ -1058,7 +1045,7 @@ const sponsorLogos = [harbourLogo, leaguesLogo];
       // page underneath. The page-init script listens for this
       // event and calls `lenis.stop()`.
       window.dispatchEvent(new CustomEvent('tenerife:lock-scroll'));
-      const el = await ensurePlayer();
+      const el = ensurePlayer();
       // mux-player exposes the underlying media-element API on the
       // custom element itself — `.play()` is a real method. Most
       // browsers allow autoplay on user-initiated click; if the
