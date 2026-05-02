@@ -115,8 +115,10 @@ export function buildHeroTitleSvg({
     .map((cp, i) => {
       const zPick = (Math.sin(i * 17.913) * 43758.5453) % 1;
       const zIndex = zPick > 0 ? 3 : 1;
-      const endAttr = noStretch ? '' : ` data-end-scale-y="${endScales[i].toFixed(3)}"`;
-      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="z-index:${zIndex}"/>`;
+      const end = noStretch ? 1 : endScales[i];
+      const endAttr = noStretch ? '' : ` data-end-scale-y="${end.toFixed(3)}"`;
+      const styleAttr = `z-index:${zIndex};--scroll-sy:${end.toFixed(3)}`;
+      return `<path d="${cp.d}" data-char="${escapeAttr(cp.char)}"${endAttr} style="${styleAttr}"/>`;
     })
     .join('');
 

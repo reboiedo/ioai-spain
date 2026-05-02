@@ -66,6 +66,63 @@ const t = useTenerifeTranslations(locale);
 </div>
 
 <style>
+  /* Reveal-on-load animations — the giant title and the bottom
+   * lede both fade in with a small directional translate while
+   * the brand fonts (PP Neue Corp Condensed Ultrabold + Inter
+   * Tight) finish loading. Pure-CSS, no JS required: animations
+   * start as soon as the stylesheet parses, which is well before
+   * the @font-face fetches resolve, so the user only ever sees
+   * elements at their final position with the real font. The
+   * fallback-font swap that previously caused the visible jump
+   * happens during the opacity-0 portion of the animation — the
+   * cover IS the fix.
+   *
+   * Title slides up from below by ~24px; the lede mirrors it.
+   * Both ride a 580 ms cubic-bezier ease-out so the brand font
+   * almost certainly lands before the animation finishes on any
+   * non-cold-cache visit. `prefers-reduced-motion` strips the
+   * translate and shortens the fade for users who opt out.  */
+  /* Top-of-page reveal choreography. The hero title leads — slides
+   * down from above + scales up from a top-anchored origin, so the
+   * cap line stays roughly fixed and the bottom of the letters grows
+   * downward into final size. The nav follows ~280 ms later, as if
+   * the title's downward motion has dragged it in (see the nav
+   * keyframe + timing in TenerifeCampV2Layout.astro).
+   *
+   * Bottom-of-viewport reveal: the lede's eyebrow + copy slide up
+   * into place; the sticky Join CTA follows ~280 ms later as if the
+   * text was tugging the button up. Children of `.hero__lede` are
+   * the animation targets (rather than the lede itself) because the
+   * lede uses `transform: translateY(-100%)` for its bottom-edge
+   * anchoring — animating its transform would fight the layout. */
+  @keyframes hero-reveal-down {
+    from { transform: translateY(-110%); }
+    to   { transform: translateY(0); }
+  }
+
+  /* Bottom-group reveal: translate from below the viewport AND scale
+   * vertically from the top edge, so the text reads as unfurling
+   * downward into place while the whole element rises. The CTA gets
+   * the translate without the scale (see StickyJoinCta). */
+  @keyframes hero-reveal-from-bottom {
+    from {
+      opacity: 0;
+      transform: translateY(40vh) scaleY(0);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scaleY(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__title,
+    .hero__eyebrow,
+    .hero__lede-copy {
+      animation: none;
+    }
+  }
+
   .hero {
     position: relative; /* containing block for the absolutely-positioned wave */
     height: 100lvh;
@@ -93,6 +150,18 @@ const t = useTenerifeTranslations(locale);
     grid-row: 1;
     align-self: start;
     line-height: 0;
+    /* Initial state matches the keyframe `from` so there's no flash
+     * before the reveal starts. Full opacity throughout — the title
+     * is always visible, it just enters from above while scaling up. */
+    transform: translateY(-110%);
+    /* Slides down from above + scales up from a top-anchored
+     * origin (so the bottom of the title grows downward). Masks
+     * the font-swap jump from the condensed bold fallback to
+     * the real PP Neue Corp. See keyframe at top of file for
+     * rationale. */
+    transform-origin: center top;
+    will-change: transform;
+    animation: hero-reveal-down 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
     /* Push the title down by the nav height plus a small visible
      * gap so the cap-tops aren't kissing the nav line.
      *   - `var(--nav-height, 80px)` is JS-synced (see syncNavHeight
@@ -202,11 +271,24 @@ const t = useTenerifeTranslations(locale);
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    opacity: 0.8;
+    /* Hidden by default — animation `both` fill keeps the `from`
+     * state (opacity: 0, scaled to 0 from the top) during the delay
+     * window so there is no flash of natural-position text before
+     * the reveal kicks in. */
+    opacity: 0;
+    transform: translateY(40vh) scaleY(0);
+    transform-origin: top;
+    will-change: transform, opacity;
+    animation: hero-reveal-from-bottom 1000ms cubic-bezier(0.16, 1, 0.3, 1) 350ms both;
   }
 
   .hero__lede-copy {
     margin: 0;
+    opacity: 0;
+    transform: translateY(40vh) scaleY(0);
+    transform-origin: top;
+    will-change: transform, opacity;
+    animation: hero-reveal-from-bottom 1000ms cubic-bezier(0.16, 1, 0.3, 1) 350ms both;
   }
 
   /* The two halves render inline on desktop so the paragraph reads

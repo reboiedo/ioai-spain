@@ -60,6 +60,27 @@ const t = useTenerifeTranslations(locale);
       crossorigin
       fetchpriority="high"
     />
+    <!-- Critical reveal CSS, inlined so the bottom-group elements are
+         guaranteed hidden before first paint — even on a hard refresh
+         where the scoped page stylesheet may arrive after the HTML.
+         Without this the eyebrow / lede / sticky CTA briefly flash at
+         their natural position before the scoped CSS lands and snaps
+         them to the keyframe `from` state. Selectors match the rules
+         in SectionHero.astro / StickyJoinCta.astro — keep them in
+         sync if either changes. -->
+    <style is:inline>
+      .hero__title { transform: translateY(-110%); }
+      .hero__eyebrow,
+      .hero__lede-copy {
+        opacity: 0;
+        transform: translateY(40vh) scaleY(0);
+        transform-origin: top;
+      }
+      .sticky-join-cta {
+        opacity: 0;
+        transform: translateY(40vh);
+      }
+    </style>
     <!-- Manual scroll restoration. The browser's default is to restore
          scroll BEFORE ScrollTrigger has measured positions, so pinned /
          scrubbed scenes paint against stale coordinates and jump. We
@@ -434,12 +455,36 @@ const t = useTenerifeTranslations(locale);
       stays legible against orange / blue / yellow backgrounds.
 -->
 <style is:global>
+  /* Nav reveal: slide down + fade in to mask the brief font-swap
+   * jump on the nav buttons (Inter Tight loading + the previously
+   * unloaded "Funnel Sans" fallback resolution). Pure CSS, runs
+   * on first paint regardless of font-load state — the visible
+   * nav only appears at its final state with the real font.
+   * Pairs with the matching reveal on the hero title + lede so
+   * the page comes together as one coordinated entrance. */
+  @keyframes nav-reveal-down {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body:has(.tenerife-camp-v2) nav {
+      animation: none;
+    }
+  }
+
   body:has(.tenerife-camp-v2) nav {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
+    /* Trails the hero title (`.hero__title` runs at t=0, 580ms).
+     * The 280ms delay starts the nav after the title is roughly
+     * halfway through its slide, so it reads as the title pulling
+     * the nav down with it. */
+    will-change: transform;
+    animation: nav-reveal-down 900ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
     /* Opaque nav background — colour matches whichever section is
      * currently under the nav (driven by the JS below). Fallback
      * to `transparent` for the hero region where no section has

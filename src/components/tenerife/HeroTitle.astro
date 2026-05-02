@@ -229,9 +229,11 @@ const svgMarkup = slotText
     }
   }
 
-  function animateGrowIn(paths: SVGPathElement[]) {
+  function wireMouseShrink(paths: SVGPathElement[]) {
     paths.forEach((path) => {
-      const end = parseFloat(path.dataset.endScaleY || '1');
+      // Letters ship pre-stretched: `--scroll-sy` is baked into the
+      // inline style by the build-time SVG generator, so we only need
+      // to add the mouse-proximity layer here.
       path.style.setProperty('--mouse-sy', '1');
       mouseTrackedPaths.push(path);
 
@@ -241,16 +243,6 @@ const svgMarkup = slotText
           duration: MOUSE_EASE_DURATION,
           ease: 'power2.out',
         }),
-      );
-
-      // Grow-only reveal: scaleY 1 → end (always >= 1) over 600ms.
-      // No compress phase, no scroll scrub — every letter stays
-      // anchored at its cap-line and only extends downward, so the
-      // row reads as growing taller in unison.
-      gsap.fromTo(
-        path,
-        { '--scroll-sy': 1 },
-        { '--scroll-sy': end, duration: 0.6, ease: 'power2.out' },
       );
     });
   }
@@ -269,7 +261,7 @@ const svgMarkup = slotText
       // `data-no-stretch` titles ship without scaleY data attrs — skip
       // the grow-in, paths render at natural height.
       if (title.dataset.noStretch !== '1') {
-        animateGrowIn(paths);
+        wireMouseShrink(paths);
       }
     });
 
