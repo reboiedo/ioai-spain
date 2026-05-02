@@ -30,6 +30,23 @@ const twitterHandle = '@ioaispain'; // Update with actual Twitter handle if avai
 ---
 
 <head>
+  <!-- Charset MUST be in the first 1024 bytes of the document
+       (Lighthouse "Best Practices" rule + browser parsing safety).
+       Keep it BEFORE the inline GTM bootstrap which used to push
+       it past the threshold. -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content={Astro.generator} />
+
+  <!-- Preconnect to the third-party origins we hit on every page so
+       the TLS handshake + DNS resolve happen in parallel with the
+       HTML parse, instead of serially when the script tags fire.
+       Order matters slightly: the highest-impact one (GTM) goes
+       first since it's the first script the page actually fetches. -->
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+  <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+  <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
+
   <!-- Google Tag Manager — must run as early as possible so the
        container has a chance to fire page-view events before any
        in-page scripts. Container ID lives on the IOAI Spain GTM
@@ -42,11 +59,6 @@ const twitterHandle = '@ioaispain'; // Update with actual Twitter handle if avai
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PST8FH3P');
   </script>
-
-  <!-- Essential Meta Tags -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="generator" content={Astro.generator} />
 
   <!-- SEO Meta Tags -->
   <title>{title}</title>

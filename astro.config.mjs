@@ -73,5 +73,16 @@ export default defineConfig({
     },
   },
 
+  // Force Vite to pre-bundle `@mux/mux-player` during `astro dev`
+  // so the dynamic `import('@mux/mux-player')` inside SectionStory
+  // resolves immediately instead of triggering an "Outdated Optimize
+  // Dep" 504 the first time the user clicks the video poster (which
+  // would leave the player un-upgraded and unable to play).
+  vite: {
+    optimizeDeps: {
+      include: ['@mux/mux-player'],
+    },
+  },
+
   integrations: [tenerifeTokens(), tunnel(), icon()],
 });
